@@ -5,3 +5,4 @@ export const UserDashBoard = () => {
     <div>UserDashBoard</div>
   )
 }
+export default UserDashBoard

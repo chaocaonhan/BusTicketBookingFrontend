@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react'
 import { FaBars, FaX } from 'react-icons/fa6';
 import { Link } from 'react-router-dom'
@@ -99,7 +97,7 @@ export const Navbar = () => {
                                 text-orange-500
                                 ease-in-out duration-300
                             "
-                            onClick={() => navigate('/register')}
+                            onClick={() => navigate('/login')}
                         >
                             Sign In
                         </button>
