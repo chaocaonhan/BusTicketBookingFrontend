@@ -1,14 +1,14 @@
 // src/components/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    matKhau: ''
+    email: "",
+    matKhau: "",
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -24,16 +24,22 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await authService.login(formData.email, formData.matKhau);
-      setMessage('Đăng nhập thành công!');
-      
+      const response = await authService.login(
+        formData.email,
+        formData.matKhau
+      );
+      setMessage("Đăng nhập thành công!");
+
+      // Dispatch event để Navbar cập nhật trạng thái
+      window.dispatchEvent(new Event("authChange"));
+
       const role = authService.getUserRole();
-      if (role === 'ADMIN') {
-        navigate('/admin/dashboard');
-      } else if (role === 'DRIVER') {
-        navigate('/driver/dashboard');
+      if (role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else if (role === "DRIVER") {
+        navigate("/driver/dashboard");
       } else {
-        navigate('/user/dashboard');
+        navigate("/user/dashboard");
       }
     } catch (error) {
       setMessage(error);
@@ -49,20 +55,25 @@ const Login = () => {
           <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
             Đăng Nhập
           </h2>
-          
+
           {message && (
-            <div className={`p-4 mb-6 rounded-lg text-sm font-medium ${
-              message.includes('thành công') 
-                ? 'bg-green-100 text-green-800 border-l-4 border-green-500' 
-                : 'bg-red-100 text-red-800 border-l-4 border-red-500'
-            }`}>
+            <div
+              className={`p-4 mb-6 rounded-lg text-sm font-medium ${
+                message.includes("thành công")
+                  ? "bg-green-100 text-green-800 border-l-4 border-green-500"
+                  : "bg-red-100 text-red-800 border-l-4 border-red-500"
+              }`}
+            >
               {message}
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-5">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email
               </label>
               <input
@@ -78,7 +89,10 @@ const Login = () => {
             </div>
 
             <div className="mb-6">
-              <label htmlFor="matKhau" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="matKhau"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Mật khẩu
               </label>
               <input
@@ -96,30 +110,48 @@ const Login = () => {
             <button
               type="submit"
               className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-300 ${
-                loading 
-                  ? 'bg-indigo-400 cursor-not-allowed' 
-                  : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'
+                loading
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
               }`}
               disabled={loading}
             >
               {loading ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8h8a8 8 0 11-16 0z"
+                    />
                   </svg>
                   Đang xử lý...
                 </span>
               ) : (
-                'Đăng nhập'
+                "Đăng nhập"
               )}
             </button>
           </form>
 
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
-              Chưa có tài khoản?{' '}
-              <a href="/register" className="text-indigo-600 font-medium hover:text-indigo-800 transition duration-200">
+              Chưa có tài khoản?{" "}
+              <a
+                href="/register"
+                className="text-indigo-600 font-medium hover:text-indigo-800 transition duration-200"
+              >
                 Đăng ký ngay
               </a>
             </p>

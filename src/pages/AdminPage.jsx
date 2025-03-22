@@ -1,13 +1,13 @@
-import React from 'react'
-import Layout from './Layout'
-import AdminDashBoard from '../components/AdminDashboard/AdminDashboard'
+import React from "react";
+import AdminDashBoard from "../components/AdminDashboard/AdminDashboard";
+import Layout from "./Layout";
 
 export const AdminPage = () => {
   return (
     <Layout>
       <AdminDashBoard></AdminDashBoard>
     </Layout>
-  )
-}
+  );
+};
 
-export default AdminPage
+export default AdminPage;
