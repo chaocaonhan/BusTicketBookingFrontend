@@ -117,10 +117,14 @@ export const Navbar = () => {
           <div className="p-4 md:p-0 relative">
             {isLoggedIn ? (
               <div className="group relative">
-                <button className="flex items-center gap-2 px-4 py-2 bg-white md:rounded-full rounded-xl text-orange-500 border border-red-500 font-normal hover:bg-gray-100 transition duration-300">
+                <button
+                  className="relative flex items-center gap-2 px-4 py-2 bg-white md:rounded-full rounded-xl text-orange-500 border border-red-500 font-normal hover:bg-gray-100 transition duration-300 
+                               after:absolute after:inset-[-8px] after:content-[''] after:bg-transparent"
+                >
                   <FaUser className="w-4 h-4" />
                   <span>{username}</span>
                 </button>
+
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 text-gray-700 md:text-sm z-50 hidden group-hover:block">
                   <Link
                     to="/user/profile"

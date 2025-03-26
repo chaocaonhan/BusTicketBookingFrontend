@@ -5,8 +5,8 @@ import authService from "../../services/authService";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: "",
-    matKhau: "",
+    email: "cnhan1154@gmail.com",
+    matKhau: "811766zz",
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
