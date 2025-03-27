@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    hoTen: '',
-    email: '',
-    matKhau: '',
-    SDT: ''
+    hoTen: "",
+    email: "",
+    matKhau: "",
+    SDT: "",
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const Register = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -43,7 +43,7 @@ const Register = () => {
     try {
       const response = await authService.register(formData);
       console.log("Response from API:", response); // Kiểm tra phản hồi
-  
+
       const userId = response.data; // Lấy userId từ response.data
       if (userId) {
         navigate(`/verify?userId=${userId}`);
@@ -57,15 +57,13 @@ const Register = () => {
       setLoading(false);
     }
   };
-  
-  
-  
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-700">Đăng Ký</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-700">
+          Đăng Ký
+        </h2>
         {message && (
           <div className="p-3 mt-3 text-sm text-blue-700 bg-blue-100 rounded-md">
             {message}
@@ -73,7 +71,12 @@ const Register = () => {
         )}
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="mb-4">
-            <label htmlFor="hoTen" className="block text-sm font-medium text-gray-600">Họ tên</label>
+            <label
+              htmlFor="hoTen"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Họ tên
+            </label>
             <input
               type="text"
               id="hoTen"
@@ -85,7 +88,12 @@ const Register = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -97,7 +105,12 @@ const Register = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="matKhau" className="block text-sm font-medium text-gray-600">Mật khẩu</label>
+            <label
+              htmlFor="matKhau"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Mật khẩu
+            </label>
             <input
               type="password"
               id="matKhau"
@@ -109,7 +122,12 @@ const Register = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="SDT" className="block text-sm font-medium text-gray-600">Số điện thoại</label>
+            <label
+              htmlFor="SDT"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Số điện thoại
+            </label>
             <input
               type="text"
               id="SDT"
@@ -125,11 +143,16 @@ const Register = () => {
             className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           >
-            {loading ? 'Đang xử lý...' : 'Đăng ký'}
+            {loading ? "Đang xử lý..." : "Đăng ký"}
           </button>
         </form>
         <div className="mt-4 text-center">
-          <p className="text-sm">Đã có tài khoản? <a href="/login" className="text-blue-500 hover:underline">Đăng nhập</a></p>
+          <p className="text-sm">
+            Đã có tài khoản?{" "}
+            <a href="/login" className="text-blue-500 hover:underline">
+              Đăng nhập
+            </a>
+          </p>
         </div>
       </div>
     </div>

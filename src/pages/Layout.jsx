@@ -12,8 +12,11 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <Navbar className="fixed top-0 left-0 w-full z-20 bg-white shadow-md" /> {/* Giả định Navbar là fixed */}
-      <main className="pt-16"> {/* Padding-top bằng chiều cao Navbar */}
+      <Navbar className="fixed top-0 left-0 w-full z-20 bg-white shadow-md p-0" />{" "}
+      {/* Giả định Navbar là fixed */}
+      <main className="pt-16">
+        {" "}
+        {/* Padding-top bằng chiều cao Navbar */}
         {children}
       </main>
       <Footer></Footer>

@@ -56,7 +56,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[url('./assets/nav-bg.png')] fixed w-full top-0 left-0 lg:px-24 md:px-16 sm:px-7 px-4 py-4 backdrop-blur-lg transition-transform duration-300 z-50">
+    <nav className="bg-[url('./assets/nav-bg.png')] fixed w-full top-0 left-0 lg:px-24 md:px-16 sm:px-7 px-4 py-4 backdrop-blur-lg transition-transform duration-300 z-50 p-0">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo section */}
         <Link to="/" className="text-4xl text-white font-bold">
