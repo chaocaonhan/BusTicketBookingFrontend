@@ -7,13 +7,11 @@ export default function BusSearchHero({ className }) {
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
 
-  // Variants for animation
   const variants = {
     hidden: { opacity: 0, y: -800 },
     visible: { opacity: 1, y: 0 },
   };
 
-  // Fetch locations on component mount
   useEffect(() => {
     fetch("http://localhost:8081/api/tinhthanh")
       .then((response) => {
@@ -21,13 +19,16 @@ export default function BusSearchHero({ className }) {
         return response.json();
       })
       .then((data) => {
-        console.log("Dữ liệu API:", data);
-        setLocations(data);
+        console.log("Full API Data:", data); // Log toàn bộ dữ liệu trả về
+        if (data.code === 0 && Array.isArray(data.result)) {
+          setLocations(data.result); // Lưu danh sách tỉnh thành vào state
+        } else {
+          console.error("Dữ liệu API không hợp lệ:", data);
+        }
       })
       .catch((error) => console.error("Lỗi khi gọi API:", error));
   }, []);
 
-  // Search handler
   const handleSearch = () => {
     console.log(
       "Tìm kiếm chuyến xe từ",
@@ -39,20 +40,19 @@ export default function BusSearchHero({ className }) {
     );
   };
 
-  // Get today's date for min date attribute
   const today = new Date().toISOString().split("T")[0];
 
   return (
     <motion.div
-      className={`w-full bg-[url("./assets/herobg.png")] flex  justify-center h-screen bg-cover bg-no-repeat bg-top ${className}`}
+      className={`w-full bg-[url("./assets/herobg.png")] flex justify-center h-screen bg-cover bg-no-repeat bg-top ${className}`}
       initial="hidden"
       animate="visible"
       variants={variants}
       exit="hidden"
       transition={{ duration: 0.85, ease: "easeInOut" }}
     >
-      <div className="this-clag bg-white bg-opacity-90 p-4 rounded-xl mt-20 shadow-lg max-w-4xl w-full mx-4 max-h-fit">
-        <div className="flex flex-col justify-center items-center max-h-fit  mt-1 md:flex-row gap-4 p-6 bg-white shadow-lg rounded-xl max-w-3xl mx-auto">
+      <div className="bg-white bg-opacity-90 p-4 rounded-xl mt-20 shadow-lg max-w-4xl w-full mx-4 max-h-fit">
+        <div className="flex flex-col justify-center items-center max-h-fit mt-1 md:flex-row gap-4 p-6 bg-white shadow-lg rounded-xl max-w-3xl mx-auto">
           {/* Dropdown Điểm Đi */}
           <select
             className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
@@ -75,6 +75,7 @@ export default function BusSearchHero({ className }) {
               ))
             )}
           </select>
+
           {/* Dropdown Điểm Đến */}
           <select
             className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
@@ -97,7 +98,8 @@ export default function BusSearchHero({ className }) {
               ))
             )}
           </select>
-          {/* Chọn ngày */}
+
+          {/* Input Ngày */}
           <input
             type="date"
             className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
@@ -106,9 +108,9 @@ export default function BusSearchHero({ className }) {
               console.log("Ngày đã chọn:", e.target.value);
               setDate(e.target.value);
             }}
-            onClick={() => console.log("Input date được click!")}
-            min={today} // Giới hạn từ hôm nay
+            min={today}
           />
+
           {/* Nút Tìm Kiếm */}
           <button
             className="bg-orange-500 text-white p-3 w-96 rounded-full hover:bg-orange-600 transition"

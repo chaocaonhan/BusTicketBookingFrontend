@@ -1,7 +1,7 @@
 // src/services/authService.js
 import axios from "axios";
 
-const API_URL = "http://localhost:8081/api/auth/";
+const API_URL = "http://localhost:8081/api/nguoidung/";
 
 // Lưu JWT token vào localStorage
 const setToken = (token) => {
@@ -65,7 +65,7 @@ const isAuthenticated = () => {
 // Xác thực tài khoản
 const verifyAccount = async (userId, code) => {
   try {
-    const response = await axios.post(
+    const response = await axios.get(
       `${API_URL}verify?userId=${userId}&token=${code}`
     );
     return response.data;

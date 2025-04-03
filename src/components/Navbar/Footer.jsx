@@ -11,34 +11,25 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-orange-500 text-lime-50">
+    <footer className="bg-orange-500 text-neutral-50">
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="grid mt-2 grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="inline-block mb-4">
-              <h2 className="text-2xl font-bold text-white">Sao Việt</h2>
+              <h2 className="text-2xl font-bold ">Sao Việt</h2>
             </Link>
-            <p className="mb-4 text-gray-400">
+            <p className="mb-4">
               Nhà xe uy tín hàng đầu Việt Nam, chuyên phục vụ các tuyến đường
               dài liên tỉnh với chất lượng dịch vụ tốt nhất.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
+            <div className=" text-white flex space-x-4">
+              <a href="#" className="hover:text-white transition-colors">
                 <Facebook size={20} />
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
+              <a href="#" className=" hover:text-white transition-colors">
                 <Instagram size={20} />
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
+              <a href="#" className=" hover:text-white transition-colors">
                 <Twitter size={20} />
               </a>
             </div>
@@ -52,7 +43,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Lào Cai - Hà Nội
                 </a>
@@ -60,7 +51,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Lào Cai - Bắc Ninh
                 </a>
@@ -68,7 +59,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Lào Cai - Hải Phòng
                 </a>
@@ -76,7 +67,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Sapa - Hà Nội
                 </a>
@@ -90,7 +81,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Trang chủ
                 </Link>
@@ -98,7 +89,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/about"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Về chúng tôi
                 </Link>
@@ -106,7 +97,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/routes"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Tuyến đường
                 </Link>
@@ -114,7 +105,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-neutral-50 hover:text-white transition-colors"
                 >
                   Liên hệ
                 </Link>

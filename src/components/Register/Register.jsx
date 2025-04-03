@@ -21,22 +21,6 @@ const Register = () => {
     });
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   try {
-  //     await authService.register(formData);
-  //     setMessage('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.');
-  //     setTimeout(() => {
-  //       navigate('/login');
-  //     }, 3000);
-  //   } catch (error) {
-  //     setMessage(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,7 +28,7 @@ const Register = () => {
       const response = await authService.register(formData);
       console.log("Response from API:", response); // Kiểm tra phản hồi
 
-      const userId = response.data; // Lấy userId từ response.data
+      const userId = response?.result?.id; // Lấy userId đúng cách
       if (userId) {
         navigate(`/verify?userId=${userId}`);
       } else {

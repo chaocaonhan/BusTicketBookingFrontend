@@ -11,7 +11,7 @@ const Home = () => {
       <div className="relative w-full min-h-screen">
         <Hero></Hero>
         <PopularRoutes></PopularRoutes>
-        <BusFeatures></BusFeatures>
+        <BusFeatures></BusFeatures>có
       </div>
     </Layout>
   );

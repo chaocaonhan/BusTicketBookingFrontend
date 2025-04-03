@@ -60,7 +60,7 @@ export const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo section */}
         <Link to="/" className="text-4xl text-white font-bold">
-          FutaBus
+          SaoVietBus
         </Link>
 
         {/* Hamburger menu for mobile */}
