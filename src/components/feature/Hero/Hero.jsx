@@ -19,9 +19,9 @@ export default function BusSearchHero({ className }) {
         return response.json();
       })
       .then((data) => {
-        console.log("Full API Data:", data); // Log toàn bộ dữ liệu trả về
-        if (data.code === 0 && Array.isArray(data.result)) {
-          setLocations(data.result); // Lưu danh sách tỉnh thành vào state
+        console.log("Full API Data:", data);
+        if (data.code === 200 && Array.isArray(data.result)) {
+          setLocations(data.result);
         } else {
           console.error("Dữ liệu API không hợp lệ:", data);
         }
@@ -55,59 +55,50 @@ export default function BusSearchHero({ className }) {
         <div className="flex flex-col justify-center items-center max-h-fit mt-1 md:flex-row gap-4 p-6 bg-white shadow-lg rounded-xl max-w-3xl mx-auto">
           {/* Dropdown Điểm Đi */}
           <select
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
+            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={departure}
-            onChange={(e) => {
-              console.log("Điểm đi đã chọn:", e.target.value);
-              setDeparture(e.target.value);
-            }}
+            onChange={(e) => setDeparture(e.target.value)}
           >
             <option value="">Chọn điểm đi</option>
-            {locations.length === 0 ? (
-              <option value="" disabled>
-                Đang tải...
-              </option>
-            ) : (
+            {locations.length > 0 ? (
               locations.map((loc) => (
                 <option key={loc.id} value={loc.tenTinhThanh}>
                   {loc.tenTinhThanh}
                 </option>
               ))
+            ) : (
+              <option value="" disabled>
+                Đang tải...
+              </option>
             )}
           </select>
 
           {/* Dropdown Điểm Đến */}
           <select
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
+            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={destination}
-            onChange={(e) => {
-              console.log("Điểm đến đã chọn:", e.target.value);
-              setDestination(e.target.value);
-            }}
+            onChange={(e) => setDestination(e.target.value)}
           >
             <option value="">Chọn điểm đến</option>
-            {locations.length === 0 ? (
-              <option value="" disabled>
-                Đang tải...
-              </option>
-            ) : (
+            {locations.length > 0 ? (
               locations.map((loc) => (
                 <option key={loc.id} value={loc.tenTinhThanh}>
                   {loc.tenTinhThanh}
                 </option>
               ))
+            ) : (
+              <option value="" disabled>
+                Đang tải...
+              </option>
             )}
           </select>
 
           {/* Input Ngày */}
           <input
             type="date"
-            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 z-10 relative"
+            className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={date}
-            onChange={(e) => {
-              console.log("Ngày đã chọn:", e.target.value);
-              setDate(e.target.value);
-            }}
+            onChange={(e) => setDate(e.target.value)}
             min={today}
           />
 

@@ -55,7 +55,7 @@ const TuyenXe = () => {
       cell: (row) => (
         <div className="text-center w-full">
           <button
-            className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold"
+            className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
             onClick={() =>
               handleSearchRouteClick(row.tinhDi.id, row.tinhDen.id)
             }
@@ -75,9 +75,9 @@ const TuyenXe = () => {
     try {
       const response = await fetch("http://localhost:8081/api/tuyen-xe");
       const result = await response.json();
-      if (result.code === 0 && Array.isArray(result.result)) {
-        setData(result.result); // Lưu dữ liệu vào state
-        setRecords(result.result); // Hiển thị dữ liệu ban đầu
+      if (result.code === 200 && Array.isArray(result.result)) {
+        setData(result.result);
+        setRecords(result.result);
       } else {
         console.error("Dữ liệu API không hợp lệ:", result);
       }
