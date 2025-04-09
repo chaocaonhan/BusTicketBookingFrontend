@@ -57,7 +57,7 @@ export const Navbar = () => {
 
   return (
     <nav className="bg-[url('./assets/nav-bg.png')] fixed w-full top-0 left-0 lg:px-24 md:px-16 sm:px-7 px-4 py-4 backdrop-blur-lg transition-transform duration-300 z-50 p-0">
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between">
         {/* Logo section */}
         <Link to="/" className="text-4xl text-white font-bold">
           SaoVietBus
@@ -95,9 +95,10 @@ export const Navbar = () => {
               flex flex-col md:flex-row 
               items-start md:items-center 
               gap-4 md:gap-8 
-              text-lg text-neutral-50 
+              text-lg 
               font-bold
               p-4 md:p-0
+              text-orange-500 md:text-neutral-50
             "
           >
             {navItems.map((item, ind) => (
