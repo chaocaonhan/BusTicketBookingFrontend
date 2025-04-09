@@ -1,13 +1,13 @@
-import React from 'react'
-import Layout from './Layout'
-import Register from '../components/Register/Register'
+import React from "react";
+import Layout from "./Layout";
+import Register from "../components/feature/Auth/Register";
 
 const RegisterPage = () => {
   return (
     <Layout>
-        <Register></Register>
+      <Register></Register>
     </Layout>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;

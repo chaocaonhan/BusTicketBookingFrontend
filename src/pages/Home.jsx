@@ -1,8 +1,8 @@
 import React from "react";
-import Hero from "../components/Hero/Hero";
+import Hero from "../components/feature/Hero/Hero";
 import Layout from "./Layout";
-import PopularRoutes from "../components/Hero/PopularRoutes";
-import BusFeatures from "../components/Hero/BusFeatures";
+import PopularRoutes from "../components/feature/Hero/PopularRoutes";
+import BusFeatures from "../components/feature/Hero/BusFeatures";
 
 const Home = () => {
   return (

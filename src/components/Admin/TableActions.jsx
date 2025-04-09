@@ -1,83 +1,49 @@
-
+// src/components/Admin/TableActions.jsx
 import React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Edit, Trash } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
-const TableActions = ({ id, onEdit, onDelete }) => {
-  const { toast } = useToast();
-
-  const handleDelete = () => {
-    onDelete(id);
-    toast({
-      title: "Deleted",
-      description: `Item ${id} has been deleted`,
-    });
-  };
-
+const TableActions = ({ onEdit, onDelete }) => {
   return (
-    <div className="flex gap-2">
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="outline" onClick={() => onEdit(id)}>
-            <Edit className="h-4 w-4 mr-1" />
-            Edit
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Item {id}</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-muted-foreground">
-              Edit form would go here. This is a placeholder.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button size="sm" variant="destructive">
-            <Trash className="h-4 w-4 mr-1" />
-            Delete
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the item. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+    <div className="flex space-x-2">
+      <button
+        onClick={onEdit}
+        className="text-blue-600 hover:text-blue-800 focus:outline-none"
+        title="Chỉnh sửa"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+          />
+        </svg>
+      </button>
+      <button
+        onClick={onDelete}
+        className="text-red-600 hover:text-red-800 focus:outline-none"
+        title="Xóa"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </button>
     </div>
   );
 };

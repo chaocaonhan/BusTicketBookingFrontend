@@ -9,11 +9,14 @@ import Home from "./pages/Home";
 import TuyenXePage from "./pages/TuyenXePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import VerifyAccount from "./components/VerifyAccount/VerifyAccount";
+import VerifyAccount from "./components/feature/Auth/VerifyAccount";
 import Unauthorized from "./components/Unauthorized/Unauthorized";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
-import AdminPage from "./pages/AdminPage";
-import Verify from "./components/VerifyAccount/VerifyAccount";
+import Dashboard from "./pages/Admin/Dashboard";
+import RoutesManagement from "./pages/Admin/RoutesManagement";
+import UsersManagement from "./pages/Admin/UsersManagement";
+import AdminLayout from "./Layout/AdminLayout";
+import ProvinceManagement from "./pages/Admin/ProvinceManagement";
 
 const App = () => {
   return (
@@ -29,17 +32,8 @@ const App = () => {
             <Route path="/lich-trinh" element={<TuyenXePage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage></LoginPage>}></Route>
-            <Route path="/verify" element={<Verify />} />{" "}
-            {/* Thêm route xác nhận */}
+            <Route path="/verify" element={<VerifyAccount />} />{" "}
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <PrivateRoute requiredRole="ADMIN">
-                  <AdminPage />
-                </PrivateRoute>
-              }
-            />
             <Route
               path="/user/dashboard"
               element={
@@ -48,6 +42,20 @@ const App = () => {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/admin"
+              element={
+                <PrivateRoute requiredRole="ADMIN">
+                  <AdminLayout />
+                </PrivateRoute>
+              }
+            >
+              {/* Các route con của admin */}
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<UsersManagement />} />
+              <Route path="routes" element={<RoutesManagement />} />
+              <Route path="province" element={<ProvinceManagement />} />
+            </Route>
           </Routes>
         </main>
       </Router>

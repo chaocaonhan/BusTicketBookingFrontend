@@ -1,25 +1,85 @@
-import React from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+// src/layout/AdminLayout.jsx
+import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/Admin/AdminSidebar";
 import AdminNavbar from "../components/Admin/AdminNavbar";
-import { Outlet } from "react-router-dom";
+import avatar from "../assets/avatar.png"; // Import ảnh từ assets
 
 const AdminLayout = () => {
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Không tìm thấy token");
+        }
+
+        const response = await fetch(
+          "http://localhost:8081/api/nguoidung/myInfor",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy thông tin người dùng");
+        }
+
+        const data = await response.json();
+        if (data.code === 0) {
+          setUserInfo(data.result);
+        } else {
+          throw new Error(data.message || "Lỗi khi lấy thông tin người dùng");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <AdminNavbar />
-          <main className="flex-1 overflow-auto p-4 md:p-6">
-            <Outlet />
-          </main>
-        </div>
-        <div className="fixed bottom-4 right-4 md:hidden">
-          <SidebarTrigger />
-        </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <AdminSidebar collapsed={collapsed} />
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 transition-all duration-300">
+        {/* Navbar */}
+        <AdminNavbar
+          toggleSidebar={toggleSidebar}
+          userInfo={userInfo}
+          loading={loading}
+          error={error}
+        />
+
+        {/* Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 bg-gray-100">
+          <Outlet />
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-white p-4 shadow-inner">
+          <div className="text-center text-gray-600">
+            <p>© 2025 Hệ thống quản lý vé xe khách</p>
+          </div>
+        </footer>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
