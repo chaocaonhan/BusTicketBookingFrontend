@@ -1,5 +1,5 @@
-// src/pages/RoutesManagement.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom"; // Thêm Link
 import TableActions from "../../components/Admin/TableActions";
 
 const RoutesManagement = () => {
@@ -9,6 +9,7 @@ const RoutesManagement = () => {
   const [error, setError] = useState(null);
   const [editingRoute, setEditingRoute] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
   const [formData, setFormData] = useState({
     tenTuyen: "",
     tinhDiId: "",
@@ -39,7 +40,7 @@ const RoutesManagement = () => {
 
   const fetchProvinces = async () => {
     try {
-      const res = await fetch("http://localhost:8081/api/tinh-thanh", {
+      const res = await fetch("http://localhost:8081/api/tinhthanh", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -151,6 +152,9 @@ const RoutesManagement = () => {
                   ID
                 </th>
                 <th className="w-40 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Tên tuyến
+                </th>
+                <th className="w-40 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Điểm đi
                 </th>
                 <th className="w-40 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
@@ -162,9 +166,6 @@ const RoutesManagement = () => {
                 <th className="w-28 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Thời gian
                 </th>
-                <th className="w-28 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Giá tiền
-                </th>
                 <th className="w-32 py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Thao tác
                 </th>
@@ -173,9 +174,20 @@ const RoutesManagement = () => {
 
             <tbody>
               {routes.map((route) => (
-                <tr key={route.id} className="border-b">
+                <tr
+                  key={route.id}
+                  className="border-b hover:bg-gray-100 cursor-pointer"
+                >
                   <td className="py-2 px-4">{route.id}</td>
-                  <td className="py-2 px-4">{route.tenTuyen}</td>
+                  <td className="py-2 px-4">
+                    <Link
+                      to={`/admin/routes/${route.id}/schedule`}
+                      state={{ route }} // Truyền dữ liệu tuyến xe qua state
+                      className=" hover:underline"
+                    >
+                      {route.tenTuyen}
+                    </Link>
+                  </td>
                   <td className="py-2 px-4">{route.tinhDi.tenTinhThanh}</td>
                   <td className="py-2 px-4">{route.tinhDen.tenTinhThanh}</td>
                   <td className="py-2 px-4">{route.khoangCach} km</td>
