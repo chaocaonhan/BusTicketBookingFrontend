@@ -17,6 +17,7 @@ import RoutesManagement from "./pages/Admin/RoutesManagement";
 import UsersManagement from "./pages/Admin/UsersManagement";
 import AdminLayout from "./Layout/AdminLayout";
 import ProvinceManagement from "./pages/Admin/ProvinceManagement";
+import VehiclesManagement from "./pages/Admin/VehiclesManagement";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
               <Route path="users" element={<UsersManagement />} />
               <Route path="routes" element={<RoutesManagement />} />
               <Route path="province" element={<ProvinceManagement />} />
+              <Route path="vehicles" element={<VehiclesManagement />} />
             </Route>
           </Routes>
         </main>
