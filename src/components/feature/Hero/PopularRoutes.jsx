@@ -41,7 +41,7 @@ const PopularRoutes = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 px-10 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Tiêu đề và mô tả */}
         <div className="text-center mb-8">

@@ -39,7 +39,7 @@ const Login = () => {
       } else if (role === "DRIVER") {
         navigate("/driver/dashboard");
       } else {
-        navigate("/user/dashboard");
+        navigate("/");
       }
     } catch (error) {
       setMessage(error);

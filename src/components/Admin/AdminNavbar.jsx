@@ -100,6 +100,12 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
                     Thông tin cá nhân
                   </Link>
                   <Link
+                    to="/"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Trang người dùng
+                  </Link>
+                  <Link
                     to="/admin/settings"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >

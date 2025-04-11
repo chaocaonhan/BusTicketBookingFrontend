@@ -1,14 +1,21 @@
 // src/components/Navbar.jsx
-import React, { useEffect, useState } from "react";
-import { FaBars, FaX, FaUser } from "react-icons/fa6";
+import React, { useEffect, useState, useRef } from "react";
+import { FaBars, FaX } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
+import axios from "axios";
+import avatar from "../../assets/avatar.png"; // Import ảnh từ assets
 
 export const Navbar = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
-  const [username, setUsername] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   // Nav items
@@ -19,22 +26,48 @@ export const Navbar = () => {
     { label: "TIN TỨC", link: "/" },
   ];
 
-  // Lấy thông tin người dùng khi component mount
+  // Fetch user information
   useEffect(() => {
-    const token = authService.getToken();
-    if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      setUsername(payload.sub || "User");
-      setIsLoggedIn(true);
-    }
+    const fetchUserInfo = async () => {
+      const token = authService.getToken();
+      if (token) {
+        setLoading(true);
+        try {
+          const response = await axios.get(
+            "http://localhost:8081/api/nguoidung/myInfor",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.data.code === 0) {
+            const userData = response.data.result;
+            setUserInfo({
+              hoTen: userData.hoTen,
+              avatar: userData.avatar || "/default-avatar.png",
+            });
+            setIsAdmin(userData.vaiTro.includes("ADMIN"));
+            setIsLoggedIn(true);
+          } else {
+            setError("Không thể lấy thông tin người dùng");
+          }
+        } catch (err) {
+          setError("Lỗi khi tải thông tin người dùng");
+          authService.logout();
+          setIsLoggedIn(false);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchUserInfo();
 
     const handleAuthChange = () => {
       setIsLoggedIn(authService.isAuthenticated());
-      const token = authService.getToken();
-      if (token) {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setUsername(payload.sub || "User");
-      }
+      fetchUserInfo();
     };
 
     window.addEventListener("authChange", handleAuthChange);
@@ -48,11 +81,32 @@ export const Navbar = () => {
     setOpen(!open);
   };
 
+  // Toggle dropdown
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Handle logout
   const handleLogout = () => {
     authService.logout();
     setIsLoggedIn(false);
+    setUserInfo(null);
+    setIsAdmin(false);
     setOpen(false);
+    setDropdownOpen(false);
   };
 
   return (
@@ -117,37 +171,85 @@ export const Navbar = () => {
           {/* User section */}
           <div className="p-4 md:p-0 relative">
             {isLoggedIn ? (
-              <div className="group relative">
-                <button
-                  className="relative flex items-center gap-2 px-4 py-2 bg-white md:rounded-full rounded-xl text-orange-500 border border-red-500 font-normal hover:bg-gray-100 transition duration-300 
-                               after:absolute after:inset-[-8px] after:content-[''] after:bg-transparent"
-                >
-                  <FaUser className="w-4 h-4" />
-                  <span>{username}</span>
-                </button>
-
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 text-gray-700 md:text-sm z-50 hidden group-hover:block">
-                  <Link
-                    to="/user/profile"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                    onClick={toggleMenu}
-                  >
-                    Hồ sơ
-                  </Link>
-                  <Link
-                    to="/user/bookings"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                    onClick={toggleMenu}
-                  >
-                    Vé của tôi
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Đăng xuất
-                  </button>
-                </div>
+              <div className="flex items-center" ref={dropdownRef}>
+                {loading ? (
+                  <div className="animate-pulse flex items-center">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                    <div className="ml-3 w-24 h-4 bg-gray-200 rounded"></div>
+                  </div>
+                ) : error ? (
+                  <div className="text-red-500">Lỗi: {error}</div>
+                ) : userInfo ? (
+                  <div className="relative">
+                    <button
+                      onClick={toggleDropdown}
+                      className="flex items-center text-gray-700 hover:text-blue-600"
+                    >
+                      <img
+                        src={avatar}
+                        alt="Avatar"
+                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                      />
+                      <span className="ml-2 font-medium text-white">
+                        {userInfo.hoTen}
+                      </span>
+                      <svg
+                        className="w-4 h-4 ml-1 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                    </button>
+                    {dropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 text-gray-700 md:text-sm z-50">
+                        <Link
+                          to="/user/profile"
+                          className="block px-4 py-2 hover:bg-gray-100"
+                          onClick={() => {
+                            toggleMenu();
+                            toggleDropdown();
+                          }}
+                        >
+                          Hồ sơ
+                        </Link>
+                        <Link
+                          to="/user/bookings"
+                          className="block px-4 py-2 hover:bg-gray-100"
+                          onClick={() => {
+                            toggleMenu();
+                            toggleDropdown();
+                          }}
+                        >
+                          Vé của tôi
+                        </Link>
+                        {isAdmin && (
+                          <Link
+                            to="/admin/dashboard"
+                            className="block px-4 py-2 hover:bg-gray-100"
+                            onClick={() => {
+                              toggleMenu();
+                              toggleDropdown();
+                            }}
+                          >
+                            Quản lý hệ thống
+                          </Link>
+                        )}
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                        >
+                          Đăng xuất
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
               </div>
             ) : (
               <button
