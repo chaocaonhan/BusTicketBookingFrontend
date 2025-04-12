@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../../services/authService";
@@ -28,9 +27,8 @@ const Login = () => {
         formData.email,
         formData.matKhau
       );
-      setMessage("Đăng nhập thành công!");
+      setMessage("✅ Đăng nhập thành công!");
 
-      // Dispatch event để Navbar cập nhật trạng thái
       window.dispatchEvent(new Event("authChange"));
 
       const role = authService.getUserRole();
@@ -42,17 +40,17 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      setMessage(error);
+      setMessage("❌ Email hoặc mật khẩu không chính xác.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white shadow-lg rounded-xl p-8 transform transition-all hover:shadow-2xl">
-          <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
+        <div className="bg-white shadow-xl rounded-xl p-8 border border-orange-200 transition hover:shadow-2xl">
+          <h2 className="text-3xl font-extrabold text-center text-orange-600 mb-6">
             Đăng Nhập
           </h2>
 
@@ -78,7 +76,7 @@ const Login = () => {
               </label>
               <input
                 type="email"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
+                className="w-full px-4 py-3 bg-orange-50 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                 id="email"
                 name="email"
                 value={formData.email}
@@ -97,7 +95,7 @@ const Login = () => {
               </label>
               <input
                 type="password"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
+                className="w-full px-4 py-3 bg-orange-50 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                 id="matKhau"
                 name="matKhau"
                 value={formData.matKhau}
@@ -111,8 +109,8 @@ const Login = () => {
               type="submit"
               className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-300 ${
                 loading
-                  ? "bg-indigo-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
+                  ? "bg-orange-400 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 active:bg-orange-700"
               }`}
               disabled={loading}
             >
@@ -150,7 +148,7 @@ const Login = () => {
               Chưa có tài khoản?{" "}
               <a
                 href="/register"
-                className="text-indigo-600 font-medium hover:text-indigo-800 transition duration-200"
+                className="text-orange-500 font-medium hover:underline transition"
               >
                 Đăng ký ngay
               </a>

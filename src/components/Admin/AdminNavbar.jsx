@@ -94,12 +94,6 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
                     </p>
                   </div>
                   <Link
-                    to="/admin/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Thông tin cá nhân
-                  </Link>
-                  <Link
                     to="/"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >

@@ -11,7 +11,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-orange-500 text-neutral-50">
+    <footer className="bg-orange-500 pt-1 text-neutral-50">
       <div className="container mx-auto px-4 md:px-6 py-12">
         <div className="grid mt-2 grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
@@ -132,7 +132,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-10 pt-6 text-center">
+        <div className="border-t-2 border-neutral-200 mt-10 pt-6 text-center">
           <p>
             © {new Date().getFullYear()} Sao Việt. Tất cả các quyền được bảo
             lưu.

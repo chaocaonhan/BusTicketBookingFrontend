@@ -41,18 +41,25 @@ const Register = () => {
       setLoading(false);
     }
   };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-700">
+    <div className="flex items-center justify-center min-h-screen bg-orange-50">
+      <div className="w-full max-w-md p-6 bg-white rounded-xl shadow-xl border border-orange-200">
+        <h2 className="text-2xl font-bold text-center text-orange-600">
           Đăng Ký
         </h2>
+
         {message && (
-          <div className="p-3 mt-3 text-sm text-blue-700 bg-blue-100 rounded-md">
+          <div
+            className={`p-3 mt-3 text-sm rounded-md font-medium ${
+              message.includes("thành công")
+                ? "bg-green-100 text-green-800 border-l-4 border-green-500"
+                : "bg-red-100 text-red-800 border-l-4 border-red-500"
+            }`}
+          >
             {message}
           </div>
         )}
+
         <form onSubmit={handleSubmit} className="mt-4">
           <div className="mb-4">
             <label
@@ -68,9 +75,10 @@ const Register = () => {
               value={formData.hoTen}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
           </div>
+
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -85,9 +93,10 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
           </div>
+
           <div className="mb-4">
             <label
               htmlFor="matKhau"
@@ -102,9 +111,10 @@ const Register = () => {
               value={formData.matKhau}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
           </div>
+
           <div className="mb-4">
             <label
               htmlFor="SDT"
@@ -119,21 +129,30 @@ const Register = () => {
               value={formData.SDT}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
           </div>
+
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className={`w-full px-4 py-2 rounded-lg text-white font-semibold transition duration-300 ${
+              loading
+                ? "bg-orange-300 cursor-not-allowed"
+                : "bg-orange-500 hover:bg-orange-600 active:bg-orange-700"
+            }`}
             disabled={loading}
           >
             {loading ? "Đang xử lý..." : "Đăng ký"}
           </button>
         </form>
+
         <div className="mt-4 text-center">
-          <p className="text-sm">
+          <p className="text-sm text-gray-600">
             Đã có tài khoản?{" "}
-            <a href="/login" className="text-blue-500 hover:underline">
+            <a
+              href="/login"
+              className="text-orange-500 font-medium hover:underline"
+            >
               Đăng nhập
             </a>
           </p>

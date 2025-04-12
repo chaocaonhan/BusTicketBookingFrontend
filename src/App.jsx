@@ -14,7 +14,6 @@ import VerifyAccount from "./components/feature/User/VerifyAccount";
 import Login from "./components/feature/User/Login";
 
 import Unauthorized from "./components/Unauthorized/Unauthorized";
-import Profile from "./components/feature/User/Profile";
 
 // Pages - Admin
 import Dashboard from "./pages/Admin/Dashboard";
@@ -26,6 +25,7 @@ import RouteSchedule from "./components/Admin/RouteSchedule";
 
 // Route guard
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import UserAccount from "./components/feature/User/UserAccount";
 
 // React App
 const App = () => {
@@ -41,7 +41,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<VerifyAccount />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/user/profile" element={<Profile />} />
+            <Route path="/user/profile" element={<UserAccount />} />
           </Route>
 
           {/* ADMIN LAYOUT ROUTES */}
