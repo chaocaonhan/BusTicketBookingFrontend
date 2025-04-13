@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-export default function BusSearchHero({ className }) {
+export default function BusSearch({ className }) {
   const [locations, setLocations] = useState([]);
   const [departure, setDeparture] = useState("");
   const [destination, setDestination] = useState("");

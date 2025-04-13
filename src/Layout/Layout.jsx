@@ -9,13 +9,16 @@ const Layout = () => {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar className="fixed top-0 left-0 w-full z-20 bg-white shadow-md p-0" />
-      <main className="pt-16">
+
+      {/* Tạo khoảng trống cho Navbar */}
+      <div className="pt-16 flex-1">
         <Outlet />
-      </main>
+      </div>
+
       <Footer />
-    </>
+    </div>
   );
 };
 
