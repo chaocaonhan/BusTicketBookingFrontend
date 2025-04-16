@@ -156,7 +156,7 @@ const VehiclesManagement = () => {
         </h1>
         <button
           onClick={handleAddVehicle}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
           Thêm phương tiện
         </button>

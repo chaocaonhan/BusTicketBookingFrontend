@@ -7,7 +7,7 @@ const Register = () => {
     hoTen: "",
     email: "",
     matKhau: "",
-    SDT: "",
+    sdt: "",
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -124,9 +124,9 @@ const Register = () => {
             </label>
             <input
               type="text"
-              id="SDT"
-              name="SDT"
-              value={formData.SDT}
+              id="sdt" // id bạn để sao cũng được
+              name="sdt" // ✅ Phải viết đúng key của formData
+              value={formData.sdt}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-export default function BusSearch({ className }) {
+export default function BusSearch({ className, onSearch, searchParams }) {
   const [locations, setLocations] = useState([]);
-  const [departure, setDeparture] = useState("");
-  const [destination, setDestination] = useState("");
-  const [date, setDate] = useState("");
+  const [departure, setDeparture] = useState(searchParams?.departure || "");
+  const [destination, setDestination] = useState(
+    searchParams?.destination || ""
+  );
+  const [date, setDate] = useState(searchParams?.date || "");
+  const [tickets, setTickets] = useState(1); // Số lượng vé
 
   const variants = {
     hidden: { opacity: 0, y: -800 },
@@ -19,7 +22,6 @@ export default function BusSearch({ className }) {
         return response.json();
       })
       .then((data) => {
-        console.log("Full API Data:", data);
         if (data.code === 200 && Array.isArray(data.result)) {
           setLocations(data.result);
         } else {
@@ -30,25 +32,21 @@ export default function BusSearch({ className }) {
   }, []);
 
   const handleSearch = () => {
-    console.log(
-      "Tìm kiếm chuyến xe từ",
-      departure,
-      "đến",
-      destination,
-      "vào ngày",
-      date
-    );
+    if (departure && destination && date && tickets > 0) {
+      onSearch(departure, destination, date, tickets); // Gọi hàm onSearch với số lượng vé
+    } else {
+      alert("Vui lòng điền đầy đủ thông tin!");
+    }
   };
 
   const today = new Date().toISOString().split("T")[0];
 
   return (
     <motion.div
-      className={`w-full bg-[url("./assets/herobg.png")] flex justify-center h-screen bg-cover bg-no-repeat bg-top ${className}`}
+      className={`w-full bg-[url("./assets/herobg.png")] flex justify-center h-auto bg-cover bg-no-repeat bg-top ${className}`}
       initial="hidden"
       animate="visible"
       variants={variants}
-      exit="hidden"
       transition={{ duration: 0.85, ease: "easeInOut" }}
     >
       <div className="bg-white bg-opacity-90 p-4 rounded-xl mt-20 shadow-lg max-w-4xl w-full mx-4 max-h-fit">
@@ -102,12 +100,22 @@ export default function BusSearch({ className }) {
             min={today}
           />
 
+          {/* Input Số Vé */}
+          <input
+            type="number"
+            className="p-2 border rounded-lg w-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={tickets}
+            onChange={(e) => setTickets(Number(e.target.value))}
+            min="1"
+            placeholder="Số vé"
+          />
+
           {/* Nút Tìm Kiếm */}
           <button
             className="bg-orange-500 text-white p-3 w-96 rounded-full hover:bg-orange-600 transition"
             onClick={handleSearch}
           >
-            Tìm kiếm
+            Tìm chuyến xe
           </button>
         </div>
       </div>

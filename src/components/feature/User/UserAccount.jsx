@@ -86,6 +86,7 @@ const UserAccount = () => {
               ? userData.sdt.substring(0, 3) + "***" + userData.sdt.slice(-4)
               : "-"}
           </p>
+
           <p className="text-sm text-gray-500">
             {extractTenVaiTro(userData.vaiTro)}
           </p>
@@ -134,6 +135,16 @@ const UserAccount = () => {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-700">
                   {userData.hoTen}
+                </span>
+                <button className="text-sm bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 transition">
+                  Thay đổi
+                </button>
+              </div>
+
+              <div className="text-gray-500">Giới tính</div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-700">
+                  {userData.gioiTinh}
                 </span>
                 <button className="text-sm bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 transition">
                   Thay đổi

@@ -1,4 +1,3 @@
-// src/pages/UsersManagement.jsx
 import { useState, useEffect } from "react";
 import TableActions from "../../components/Admin/TableActions";
 
@@ -6,10 +5,14 @@ const UsersManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(""); // Thêm thông báo thành công
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [formData, setFormData] = useState({
+    id: 0,
     hoTen: "",
+    gioiTinh: "",
     email: "",
     matKhau: "",
     trangThai: "ACTIVE",
@@ -60,7 +63,9 @@ const UsersManagement = () => {
   const handleAddUser = () => {
     setEditingUser(null);
     setFormData({
+      id: 0,
       hoTen: "",
+      gioiTinh: "",
       email: "",
       matKhau: "",
       trangThai: "ACTIVE",
@@ -74,7 +79,9 @@ const UsersManagement = () => {
   const handleEditUser = (user) => {
     setEditingUser(user);
     setFormData({
+      id: user.id,
       hoTen: user.hoTen,
+      gioiTinh: user.gioiTinh,
       email: user.email,
       matKhau: "", // Không hiển thị mật khẩu khi sửa
       trangThai: user.trangThai,
@@ -85,38 +92,13 @@ const UsersManagement = () => {
     setShowModal(true);
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8081/api/nguoidung/${userId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Không thể xóa người dùng");
-        }
-
-        fetchUsers(); // Refresh danh sách sau khi xóa
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
       const url = editingUser
-        ? `http://localhost:8081/api/nguoidung/${editingUser.id}`
-        : "http://localhost:8081/api/nguoidung";
+        ? `http://localhost:8081/api/nguoidung/${formData.id}`
+        : "http://localhost:8081/api/nguoidung/createUser";
 
       const method = editingUser ? "PUT" : "POST";
 
@@ -136,7 +118,15 @@ const UsersManagement = () => {
       }
 
       setShowModal(false);
+      setSuccessMessage(
+        editingUser
+          ? "Cập nhật người dùng thành công!"
+          : "Thêm người dùng mới thành công!"
+      );
       fetchUsers(); // Refresh danh sách sau khi thêm/sửa
+
+      // Xóa thông báo sau 3 giây
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -148,11 +138,18 @@ const UsersManagement = () => {
         <h1 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h1>
         <button
           onClick={handleAddUser}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
         >
           Thêm người dùng
         </button>
       </div>
+
+      {/* Hiển thị thông báo thành công */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {successMessage}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
@@ -175,6 +172,9 @@ const UsersManagement = () => {
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Email
+                </th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Giới tính
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   SĐT
@@ -200,8 +200,11 @@ const UsersManagement = () => {
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {user.hoTen}
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
+                  <td className="py-3 px-4 text-sm text-gray-900 truncate max-w-[200px]">
                     {user.email}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-900">
+                    {user.gioiTinh}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {user.sdt}
@@ -226,7 +229,7 @@ const UsersManagement = () => {
                   <td className="py-3 px-4 text-sm text-gray-900">
                     <TableActions
                       onEdit={() => handleEditUser(user)}
-                      onDelete={() => handleDeleteUser(user.id)}
+                      onDelete={() => handleDeleteUser(user)}
                     />
                   </td>
                 </tr>
@@ -239,9 +242,9 @@ const UsersManagement = () => {
       {/* Modal for Add/Edit User */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {editingUser ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"}
               </h2>
               <button
@@ -265,150 +268,111 @@ const UsersManagement = () => {
             </div>
 
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="hoTen"
-                >
-                  Họ tên
-                </label>
-                <input
-                  type="text"
-                  id="hoTen"
-                  name="hoTen"
-                  value={formData.hoTen}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  required
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  required
-                />
-              </div>
-
-              {!editingUser && (
-                <div className="mb-4">
-                  <label
-                    className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="matKhau"
-                  >
-                    Mật khẩu
-                  </label>
+              <div className="grid grid-cols-3 gap-6">
+                <div>
+                  <label className="text-sm text-gray-600">Họ tên</label>
                   <input
-                    type="password"
-                    id="matKhau"
-                    name="matKhau"
-                    value={formData.matKhau}
+                    type="text"
+                    name="hoTen"
+                    value={formData.hoTen}
                     onChange={handleInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required={!editingUser}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                    required
                   />
                 </div>
-              )}
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="sdt"
-                >
-                  Số điện thoại
-                </label>
-                <input
-                  type="text"
-                  id="sdt"
-                  name="sdt"
-                  value={formData.sdt}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  required
-                />
+                <div>
+                  <label className="text-sm text-gray-600">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                    required
+                  />
+                </div>
+
+                {!editingUser && (
+                  <div>
+                    <label className="text-sm text-gray-600">Mật khẩu</label>
+                    <input
+                      type="password"
+                      name="matKhau"
+                      value={formData.matKhau}
+                      onChange={handleInputChange}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                      required
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-sm text-gray-600">Số điện thoại</label>
+                  <input
+                    type="text"
+                    name="sdt"
+                    value={formData.sdt}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600">Giới tính</label>
+                  <select
+                    name="gioiTinh"
+                    value={formData.gioiTinh}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600">Trạng thái</label>
+                  <select
+                    name="trangThai"
+                    value={formData.trangThai}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="INACTIVE">Không hoạt động</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600">Vai trò</label>
+                  <select
+                    name="vaiTro"
+                    value={formData.vaiTro}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="ADMIN">Quản trị viên</option>
+                    <option value="EMPLOYEE">Nhân viên</option>
+                    <option value="USER">Người dùng</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="trangThai"
-                >
-                  Trạng thái
-                </label>
-                <select
-                  id="trangThai"
-                  name="trangThai"
-                  value={formData.trangThai}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="ACTIVE">Hoạt động</option>
-                  <option value="INACTIVE">Không hoạt động</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="vaiTro"
-                >
-                  Vai trò
-                </label>
-                <select
-                  id="vaiTro"
-                  name="vaiTro"
-                  value={formData.vaiTro}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="ADMIN">Quản trị viên</option>
-                  <option value="EMPLOYEE">Nhân viên</option>
-                  <option value="USER">Người dùng</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="loaiDangKi"
-                >
-                  Loại đăng kí
-                </label>
-                <select
-                  id="loaiDangKi"
-                  name="loaiDangKi"
-                  value={formData.loaiDangKi}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="email">Email</option>
-                  <option value="google">Google</option>
-                  <option value="facebook">Facebook</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-end">
+              <div className="flex justify-end mt-6">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="mr-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                  className="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  className="px-4 py-2 bg-green-100 text-green-800 rounded ring ring-transparent hover:ring-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                 >
                   {editingUser ? "Cập nhật" : "Thêm mới"}
                 </button>
