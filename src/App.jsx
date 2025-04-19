@@ -26,6 +26,7 @@ import RouteSchedule from "./components/Admin/RouteSchedule";
 // Route guard
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import UserAccount from "./components/feature/User/UserAccount";
+import TripManagement from "./pages/Admin/TripManagement";
 
 // React App
 const App = () => {
@@ -56,6 +57,8 @@ const App = () => {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="routes" element={<RoutesManagement />} />
+            <Route path="manage-trips" element={<TripManagement />} />
+
             <Route
               path="routes/:routeId/schedule"
               element={<RouteSchedule />}
