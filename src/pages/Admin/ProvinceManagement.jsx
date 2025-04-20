@@ -34,14 +34,14 @@ const ProvinceManagement = () => {
   const fetchPickupPoints = async (provinceName) => {
     try {
       const response = await fetch(
-        "http://localhost:8081/api/Station/getByProvince",
+        `http://localhost:8081/api/Station/getByProvince?province=${encodeURIComponent(
+          provinceName
+        )}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: new URLSearchParams({ province: provinceName }),
         }
       );
 

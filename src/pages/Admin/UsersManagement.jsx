@@ -5,7 +5,7 @@ const UsersManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(""); // Thêm thông báo thành công
+  const [successMessage, setSuccessMessage] = useState("");
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -21,11 +21,33 @@ const UsersManagement = () => {
     sdt: "",
   });
 
-  const fetchUsers = async () => {
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const fetchUsers = async (
+    page = currentPage,
+    size = pageSize,
+    search = searchTerm
+  ) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8081/api/nguoidung", {
+
+      // Quyết định sử dụng API nào dựa trên từ khóa tìm kiếm
+      let url = search.trim()
+        ? `http://localhost:8081/api/nguoidung/search?keyword=${encodeURIComponent(
+            search
+          )}&page=${page}&size=${size}`
+        : `http://localhost:8081/api/nguoidung/getPage?page=${page}&size=${size}`;
+
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -36,11 +58,10 @@ const UsersManagement = () => {
       }
 
       const data = await response.json();
-      if (data.code === 200) {
-        setUsers(data.result);
-      } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách người dùng");
-      }
+      setUsers(data.content);
+      setTotalPages(data.totalPages);
+      setTotalElements(data.totalElements);
+      setCurrentPage(data.number);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -51,6 +72,30 @@ const UsersManagement = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setCurrentPage(newPage);
+      fetchUsers(newPage);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Clear existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set new timeout to prevent too many API calls
+    const timeout = setTimeout(() => {
+      fetchUsers(0, pageSize, value); // Reset to first page when searching
+    }, 500);
+
+    setSearchTimeout(timeout);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,6 +137,41 @@ const UsersManagement = () => {
     setShowModal(true);
   };
 
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user);
+    // Implement delete confirmation modal logic here
+    if (window.confirm(`Bạn có chắc chắn muốn xóa người dùng ${user.hoTen}?`)) {
+      deleteUser(user.id);
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/nguoidung/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể xóa người dùng");
+      }
+
+      setSuccessMessage("Xóa người dùng thành công!");
+      fetchUsers(currentPage); // Refresh with current page
+
+      // Xóa thông báo sau 3 giây
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -123,13 +203,35 @@ const UsersManagement = () => {
           ? "Cập nhật người dùng thành công!"
           : "Thêm người dùng mới thành công!"
       );
-      fetchUsers(); // Refresh danh sách sau khi thêm/sửa
+      fetchUsers(currentPage); // Refresh with current page
 
       // Xóa thông báo sau 3 giây
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  // Generate page numbers for pagination
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      0,
+      Math.min(
+        currentPage - Math.floor(maxVisiblePages / 2),
+        totalPages - maxVisiblePages
+      )
+    );
+    startPage = Math.max(0, startPage);
+
+    const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages - 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   };
 
   return (
@@ -144,6 +246,35 @@ const UsersManagement = () => {
         </button>
       </div>
 
+      {/* Search box */}
+      <div className="mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm người dùng..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400 pl-10"
+          />
+          <div className="absolute left-3 top-2.5 text-gray-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
       {/* Hiển thị thông báo thành công */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -151,92 +282,174 @@ const UsersManagement = () => {
         </div>
       )}
 
+      {/* Hiển thị lỗi nếu có */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      ) : error ? (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Họ tên
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Giới tính
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  SĐT
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Trạng thái
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Vai trò
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Loại đăng kí
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Thao tác
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm text-gray-900">{user.id}</td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {user.hoTen}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900 truncate max-w-[200px]">
-                    {user.email}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {user.gioiTinh}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {user.sdt}
-                  </td>
-                  <td className="py-3 px-4 text-sm">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.trangThai === "ACTIVE"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {user.trangThai}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {user.vaiTro}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {user.loaiDangKi || "N/A"}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    <TableActions
-                      onEdit={() => handleEditUser(user)}
-                      onDelete={() => handleDeleteUser(user)}
-                    />
-                  </td>
+        <>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Họ tên
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Giới tính
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    SĐT
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Trạng thái
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Vai trò
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Loại đăng kí
+                  </th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Thao tác
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50">
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.id}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.hoTen}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900 truncate max-w-[200px]">
+                        {user.email}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.gioiTinh}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.sdt}
+                      </td>
+                      <td className="py-3 px-4 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            user.trangThai === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {user.trangThai}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.vaiTro}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {user.loaiDangKi || "N/A"}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        <TableActions
+                          onEdit={() => handleEditUser(user)}
+                          onDelete={() => handleDeleteUser(user)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="9" className="py-4 text-center text-gray-500">
+                      Không có dữ liệu người dùng
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 0 && (
+            <div className="flex justify-center items-center mt-6">
+              <div className="flex space-x-1">
+                <button
+                  onClick={() => handlePageChange(0)}
+                  disabled={currentPage === 0}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 0
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  &laquo;
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 0
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  &lsaquo;
+                </button>
+
+                {generatePageNumbers().map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === page
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages - 1}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages - 1
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  &rsaquo;
+                </button>
+                <button
+                  onClick={() => handlePageChange(totalPages - 1)}
+                  disabled={currentPage === totalPages - 1}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages - 1
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  &raquo;
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal for Add/Edit User */}

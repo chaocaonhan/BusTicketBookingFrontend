@@ -27,6 +27,7 @@ import RouteSchedule from "./components/Admin/RouteSchedule";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import UserAccount from "./components/feature/User/UserAccount";
 import TripManagement from "./pages/Admin/TripManagement";
+import BusSearchResults from "./components/Trip/BusSearchResults";
 
 // React App
 const App = () => {
