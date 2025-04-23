@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import TableActions from "../../components/Admin/TableActions";
+import { toast } from "react-toastify";
 
 const UsersManagement = () => {
   const [users, setUsers] = useState([]);
@@ -162,7 +163,7 @@ const UsersManagement = () => {
         throw new Error("Không thể xóa người dùng");
       }
 
-      setSuccessMessage("Xóa người dùng thành công!");
+      toast.success("Xóa người dùng thành công!");
       fetchUsers(currentPage); // Refresh with current page
 
       // Xóa thông báo sau 3 giây
@@ -198,15 +199,12 @@ const UsersManagement = () => {
       }
 
       setShowModal(false);
-      setSuccessMessage(
+      toast.success(
         editingUser
           ? "Cập nhật người dùng thành công!"
           : "Thêm người dùng mới thành công!"
       );
       fetchUsers(currentPage); // Refresh with current page
-
-      // Xóa thông báo sau 3 giây
-      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError(err.message);
     }
@@ -295,7 +293,7 @@ const UsersManagement = () => {
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto " style={{ minHeight: "500px" }}>
             <table className="min-w-full bg-white">
               <thead className="bg-gray-100">
                 <tr>

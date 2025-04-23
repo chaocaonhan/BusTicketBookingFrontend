@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Import toast
 import authService from "../../../services/authService";
 
 const Login = () => {
@@ -7,7 +8,6 @@ const Login = () => {
     email: "ccnhan1288@gmail.com",
     matKhau: "ccnhan1288@gmail.com",
   });
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -27,7 +27,17 @@ const Login = () => {
         formData.email,
         formData.matKhau
       );
-      setMessage("✅ Đăng nhập thành công!");
+
+      // Hiển thị thông báo thành công
+      toast.success("Đăng nhập thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
 
       window.dispatchEvent(new Event("authChange"));
 
@@ -40,7 +50,16 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      setMessage("❌ Email hoặc mật khẩu không chính xác.");
+      // Hiển thị thông báo lỗi
+      toast.error("Email hoặc mật khẩu không chính xác.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     } finally {
       setLoading(false);
     }
@@ -53,18 +72,6 @@ const Login = () => {
           <h2 className="text-3xl font-extrabold text-center text-orange-600 mb-6">
             Đăng Nhập
           </h2>
-
-          {message && (
-            <div
-              className={`p-4 mb-6 rounded-lg text-sm font-medium ${
-                message.includes("thành công")
-                  ? "bg-green-100 text-green-800 border-l-4 border-green-500"
-                  : "bg-red-100 text-red-800 border-l-4 border-red-500"
-              }`}
-            >
-              {message}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-5">

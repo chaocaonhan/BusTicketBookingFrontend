@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import TableActions from "../../components/Admin/TableActions";
+import Select from "react-select";
 
 const TripManagement = () => {
   const [trips, setTrips] = useState([]);
@@ -31,7 +32,7 @@ const TripManagement = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8081/api/chuyenxe/getAll",
+        "http://localhost:8081/api/chuyenxe/getAllChuyenXe",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -342,6 +343,16 @@ const TripManagement = () => {
     (vehicle) => vehicle.loaiXe === formData.loaiXe
   );
 
+  const hourOptions = Array.from({ length: 24 }, (_, i) => ({
+    value: i,
+    label: i.toString().padStart(2, "0"),
+  }));
+
+  const minuteOptions = Array.from({ length: 60 }, (_, i) => ({
+    value: i,
+    label: i.toString().padStart(2, "0"),
+  }));
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
       <div className="flex justify-between items-center mb-6">
@@ -380,6 +391,9 @@ const TripManagement = () => {
                   Điểm đến
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Ngày đi
+                </th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Giờ khởi hành
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
@@ -407,6 +421,9 @@ const TripManagement = () => {
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {trip.diemDen}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-900">
+                    {trip.ngayKhoiHanh}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {trip.gioKhoiHanh}
@@ -437,7 +454,7 @@ const TripManagement = () => {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 overflow-visible">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
@@ -593,29 +610,28 @@ const TripManagement = () => {
                 <div>
                   <label className="text-sm text-gray-600">Giờ khởi hành</label>
                   <div className="flex gap-2">
-                    <input
-                      type="number"
+                    <Select
+                      options={hourOptions}
                       placeholder="Giờ"
-                      value={formData.gioKhoiHanh.hour}
-                      onChange={(e) =>
-                        handleTimeChange(e, "gioKhoiHanh", "hour")
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKhoiHanh",
+                          "hour"
+                        )
                       }
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                      min="0"
-                      max="23"
-                      required
                     />
-                    <input
-                      type="number"
+
+                    <Select
+                      options={minuteOptions}
                       placeholder="Phút"
-                      value={formData.gioKhoiHanh.minute}
-                      onChange={(e) =>
-                        handleTimeChange(e, "gioKhoiHanh", "minute")
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKhoiHanh",
+                          "minute"
+                        )
                       }
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                      min="0"
-                      max="59"
-                      required
                     />
                   </div>
                 </div>
@@ -623,29 +639,28 @@ const TripManagement = () => {
                 <div>
                   <label className="text-sm text-gray-600">Giờ kết thúc</label>
                   <div className="flex gap-2">
-                    <input
-                      type="number"
+                    <Select
+                      options={hourOptions}
                       placeholder="Giờ"
-                      value={formData.gioKetThuc.hour}
-                      onChange={(e) =>
-                        handleTimeChange(e, "gioKetThuc", "hour")
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKetThuc",
+                          "hour"
+                        )
                       }
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                      min="0"
-                      max="23"
-                      required
                     />
-                    <input
-                      type="number"
+
+                    <Select
+                      options={minuteOptions}
                       placeholder="Phút"
-                      value={formData.gioKetThuc.minute}
-                      onChange={(e) =>
-                        handleTimeChange(e, "gioKetThuc", "minute")
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKetThuc",
+                          "minute"
+                        )
                       }
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                      min="0"
-                      max="59"
-                      required
                     />
                   </div>
                 </div>

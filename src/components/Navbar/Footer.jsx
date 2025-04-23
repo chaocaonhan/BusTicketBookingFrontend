@@ -115,17 +115,17 @@ const Footer = () => {
 
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-white">Liên hệ</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 t">
               <li className="flex items-start">
-                <MapPin size={20} className="mr-2 text-primary shrink-0 mt-1" />
+                <MapPin size={20} className="mr-2  shrink-0 mt-1" />
                 <span>Bến xe trung tâm Lào Cai</span>
               </li>
               <li className="flex items-center">
-                <Phone size={20} className="mr-2 text-primary" />
+                <Phone size={20} className="mr-2 " />
                 <span>1900 1234</span>
               </li>
               <li className="flex items-center">
-                <Mail size={20} className="mr-2 text-primary" />
+                <Mail size={20} className="mr-2 " />
                 <span>info@saoviet.com</span>
               </li>
             </ul>

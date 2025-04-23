@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 // Layouts
 import Layout from "./Layout/Layout";
@@ -28,6 +29,7 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import UserAccount from "./components/feature/User/UserAccount";
 import TripManagement from "./pages/Admin/TripManagement";
 import BusSearchResults from "./components/Trip/BusSearchResults";
+import SearchBar from "./components/feature/Hero/SearchBar";
 
 // React App
 const App = () => {
@@ -38,7 +40,7 @@ const App = () => {
           {/* USER LAYOUT ROUTES */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/lich-trinh" element={<TuyenXe />} />
+            <Route path="/lich-trinh" element={<BusSearchResults />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<VerifyAccount />} />
@@ -69,6 +71,7 @@ const App = () => {
           </Route>
         </Routes>
       </main>
+      <ToastContainer />
     </Router>
   );
 };

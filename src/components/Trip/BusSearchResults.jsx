@@ -521,86 +521,79 @@ export default function BusBookingInterface() {
       </div>
 
       {/* Middle Column: Bus Results */}
-      <div className="w-1/2 p-4 bg-gray-50">
+      <div className="w-full md:w-1/2 p-4 bg-gray-50 overflow-y-auto">
         {busOptions.map((bus) => (
           <div key={bus.id} className="bg-white rounded-lg mb-4 shadow border">
             <div className="p-4">
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      bus.type.includes("ROYAL")
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {bus.type}
-                  </span>
-                </div>
-                <div className="flex flex-col items-end">
+              {/* Bus Header */}
+              <div className="flex justify-between items-center mb-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    bus.type.includes("ROYAL")
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {bus.type}
+                </span>
+                <div className="flex flex-col items-end gap-1">
                   {bus.company && (
-                    <div className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded mb-1">
+                    <span className="bg-red-100 text-red-800 px-2 py-0.5 text-xs rounded">
                       {bus.company}
-                    </div>
+                    </span>
                   )}
-                  <div className="text-gray-800">
-                    Từ {bus.price.toLocaleString()} đ
-                  </div>
+                  <span className="text-gray-800 font-semibold">
+                    Từ {bus.price.toLocaleString()} VNĐ
+                  </span>
                 </div>
               </div>
 
+              {/* Bus Route Info */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
-                  <div className="font-bold">{bus.departureTime}</div>
+                  <div className="font-bold text-lg">{bus.departureTime}</div>
                   <div className="text-xs text-gray-600">
                     {bus.departureStation}
                   </div>
                 </div>
                 <div className="flex flex-col items-center px-4">
-                  <div className="text-xs text-gray-600">{bus.duration}</div>
-                  <div className="w-24 h-0.5 bg-gray-300 relative my-1">
+                  <span className="text-xs text-gray-600">{bus.duration}</span>
+                  <div className="w-20 h-0.5 bg-gray-300 relative my-1">
                     <div className="absolute -top-1 left-0 w-2 h-2 rounded-full bg-black"></div>
                     <div className="absolute -top-1 right-0 w-2 h-2 rounded-full bg-black"></div>
                   </div>
                 </div>
                 <div className="flex-1 text-right">
-                  <div className="font-bold">{bus.arrivalTime}</div>
+                  <div className="font-bold text-lg">{bus.arrivalTime}</div>
                   <div className="text-xs text-gray-600">
                     {bus.arrivalStation}
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-between text-xs text-gray-600 mb-4">
-                <div>{bus.midStation}</div>
-                <div>{bus.arrivalStation}</div>
-              </div>
-
-              <div className="flex justify-between items-center">
+              {/* Amenities and Seats */}
+              <div className="flex justify-between items-center mb-4">
                 <div>
-                  <div className="text-sm mb-1">Tiện ích</div>
+                  <div className="text-sm font-medium mb-2">Tiện ích</div>
                   {renderAmenities(bus.amenities)}
                 </div>
-                <div className="flex items-center">
-                  <div className="mr-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="mr-1">🚌</span>
-                      <span>{bus.availableSeats} chỗ trống</span>
-                    </div>
-                  </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <span className="mr-1">🚌</span>
+                  <span>{bus.availableSeats} chỗ trống</span>
                 </div>
               </div>
 
-              <div className="mt-2">
-                <div className="flex items-center text-xs text-gray-600 mb-2">
+              {/* Departure Info and Button */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center text-xs text-gray-600">
                   <Clock size={12} className="mr-1" />
                   <span>
                     Khởi hành {bus.departureTime} ({bus.date})
+                    {bus.id === 2 && <span className="ml-1">tới Bắc Ninh</span>}
                   </span>
-                  {bus.id === 2 && <span className="ml-1">tới Bắc Ninh</span>}
                 </div>
                 <button
-                  className="bg-orange-500 text-white px-4 py-2 rounded float-right"
+                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"
                   onClick={() => {
                     setExpandedBus(expandedBus === bus.id ? null : bus.id);
                     setSelectedTab("seats");
@@ -611,6 +604,7 @@ export default function BusBookingInterface() {
               </div>
             </div>
 
+            {/* Expanded Section */}
             {expandedBus === bus.id && (
               <div className="border-t">
                 <Tabs
@@ -618,22 +612,22 @@ export default function BusBookingInterface() {
                   value={selectedTab}
                   onValueChange={setSelectedTab}
                 >
-                  <TabsList className="w-full rounded-none bg-white border-b">
+                  <TabsList className="w-full rounded-none bg-white border-b flex">
                     <TabsTrigger
                       value="seats"
-                      className="flex-1 data-[state=active]:bg-orange-500 data-[state=active]:text-white"
+                      className="flex-1 py-2 text-sm data-[state=active]:bg-orange-500 data-[state=active]:text-white"
                     >
                       Chọn chỗ
                     </TabsTrigger>
                     <TabsTrigger
                       value="route"
-                      className="flex-1 data-[state=active]:bg-orange-500 data-[state=active]:text-white"
+                      className="flex-1 py-2 text-sm data-[state=active]:bg-orange-500 data-[state=active]:text-white"
                     >
                       Lộ trình
                     </TabsTrigger>
                     <TabsTrigger
                       value="bus-info"
-                      className="flex-1 data-[state=active]:bg-orange-500 data-[state=active]:text-white"
+                      className="flex-1 py-2 text-sm data-[state=active]:bg-orange-500 data-[state=active]:text-white"
                     >
                       Thông tin xe
                     </TabsTrigger>
@@ -643,7 +637,9 @@ export default function BusBookingInterface() {
                     <TabsContent value="route">{renderRoute()}</TabsContent>
                     <TabsContent value="bus-info">
                       <div className="py-4">
-                        <h3 className="font-medium mb-2">Thông tin xe</h3>
+                        <h3 className="font-medium text-lg mb-2">
+                          Thông tin xe
+                        </h3>
                         <p className="text-gray-600">
                           {bus.type} - {bus.availableSeats} chỗ
                         </p>
