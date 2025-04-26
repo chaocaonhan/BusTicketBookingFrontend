@@ -7,7 +7,7 @@ import Layout from "./Layout/Layout";
 import AdminLayout from "./Layout/AdminLayout";
 
 // Pages - User
-import Home from "./pages/User/Home";
+import Home from "./pages/HomePage";
 import Register from "./components/feature/User/Register";
 
 import TuyenXe from "./components/TuyenXe/TuyenXe";
@@ -29,7 +29,7 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import UserAccount from "./components/feature/User/UserAccount";
 import TripManagement from "./pages/Admin/TripManagement";
 import BusSearchResults from "./components/Trip/BusSearchResults";
-import SearchBar from "./components/feature/Hero/SearchBar";
+import SearchBar from "./components/feature/Hero/BusSearch";
 
 // React App
 const App = () => {
@@ -71,7 +71,7 @@ const App = () => {
           </Route>
         </Routes>
       </main>
-      <ToastContainer />
+      <ToastContainer limit={3} />
     </Router>
   );
 };

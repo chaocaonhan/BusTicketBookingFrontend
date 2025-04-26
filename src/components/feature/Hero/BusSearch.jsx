@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 export default function BusSearch({ className, onSearch, searchParams }) {
   const [locations, setLocations] = useState([]);
@@ -35,19 +36,51 @@ export default function BusSearch({ className, onSearch, searchParams }) {
   const handleSearch = () => {
     if (departure && destination && departureDate) {
       if (tripType === "roundTrip" && !returnDate) {
-        alert("Vui lòng chọn ngày về!");
+        toast.error("Vui lòng chọn ngày về!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        });
         return;
       }
 
-      onSearch({
+      const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      const formattedDepartureDate = formatDate(departureDate);
+      const formattedReturnDate =
+        tripType === "roundTrip" && returnDate ? formatDate(returnDate) : null;
+
+      console.log("Departure:", departure || "Không có giá trị");
+      console.log("Destination:", destination || "Không có giá trị");
+      console.log("Departure Date:", departureDate || "Không có giá trị");
+      console.log("Return Date:", formattedReturnDate);
+
+      onSearch(
         departure,
         destination,
-        departureDate,
-        returnDate: tripType === "roundTrip" ? returnDate : null,
-        tripType,
-      });
+        formattedDepartureDate,
+        formattedReturnDate
+      );
     } else {
-      alert("Vui lòng điền đầy đủ thông tin!");
+      toast.error("Vui lòng điền đầy đủ thông tin!", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
     }
   };
 
@@ -71,7 +104,7 @@ export default function BusSearch({ className, onSearch, searchParams }) {
       variants={variants}
       transition={{ duration: 0.85, ease: "easeInOut" }}
     >
-      <div className="bg-white rounded-xl mt-3 shadow-lg w-full max-w-4xl mx-4 p-6 border border-gray-100">
+      <div className="bg-white bg-opacity-70 rounded-xl mt-3 shadow-lg w-full max-w-4xl mx-4 p-6 border border-gray-100">
         <div className="flex flex-col gap-6">
           {/* Trip Type Selection */}
           <div className="flex items-center gap-6">
