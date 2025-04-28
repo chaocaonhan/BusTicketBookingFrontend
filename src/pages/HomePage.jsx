@@ -1,74 +1,69 @@
-import React, { useState } from "react";
-import BusSearch from "../components/feature/Hero/BusSearch";
-import PopularRoutes from "../components/feature/Hero/PopularRoutes";
-import BusFeatures from "../components/feature/Hero/BusFeatures";
-import SearchResults from "../components/feature/Hero/SearchResults";
+// src/pages/HomePage.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import BusSearch from "../components/comon/BusSearch";
+import PopularRoutes from "../components/comon/PopularRoutes";
+import BusFeatures from "../components/comon/BusFeatures";
 
 const Home = () => {
-  const [searchResults, setSearchResults] = useState(null);
-  const [searchParams, setSearchParams] = useState({
-    departure: "",
-    destination: "",
-    departureDate: "",
-    returnDate: "",
-  });
+  const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
 
-  const handleSearch = (departure, destination, departureDate, returnDate) => {
-    console.log("Received from BusSearch:");
-    console.log("Departure:", departure);
-    console.log("Destination:", destination);
-    console.log("Departure Date:", departureDate);
-    console.log("Return Date:", returnDate);
+  const handleSearch = (
+    departure,
+    destination,
+    departureDate,
+    returnDate,
+    isReturn
+  ) => {
+    // Đảm bảo isReturn là false nếu không có returnDate
+    if (!returnDate || returnDate === "null") {
+      isReturn = false;
+    }
 
-    setSearchParams({ departure, destination, departureDate, returnDate });
+    console.log("Search triggered with:", {
+      departure,
+      destination,
+      departureDate,
+      returnDate,
+      isReturn,
+    });
 
-    fetch(
-      `http://localhost:8081/api/chuyenxe/search?tinhDi=${encodeURIComponent(
-        departure
-      )}&tinhDen=${encodeURIComponent(destination)}&ngayDi=${encodeURIComponent(
-        departureDate
-      )}`
-    )
-      .then((response) => {
-        if (!response.ok) throw new Error("Không tìm thấy chuyến xe");
-        return response.json();
-      })
-      .then((data) => {
-        setSearchResults(data); // Lưu kết quả từ API
-      })
-      .catch((error) => {
-        console.error("Lỗi khi gọi API:", error);
-        setSearchResults([]);
-      });
+    // Tạo query string từ các tham số tìm kiếm
+    const queryParams = new URLSearchParams({
+      departure,
+      destination,
+      departureDate,
+      returnDate: returnDate || "null", // Đặt null nếu không có returnDate
+      isReturn: isReturn ? "true" : "false",
+    }).toString();
+
+    // Điều hướng đến BookingPage với query string
+    navigate(`/dat-ve?${queryParams}`);
   };
 
   return (
     <div className="relative w-full min-h-screen">
+      {/* Phần BusSearch */}
       <div
         className="w-full grid place-items-center"
         style={{
           minHeight: "500px",
           backgroundImage:
-            "url('https://cuscoperu.b-cdn.net/wp-content/uploads/2024/08/Carretera.jpg')", // URL ảnh
-          backgroundSize: "cover", // Đảm bảo ảnh phủ toàn bộ div
-          backgroundPosition: "center", // Căn giữa ảnh
-          backgroundRepeat: "no-repeat", // Không lặp lại ảnh
+            "url('https://cuscoperu.b-cdn.net/wp-content/uploads/2024/08/Carretera.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       >
         <BusSearch
-          className=" p-6 rounded-lg shadow-lg"
-          onSearch={handleSearch}
-          searchParams={searchParams}
+          className="p-6 rounded-lg shadow-lg"
+          onSearch={handleSearch} // Truyền handleSearch vào BusSearch
         />
       </div>
-      {searchResults ? (
-        <SearchResults results={searchResults} />
-      ) : (
-        <>
-          <PopularRoutes className="px-3" />
-          <BusFeatures />
-        </>
-      )}
+
+      {/* Phần PopularRoutes và BusFeatures */}
+      <PopularRoutes className="px-3" />
+      <BusFeatures />
     </div>
   );
 };

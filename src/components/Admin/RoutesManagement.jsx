@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Thêm Link
-import TableActions from "../../components/Admin/TableActions";
+import TableActions from "./TableActions";
 
 const RoutesManagement = () => {
   const [routes, setRoutes] = useState([]);

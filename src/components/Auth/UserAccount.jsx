@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import avatar from "../../../assets/avatar.png";
+import avatar from "../../assets/avatar.png";
 
 const UserAccount = () => {
   const [userData, setUserData] = useState(null);

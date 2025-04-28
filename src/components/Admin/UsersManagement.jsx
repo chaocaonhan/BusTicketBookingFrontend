@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import TableActions from "../../components/Admin/TableActions";
+import TableActions from "./TableActions";
 import { toast } from "react-toastify";
 
 const UsersManagement = () => {

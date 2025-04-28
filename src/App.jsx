@@ -8,28 +8,28 @@ import AdminLayout from "./Layout/AdminLayout";
 
 // Pages - User
 import Home from "./pages/HomePage";
-import Register from "./components/feature/User/Register";
+import Register from "./components/Auth/Register";
 
-import TuyenXe from "./components/TuyenXe/TuyenXe";
-import VerifyAccount from "./components/feature/User/VerifyAccount";
-import Login from "./components/feature/User/Login";
+import TuyenXe from "./components/comon/TuyenXe";
+import VerifyAccount from "./components/Auth/VerifyAccount";
+import Login from "./components/Auth/Login";
 
-import Unauthorized from "./components/Unauthorized/Unauthorized";
+import Unauthorized from "./components/comon/Unauthorized";
 
 // Pages - Admin
-import Dashboard from "./pages/Admin/Dashboard";
-import RoutesManagement from "./pages/Admin/RoutesManagement";
-import UsersManagement from "./pages/Admin/UsersManagement";
-import ProvinceManagement from "./pages/Admin/ProvinceManagement";
-import VehiclesManagement from "./pages/Admin/VehiclesManagement";
+import Dashboard from "./components/Admin/Dashboard";
+import RoutesManagement from "./components/Admin/RoutesManagement";
+import UsersManagement from "./components/Admin/UsersManagement";
+import ProvinceManagement from "./components/Admin/ProvinceManagement";
+import VehiclesManagement from "./components/Admin/VehiclesManagement";
 import RouteSchedule from "./components/Admin/RouteSchedule";
 
 // Route guard
-import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
-import UserAccount from "./components/feature/User/UserAccount";
-import TripManagement from "./pages/Admin/TripManagement";
-import BusSearchResults from "./components/Trip/BusSearchResults";
-import SearchBar from "./components/feature/Hero/BusSearch";
+import PrivateRoute from "./components/Auth/PrivateRoute";
+import UserAccount from "./components/Auth/UserAccount";
+import TripManagement from "./components/Admin/TripManagement";
+import SearchBar from "./components/comon/BusSearch";
+import BookingPage from "./pages/BookingPage";
 
 // React App
 const App = () => {
@@ -40,7 +40,9 @@ const App = () => {
           {/* USER LAYOUT ROUTES */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/lich-trinh" element={<BusSearchResults />} />
+            <Route path="/dat-ve" element={<BookingPage />}></Route>
+            {/* <Route path="/datve" element={<BookingPage />} /> */}
+            <Route path="/lich-trinh" element={<TuyenXe />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<VerifyAccount />} />

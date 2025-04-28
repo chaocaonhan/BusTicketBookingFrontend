@@ -1,7 +1,7 @@
 // src/components/PrivateRoute.jsx
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 const PrivateRoute = ({ children, requiredRole }) => {
   const isAuthenticated = authService.isAuthenticated();

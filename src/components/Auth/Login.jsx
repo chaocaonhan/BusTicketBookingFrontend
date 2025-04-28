@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; // Import toast
-import authService from "../../../services/authService";
+import authService from "../../services/authService";
 
 const Login = () => {
   const [formData, setFormData] = useState({
