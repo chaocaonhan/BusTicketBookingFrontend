@@ -1,6 +1,3 @@
-// components/TripItem.jsx
-import React from "react";
-
 const TripItem = ({ trip, calculateDuration }) => {
   return (
     <div className="bg-white rounded-lg shadow p-4">
@@ -28,17 +25,43 @@ const TripItem = ({ trip, calculateDuration }) => {
 };
 
 const TripTime = ({ start, end, duration }) => (
-  <div className="flex items-center">
-    <span className="text-xl font-bold">{start.slice(0, 5)}</span>
-    {/* Icon và duration */}
-    <span className="text-xl font-bold ml-auto">{end.slice(0, 5)}</span>
+  <div className="grid grid-cols-3 items-center w-full mb-2">
+    <div className="justify-self-start">
+      <span className="text-xl font-bold">{start.slice(0, 5)}</span>
+    </div>
+
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex items-center">
+        <div className="h-px w-4 bg-gray-300"></div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4 text-gray-500 mx-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <div className="h-px w-4 bg-gray-300"></div>
+      </div>
+      <span className="text-xs text-gray-500 mt-1">{duration}</span>
+    </div>
+
+    <div className="justify-self-end">
+      <span className="text-xl font-bold">{end.slice(0, 5)}</span>
+    </div>
   </div>
 );
 
 const TripLocations = ({ from, to }) => (
   <div className="flex mb-4">
-    <div className="w-1/2 font-medium">{from}</div>
-    <div className="w-1/2 text-right font-medium">{to}</div>
+    <div className="w-1/2 font-medium text-gray-700">{from}</div>
+    <div className="w-1/2 text-right font-medium text-gray-700">{to}</div>
   </div>
 );
 
@@ -57,9 +80,25 @@ const TripPrice = ({ price, type, seats }) => (
 const TripActions = () => (
   <div className="flex border-t pt-4">
     {/* Các action buttons */}
-    <button className="bg-orange-100 text-orange-500 font-medium px-6 py-2 rounded-lg">
-      Chọn chuyến
-    </button>
+    <div className="flex space-x-4">
+      <button className="px-4 py-2 text-orange-600 font-medium">
+        Chọn ghế
+      </button>
+      <button className="px-4 py-2 text-orange-600 font-medium">
+        Lịch trình
+      </button>
+      <button className="px-4 py-2 text-orange-600 font-medium">
+        Trung chuyển
+      </button>
+      <button className="px-4 py-2 text-orange-600 font-medium">
+        Chính sách
+      </button>
+    </div>
+    <div className="ml-auto">
+      <button className="bg-orange-100 text-orange-500 font-medium px-6 py-2 rounded-lg">
+        Chọn chuyến
+      </button>
+    </div>
   </div>
 );
 

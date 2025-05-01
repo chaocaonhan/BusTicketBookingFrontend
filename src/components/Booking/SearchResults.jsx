@@ -3,9 +3,16 @@ import React, { useState, useEffect } from "react";
 import FilterPanel from "./FilterPanel";
 import ResultsHeader from "./ResultsHeader";
 import TripItem from "./TripItem";
-import { parseTime, calculateDuration } from "../utils/timeUtils";
+import { parseTime, calculateDuration } from "@/utils/timeUtils";
 
-const SearchResults = ({ results }) => {
+const SearchResults = ({
+  fromProvince,
+  toProvince,
+  results,
+  isReturn,
+  departureDate,
+  returnDate,
+}) => {
   const [filteredResults, setFilteredResults] = useState(results);
   const [timeFilters, setTimeFilters] = useState({
     morningEarly: false,
@@ -114,16 +121,18 @@ const SearchResults = ({ results }) => {
 
         <div className="w-3/4">
           <ResultsHeader
-            from={results[0]?.diemDi || "Điểm đi"}
-            to={results[0]?.diemDen || "Điểm đến"}
+            from={fromProvince || "Điểm đi"}
+            to={toProvince || "Điểm đến"}
             count={filteredResults.length}
+            isReturn={isReturn}
+            departureDate={departureDate}
+            returnDate={returnDate}
           />
-
           <div className="space-y-4">
             {filteredResults.length > 0 ? (
               filteredResults.map((trip) => (
                 <TripItem
-                  key={`${trip.id}-${trip.gioKhoiHanh}`}
+                  key={trip.id}
                   trip={trip}
                   calculateDuration={calculateDuration}
                 />

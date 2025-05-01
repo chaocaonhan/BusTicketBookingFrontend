@@ -33,7 +33,7 @@ const Home = () => {
       departure,
       destination,
       departureDate,
-      returnDate: returnDate || "null", // Đặt null nếu không có returnDate
+      returnDate: returnDate, // Đặt null nếu không có returnDate
       isReturn: isReturn ? "true" : "false",
     }).toString();
 

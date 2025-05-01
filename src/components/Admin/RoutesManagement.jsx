@@ -133,7 +133,7 @@ const RoutesManagement = () => {
         <h1 className="text-2xl font-bold">Quản lý tuyến xe</h1>
         <button
           onClick={handleAddRoute}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md"
+          className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
         >
           Thêm tuyến xe
         </button>

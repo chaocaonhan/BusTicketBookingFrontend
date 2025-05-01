@@ -1,87 +1,89 @@
-"use client";
-
+// components/FilterPanel.jsx
 import React from "react";
 
-import FilterPanel from "../components/FilterPanel";
-
-export default function Page() {
-  const [timeFilters, setTimeFilters] = React.useState({
-    morningEarly: false,
-    morning: false,
-    afternoon: false,
-    evening: false,
-  });
-
-  const [typeFilters, setTypeFilters] = React.useState({
-    seat: false,
-    bed: false,
-    limousine: false,
-  });
-
-  const [rowFilters, setRowFilters] = React.useState({
-    row1: false,
-    row2: false,
-    row3: false,
-  });
-
-  const [floorFilters, setFloorFilters] = React.useState({
-    floor1: false,
-    floor2: false,
-  });
-
-  const handleTimeFilterChange = (id) => {
-    setTimeFilters((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleTypeFilterChange = (id) => {
-    setTypeFilters((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleRowFilterChange = (id) => {
-    setRowFilters((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleFloorFilterChange = (id) => {
-    setFloorFilters((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleResetFilters = () => {
-    setTimeFilters({
-      morningEarly: false,
-      morning: false,
-      afternoon: false,
-      evening: false,
-    });
-    setTypeFilters({
-      seat: false,
-      bed: false,
-      limousine: false,
-    });
-    setRowFilters({
-      row1: false,
-      row2: false,
-      row3: false,
-    });
-    setFloorFilters({
-      floor1: false,
-      floor2: false,
-    });
-  };
-
+const FilterPanel = ({
+  timeFilters,
+  typeFilters,
+  rowFilters,
+  floorFilters,
+  onTimeFilterChange,
+  onTypeFilterChange,
+  onRowFilterChange,
+  onFloorFilterChange,
+  onResetFilters,
+}) => {
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Bus Ticket Filters</h1>
-      <FilterPanel
-        timeFilters={timeFilters}
-        typeFilters={typeFilters}
-        rowFilters={rowFilters}
-        floorFilters={floorFilters}
-        onTimeFilterChange={handleTimeFilterChange}
-        onTypeFilterChange={handleTypeFilterChange}
-        onRowFilterChange={handleRowFilterChange}
-        onFloorFilterChange={handleFloorFilterChange}
-        onResetFilters={handleResetFilters}
+    <div className="w-1/4 p-6 bg-white rounded-lg shadow mr-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-bold">BỘ LỌC TÌM KIẾM</h3>
+        <button
+          onClick={onResetFilters}
+          className="text-red-500 mr-2 flex items-center"
+        >
+          Bỏ lọc
+          {/* Icon SVG giữ nguyên */}
+        </button>
+      </div>
+
+      <FilterSection
+        title="Giờ đi"
+        filters={timeFilters}
+        onChange={onTimeFilterChange}
+        type="checkbox"
+        options={[
+          { id: "morningEarly", label: "Sáng sớm 00:00 - 06:00" },
+          { id: "morning", label: "Buổi sáng 06:00 - 12:00" },
+          { id: "afternoon", label: "Buổi chiều 12:00 - 18:00" },
+          { id: "evening", label: "Buổi tối 18:00 - 24:00" },
+        ]}
       />
+
+      <FilterSection
+        title="Loại xe"
+        filters={typeFilters}
+        onChange={onTypeFilterChange}
+        type="button"
+        options={[
+          { id: "eco", label: "ECONOMY" },
+          { id: "vip", label: "VIP" },
+          { id: "royal", label: "ROYAL" },
+        ]}
+      />
+
+      {/* Tương tự cho các filter sections khác */}
     </div>
   );
-}
+};
+
+const FilterSection = ({ title, filters, onChange, type, options }) => (
+  <div className="mb-6">
+    <h4 className="font-medium mb-2">{title}</h4>
+    <div className={type === "checkbox" ? "flex flex-col gap-2" : "flex gap-2"}>
+      {options.map(({ id, label }) =>
+        type === "checkbox" ? (
+          <label key={id} className="flex items-center">
+            <input
+              type="checkbox"
+              checked={filters[id]}
+              onChange={() => onChange(id)}
+              className="mr-2"
+            />
+            {label}
+          </label>
+        ) : (
+          <button
+            key={id}
+            className={`px-4 py-2 rounded-md ${
+              filters[id] ? "bg-blue-100 border border-blue-500" : "bg-gray-100"
+            }`}
+            onClick={() => onChange(id)}
+          >
+            {label}
+          </button>
+        )
+      )}
+    </div>
+  </div>
+);
+
+export default FilterPanel;

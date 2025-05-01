@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { set } from "date-fns";
 
 export default function BusSearch({ className, onSearch, searchParams }) {
   const [locations, setLocations] = useState([]);
@@ -28,7 +29,9 @@ export default function BusSearch({ className, onSearch, searchParams }) {
       : ""
   );
 
-  const [tripType, setTripType] = useState(searchParams?.tripType || "oneWay"); // Default to "oneWay"
+  const [isReturn, setIsReturn] = useState(
+    searchParams?.isReturn === true || searchParams?.isReturn === "true"
+  );
 
   const variants = {
     hidden: { opacity: 0, y: -800 },
@@ -55,7 +58,7 @@ export default function BusSearch({ className, onSearch, searchParams }) {
   // Handle search logic
   const handleSearch = () => {
     if (departure && destination && departureDate) {
-      if (tripType === "roundTrip" && !returnDate) {
+      if (isReturn === true && !returnDate) {
         toast.error("Vui lòng chọn ngày về!", {
           position: "top-right",
           autoClose: 3000,
@@ -78,14 +81,14 @@ export default function BusSearch({ className, onSearch, searchParams }) {
 
       const formattedDepartureDate = formatDate(departureDate);
       const formattedReturnDate =
-        tripType === "roundTrip" && returnDate ? formatDate(returnDate) : null;
+        isReturn === true && returnDate ? formatDate(returnDate) : null;
 
       onSearch(
         departure,
         destination,
         formattedDepartureDate,
-        formattedReturnDate,
-        tripType
+        isReturn === true && returnDate ? formattedReturnDate : "",
+        isReturn
       );
     } else {
       toast.error("Vui lòng điền đầy đủ thông tin!", {
@@ -118,8 +121,8 @@ export default function BusSearch({ className, onSearch, searchParams }) {
               <input
                 type="radio"
                 name="tripType"
-                checked={tripType === "oneWay"}
-                onChange={() => setTripType("oneWay")}
+                checked={isReturn === false}
+                onChange={() => setIsReturn(false)}
                 className="mr-2 accent-orange-500"
               />
               <span className="text-base font-medium text-gray-800">
@@ -130,8 +133,8 @@ export default function BusSearch({ className, onSearch, searchParams }) {
               <input
                 type="radio"
                 name="tripType"
-                checked={tripType === "roundTrip"}
-                onChange={() => setTripType("roundTrip")}
+                checked={isReturn === true}
+                onChange={() => setIsReturn(true)}
                 className="mr-2 accent-orange-500"
               />
               <span className="text-base font-medium text-gray-800">
@@ -205,7 +208,7 @@ export default function BusSearch({ className, onSearch, searchParams }) {
             </div>
 
             {/* Return Date Field - Only shown for Round Trip */}
-            {tripType === "roundTrip" && (
+            {isReturn === true && (
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Ngày về</label>
                 <input

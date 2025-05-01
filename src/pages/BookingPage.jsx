@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import BusSearch from "@/components/comon/BusSearch";
-import SearchResults from "@/components/comon/SearchResults";
+import SearchResults from "../components/Booking/SearchResults";
 import { toast } from "react-toastify";
 
 const BookingPage = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // Thêm useNavigate
+
   const queryParams = new URLSearchParams(location.search);
 
   const [searchParams, setSearchParams] = useState({
@@ -13,15 +15,34 @@ const BookingPage = () => {
     destination: queryParams.get("destination") || "",
     departureDate: queryParams.get("departureDate") || "",
     returnDate: queryParams.get("returnDate") || "",
-    tripType: queryParams.get("isReturn") === "true" ? "roundTrip" : "oneWay",
+    isReturn: queryParams.get("isReturn") || false,
   });
 
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Hàm xử lý tìm kiếm
-  const handleSearch = (departure, destination, departureDate, returnDate) => {
-    setSearchParams({ departure, destination, departureDate, returnDate });
+  const handleSearch = (
+    departure,
+    destination,
+    departureDate,
+    returnDate,
+    isReturn
+  ) => {
+    const updatedParams = {
+      departure,
+      destination,
+      departureDate,
+      returnDate,
+      isReturn,
+    };
+
+    // Cập nhật state
+    setSearchParams(updatedParams);
+
+    // Cập nhật URL
+    const newQueryParams = new URLSearchParams(updatedParams);
+    navigate(`?${newQueryParams.toString()}`);
   };
 
   // Fetch dữ liệu chuyến xe
@@ -43,6 +64,8 @@ const BookingPage = () => {
         apiUrl.searchParams.append("tinhDi", searchParams.departure);
         apiUrl.searchParams.append("tinhDen", searchParams.destination);
         apiUrl.searchParams.append("ngayDi", searchParams.departureDate);
+        apiUrl.searchParams.append("ngayVe", searchParams.returnDate);
+        apiUrl.searchParams.append("khuHoi", searchParams.isReturn);
 
         const response = await fetch(apiUrl);
 
@@ -101,7 +124,14 @@ const BookingPage = () => {
           <LoadingSpinner />
         ) : searchResults ? (
           searchResults.length > 0 ? (
-            <SearchResults results={searchResults} />
+            <SearchResults
+              fromProvince={searchParams.departure}
+              toProvince={searchParams.destination}
+              results={searchResults}
+              isReturn={searchParams.isReturn}
+              departureDate={searchParams.departureDate}
+              returnDate={searchParams.returnDate}
+            />
           ) : (
             <div className="text-center py-8">
               <p className="text-xl text-gray-600">
