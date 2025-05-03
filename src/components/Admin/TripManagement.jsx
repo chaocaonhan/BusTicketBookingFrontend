@@ -251,39 +251,50 @@ const TripManagement = () => {
 
   const handleEditTrip = (trip) => {
     setEditingTrip(trip);
+
+    // Nếu muốn load lại bến xe theo tuyến, có thể tìm tuyến theo tên
     const selectedRoute = routes.find(
-      (route) =>
-        route.tinhDi.tenTinhThanh === trip.diemDi.split(" ")[2] &&
-        route.tinhDen.tenTinhThanh === trip.diemDen.split(" ")[2]
+      (route) => route.tenTuyen === trip.tenTuyen
     );
     if (selectedRoute) {
-      fetchStations(selectedRoute.tinhDi.id, true);
-      fetchStations(selectedRoute.tinhDen.id, false);
+      fetchStations(selectedRoute.tinhDi.tenTinhThanh, true);
+      fetchStations(selectedRoute.tinhDen.tenTinhThanh, false);
     }
+
     setFormData({
-      tenTuyen: selectedRoute ? selectedRoute.tenTuyen : "",
-      bienSoXe: trip.bienSoXe || "",
+      tenTuyen: trip.tenTuyen || "",
+      bienSoXe: trip.bienSo || "",
       taiXe: trip.taiXe || "",
-      diemDi: trip.diemDi,
-      diemDen: trip.diemDen,
-      ngayKhoiHanh: trip.ngayKhoiHanh || "2025-04-18",
-      gioKhoiHanh: {
-        hour: parseInt(trip.gioKhoiHanh.split(":")[0]),
-        minute: parseInt(trip.gioKhoiHanh.split(":")[1]),
-        second: parseInt(trip.gioKhoiHanh.split(":")[2]),
-        nano: 0,
-      },
-      gioKetThuc: {
-        hour: parseInt(trip.gioKetThuc.split(":")[0]),
-        minute: parseInt(trip.gioKetThuc.split(":")[1]),
-        second: parseInt(trip.gioKetThuc.split(":")[2]),
-        nano: 0,
-      },
-      giaVe: trip.giaVe,
-      loaiXe: trip.tenLoaiXe,
+      diemDi: trip.diemDi || "",
+      diemDen: trip.diemDen || "",
+      // Chuyển ngày về dạng yyyy-MM-dd nếu cần
+      ngayKhoiHanh: formatDateToInput(trip.ngayKhoiHanh),
+      gioKhoiHanh: parseTime(trip.gioKhoiHanh),
+      gioKetThuc: parseTime(trip.gioKetThuc),
+      giaVe: trip.giaVe || 0,
+      loaiXe: trip.tenLoaiXe || "",
     });
     setShowModal(true);
   };
+
+  // Hàm chuyển ngày "25/12/23" => "2023-12-25"
+  function formatDateToInput(dateStr) {
+    if (!dateStr) return "";
+    const [day, month, year] = dateStr.split("/");
+    return `20${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }
+
+  // Hàm chuyển "06:00" => { hour: 6, minute: 0, second: 0, nano: 0 }
+  function parseTime(timeStr) {
+    if (!timeStr) return { hour: 0, minute: 0, second: 0, nano: 0 };
+    const [hour, minute] = timeStr.split(":");
+    return {
+      hour: parseInt(hour),
+      minute: parseInt(minute),
+      second: 0,
+      nano: 0,
+    };
+  }
 
   const padTime = (num) => num.toString().padStart(2, "0");
 
@@ -291,38 +302,56 @@ const TripManagement = () => {
     e.preventDefault();
     try {
       const payload = {
-        ...formData,
+        tenTuyen: formData.tenTuyen,
+        bienSoXe: formData.bienSoXe,
+        taiXe: formData.taiXe,
+        diemDi: formData.diemDi,
+        diemDen: formData.diemDen,
+        ngayKhoiHanh: formData.ngayKhoiHanh,
         gioKhoiHanh: `${padTime(formData.gioKhoiHanh.hour)}:${padTime(
           formData.gioKhoiHanh.minute
-        )}:00`,
+        )}`,
         gioKetThuc: `${padTime(formData.gioKetThuc.hour)}:${padTime(
           formData.gioKetThuc.minute
-        )}:00`,
+        )}`,
         giaVe: parseInt(formData.giaVe),
       };
 
       console.log("Dữ liệu gửi đi:", payload); // Kiểm tra dữ liệu
 
       const token = localStorage.getItem("token");
-      const url = editingTrip
-        ? `http://localhost:8081/api/chuyenxe/${formData.id}`
-        : "http://localhost:8081/api/chuyenxe/TaoChuyenXe";
-
-      const method = editingTrip ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Không thể ${editingTrip ? "cập nhật" : "thêm"} chuyến xe`
+      let response;
+      if (editingTrip) {
+        // Gọi API cập nhật
+        response = await fetch(
+          `http://localhost:8081/api/chuyenxe/editChuyenXe?id=${editingTrip.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
         );
+      } else {
+        // Gọi API tạo mới (giữ nguyên như cũ)
+        response = await fetch(
+          "http://localhost:8081/api/chuyenxe/TaoChuyenXe",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+      }
+
+      const data = await response.json();
+      if (!response.ok || data.code !== 200) {
+        throw new Error(data.message || "Có lỗi xảy ra!");
       }
 
       setShowModal(false);
@@ -332,7 +361,6 @@ const TripManagement = () => {
           : "Thêm chuyến xe mới thành công!"
       );
       fetchTrips();
-
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       setError(err.message);
@@ -441,10 +469,7 @@ const TripManagement = () => {
                     {trip.soGheTrong}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    <TableActions
-                      onEdit={() => handleEditTrip(trip)}
-                      onDelete={() => {}}
-                    />
+                    <TableActions onEdit={() => handleEditTrip(trip)} />
                   </td>
                 </tr>
               ))}
@@ -613,6 +638,9 @@ const TripManagement = () => {
                     <Select
                       options={hourOptions}
                       placeholder="Giờ"
+                      value={hourOptions.find(
+                        (opt) => opt.value === formData.gioKhoiHanh.hour
+                      )}
                       onChange={(selectedOption) =>
                         handleTimeChange(
                           { target: { value: selectedOption.value } },
@@ -621,10 +649,12 @@ const TripManagement = () => {
                         )
                       }
                     />
-
                     <Select
                       options={minuteOptions}
                       placeholder="Phút"
+                      value={minuteOptions.find(
+                        (opt) => opt.value === formData.gioKhoiHanh.minute
+                      )}
                       onChange={(selectedOption) =>
                         handleTimeChange(
                           { target: { value: selectedOption.value } },
@@ -642,6 +672,9 @@ const TripManagement = () => {
                     <Select
                       options={hourOptions}
                       placeholder="Giờ"
+                      value={hourOptions.find(
+                        (opt) => opt.value === formData.gioKetThuc.hour
+                      )}
                       onChange={(selectedOption) =>
                         handleTimeChange(
                           { target: { value: selectedOption.value } },
@@ -650,10 +683,12 @@ const TripManagement = () => {
                         )
                       }
                     />
-
                     <Select
                       options={minuteOptions}
                       placeholder="Phút"
+                      value={minuteOptions.find(
+                        (opt) => opt.value === formData.gioKetThuc.minute
+                      )}
                       onChange={(selectedOption) =>
                         handleTimeChange(
                           { target: { value: selectedOption.value } },

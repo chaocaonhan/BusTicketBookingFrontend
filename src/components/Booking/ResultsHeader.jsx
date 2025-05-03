@@ -1,11 +1,21 @@
 // components/ResultsHeader.jsx
 import React from "react";
 
-const ResultsHeader = ({ from, to, count, isReturn }) => (
+const ResultsHeader = ({
+  from,
+  to,
+  count,
+  isReturn,
+  departureDate,
+  returnDate,
+  activeTab,
+  setActiveTab,
+}) => (
   <div className="mb-4">
     <h2 className="text-xl font-bold">
       {from} - {to} ({count})
     </h2>
+
     <div className="flex mt-2 gap-2">
       <div className="flex mt-2 gap-2">
         <button className="flex items-center bg-orange-100 text-orange-500 px-3 py-2 rounded-md">
@@ -34,6 +44,30 @@ const ResultsHeader = ({ from, to, count, isReturn }) => (
         </button>
       </div>
     </div>
+    {isReturn === true && (
+      <div className="flex min-w-full justify-center mt-4 mb-2 gap-2">
+        <button
+          className={`w-1/2 py-2 font-semibold rounded-t ${
+            activeTab === "outbound"
+              ? "border-b-2 border-orange-500 text-orange-500"
+              : "text-gray-500"
+          }`}
+          onClick={() => setActiveTab("outbound")}
+        >
+          Chiều đi {departureDate ? `- ${departureDate}` : ""}
+        </button>
+        <button
+          className={`w-1/2  py-2 font-semibold rounded-t ${
+            activeTab === "return"
+              ? "border-b-2 border-orange-500 text-orange-500"
+              : "text-gray-500"
+          }`}
+          onClick={() => setActiveTab("return")}
+        >
+          Chiều về {returnDate ? `- ${returnDate}` : ""}
+        </button>
+      </div>
+    )}
   </div>
 );
 

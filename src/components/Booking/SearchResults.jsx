@@ -107,6 +107,8 @@ const SearchResults = ({
     });
   };
 
+  const [activeTab, setActiveTab] = useState("outbound"); // "outbound" hoặc "return"
+
   return (
     <div className="py-4 max-w-6xl mx-auto">
       <div className="flex">
@@ -127,6 +129,8 @@ const SearchResults = ({
             isReturn={isReturn}
             departureDate={departureDate}
             returnDate={returnDate}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
           />
           <div className="space-y-4">
             {filteredResults.length > 0 ? (
