@@ -1,5 +1,5 @@
 // SearchResults.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import FilterPanel from "./FilterPanel";
 import ResultsHeader from "./ResultsHeader";
 import TripItem from "./TripItem";
@@ -35,9 +35,30 @@ const SearchResults = ({
     lower: false,
   });
 
+  const outboundTrips = useMemo(
+    () => results.filter((trip) => trip.ngayKhoiHanh === departureDate),
+    [results, departureDate]
+  );
+  const returnTrips = useMemo(
+    () => results.filter((trip) => trip.ngayKhoiHanh === returnDate),
+    [results, returnDate]
+  );
+
+  const [activeTab, setActiveTab] = useState("outbound"); // "outbound" hoặc "return"
+
+  const tripsToShow = useMemo(
+    () =>
+      isReturn
+        ? activeTab === "outbound"
+          ? outboundTrips
+          : returnTrips
+        : outboundTrips,
+    [isReturn, activeTab, outboundTrips, returnTrips]
+  );
+
   // Filter logic
   useEffect(() => {
-    let filtered = [...results];
+    let filtered = [...tripsToShow];
 
     // Time filter
     filtered = filtered.filter((trip) => {
@@ -67,7 +88,8 @@ const SearchResults = ({
     });
 
     setFilteredResults(filtered);
-  }, [timeFilters, typeFilters, rowFilters, floorFilters, results]);
+    // eslint-disable-next-line
+  }, [timeFilters, typeFilters, rowFilters, floorFilters, tripsToShow]);
 
   // Filter handlers
   const handleFilterChange = (filterType, filterName) => {
@@ -106,8 +128,6 @@ const SearchResults = ({
       lower: false,
     });
   };
-
-  const [activeTab, setActiveTab] = useState("outbound"); // "outbound" hoặc "return"
 
   return (
     <div className="py-4 max-w-6xl mx-auto">

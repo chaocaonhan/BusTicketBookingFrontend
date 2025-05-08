@@ -15,7 +15,7 @@ const BookingPage = () => {
     destination: queryParams.get("destination") || "",
     departureDate: queryParams.get("departureDate") || "",
     returnDate: queryParams.get("returnDate") || "",
-    isReturn: queryParams.get("isReturn") || false,
+    isReturn: queryParams.get("isReturn") === "true",
   });
 
   const [searchResults, setSearchResults] = useState(null);
@@ -34,14 +34,15 @@ const BookingPage = () => {
       destination,
       departureDate,
       returnDate,
-      isReturn,
+      isReturn: !!isReturn, // ép về boolean
     };
 
-    // Cập nhật state
     setSearchParams(updatedParams);
 
-    // Cập nhật URL
-    const newQueryParams = new URLSearchParams(updatedParams);
+    const newQueryParams = new URLSearchParams({
+      ...updatedParams,
+      isReturn: isReturn ? "true" : "false", // lưu lên URL vẫn là string
+    });
     navigate(`?${newQueryParams.toString()}`);
   };
 
@@ -128,7 +129,7 @@ const BookingPage = () => {
               fromProvince={searchParams.departure}
               toProvince={searchParams.destination}
               results={searchResults}
-              isReturn={searchParams.isReturn}
+              isReturn={!!searchParams.isReturn}
               departureDate={searchParams.departureDate}
               returnDate={searchParams.returnDate}
             />
