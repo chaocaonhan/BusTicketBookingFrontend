@@ -30,7 +30,6 @@ import UserAccount from "./components/Auth/UserAccount";
 import TripManagement from "./components/Admin/TripManagement";
 import SearchBar from "./components/comon/BusSearch";
 import BookingPage from "./pages/BookingPage";
-import SeatPanel from "./components/Booking/SeatPanel";
 
 // React App
 const App = () => {
@@ -42,7 +41,6 @@ const App = () => {
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/dat-ve" element={<BookingPage />}></Route>
-            <Route path="/test" element={<SeatPanel />} />
             <Route path="/lich-trinh" element={<TuyenXe />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />

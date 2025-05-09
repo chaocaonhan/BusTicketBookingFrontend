@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import SeatTable from "./SeatTable";
 
-const TripItem = ({ trip, calculateDuration }) => {
-  const [showSeatMap, setShowSeatMap] = useState(false);
+const TripItem = ({
+  trip,
+  calculateDuration,
+  isSeatMapOpen,
+  onSeatMapToggle,
+}) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [seatData, setSeatData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,12 +17,12 @@ const TripItem = ({ trip, calculateDuration }) => {
   const totalPrice = selectedSeats.length * trip.giaVe;
 
   const handleShowSeatMap = async () => {
-    if (showSeatMap) {
-      setShowSeatMap(false);
+    if (isSeatMapOpen) {
+      onSeatMapToggle(trip.id);
       return;
     }
 
-    setShowSeatMap(true);
+    onSeatMapToggle(trip.id);
     setLoading(true);
     try {
       const response = await axios.get(
@@ -118,21 +122,18 @@ const TripItem = ({ trip, calculateDuration }) => {
           Lịch trình
         </button>
         <button className="px-4 py-2 text-orange-600 font-medium">
-          Trung chuyển
-        </button>
-        <button className="px-4 py-2 text-orange-600 font-medium">
           Chính sách
         </button>
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex space-x-4">
         <button
           className={`font-medium px-6 py-2 rounded-lg ${
             selectedSeats.length > 0
-              ? "bg-orange-500 text-white"
-              : "bg-orange-100 text-orange-500"
+              ? "bg-orange-100 text-orange-500"
+              : "bg-orange-500 text-white"
           }`}
         >
-          {selectedSeats.length > 0 ? "Đặt vé" : "Chọn chuyến"}
+          Chọn chuyến
         </button>
       </div>
     </div>
@@ -162,7 +163,7 @@ const TripItem = ({ trip, calculateDuration }) => {
         selectedSeats={selectedSeats}
       />
 
-      {showSeatMap && (
+      {isSeatMapOpen && (
         <div className="mb-4 relative">
           {loading ? (
             <div className="text-center py-4">Đang tải...</div>
@@ -177,24 +178,26 @@ const TripItem = ({ trip, calculateDuration }) => {
                 pricePerSeat={trip.giaVe}
               />
               {selectedSeats.length > 0 && (
-                <div className="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-md">
-                  <div className="text-sm text-gray-600">Tổng tiền:</div>
-                  <div className="text-xl font-bold text-orange-500">
-                    {totalPrice.toLocaleString()}đ
+                <div className="mb-4 p-2 bg-orange-50 rounded flex justify-between items-center">
+                  <p className="text-sm font-medium text-orange-700">
+                    Đã chọn {selectedSeats.length} ghế:{" "}
+                    {selectedSeats.map((seat) => seat.chair).join(", ")}
+                  </p>
+                  <div className="flex items-center space-x-8">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600">Tổng tiền:</span>
+                      <span className="text-xl font-bold text-orange-500">
+                        {totalPrice.toLocaleString()}đ
+                      </span>
+                    </div>
+                    <button className="font-medium px-6 py-2 rounded-lg bg-orange-500 text-white">
+                      Tiếp tục
+                    </button>
                   </div>
                 </div>
               )}
             </>
           )}
-        </div>
-      )}
-
-      {selectedSeats.length > 0 && (
-        <div className="mb-4 p-2 bg-orange-50 rounded">
-          <p className="text-sm font-medium text-orange-700">
-            Đã chọn {selectedSeats.length} ghế:{" "}
-            {selectedSeats.map((seat) => seat.chair).join(", ")}
-          </p>
         </div>
       )}
     </div>

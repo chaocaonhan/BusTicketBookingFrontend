@@ -34,6 +34,7 @@ const SearchResults = ({
     upper: false,
     lower: false,
   });
+  const [openSeatMapId, setOpenSeatMapId] = useState(null);
 
   const outboundTrips = useMemo(
     () => results.filter((trip) => trip.ngayKhoiHanh === departureDate),
@@ -55,6 +56,11 @@ const SearchResults = ({
         : outboundTrips,
     [isReturn, activeTab, outboundTrips, returnTrips]
   );
+
+  // Reset openSeatMapId when switching tabs
+  useEffect(() => {
+    setOpenSeatMapId(null);
+  }, [activeTab]);
 
   // Filter logic
   useEffect(() => {
@@ -159,6 +165,10 @@ const SearchResults = ({
                   key={trip.id}
                   trip={trip}
                   calculateDuration={calculateDuration}
+                  isSeatMapOpen={openSeatMapId === trip.id}
+                  onSeatMapToggle={(tripId) => {
+                    setOpenSeatMapId(openSeatMapId === tripId ? null : tripId);
+                  }}
                 />
               ))
             ) : (
