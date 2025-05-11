@@ -37,7 +37,7 @@ const AdminLayout = () => {
         }
 
         const data = await response.json();
-        if (data.code === 0) {
+        if (data.code === 200) {
           setUserInfo(data.result);
         } else {
           throw new Error(data.message || "Lỗi khi lấy thông tin người dùng");

@@ -23,6 +23,7 @@ import UsersManagement from "./components/Admin/UsersManagement";
 import ProvinceManagement from "./components/Admin/ProvinceManagement";
 import VehiclesManagement from "./components/Admin/VehiclesManagement";
 import RouteSchedule from "./components/Admin/RouteSchedule";
+import OrderManagement from "./components/Admin/OrderManagement";
 
 // Route guard
 import PrivateRoute from "./components/Auth/PrivateRoute";
@@ -30,6 +31,7 @@ import UserAccount from "./components/Auth/UserAccount";
 import TripManagement from "./components/Admin/TripManagement";
 import SearchBar from "./components/comon/BusSearch";
 import BookingPage from "./pages/BookingPage";
+import BookingDetail from "./components/Booking/BookingDetail";
 
 // React App
 const App = () => {
@@ -42,6 +44,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/dat-ve" element={<BookingPage />}></Route>
             <Route path="/lich-trinh" element={<TuyenXe />} />
+            <Route path="//BookingDetail" element={<BookingDetail />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<VerifyAccount />} />
@@ -62,6 +65,7 @@ const App = () => {
             <Route path="users" element={<UsersManagement />} />
             <Route path="routes" element={<RoutesManagement />} />
             <Route path="manage-trips" element={<TripManagement />} />
+            <Route path="manage-orders" element={<OrderManagement />} />
 
             <Route
               path="routes/:routeId/schedule"

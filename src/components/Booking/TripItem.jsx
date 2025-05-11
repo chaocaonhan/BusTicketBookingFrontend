@@ -7,6 +7,9 @@ const TripItem = ({
   calculateDuration,
   isSeatMapOpen,
   onSeatMapToggle,
+  isReturn,
+  activeTab,
+  onContinueBooking,
 }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [seatData, setSeatData] = useState([]);
@@ -54,6 +57,23 @@ const TripItem = ({
 
   const handleSeatsSelected = (seats) => {
     setSelectedSeats(seats);
+  };
+
+  const handleContinue = () => {
+    const tripInfo = {
+      id: trip.id,
+      diemDi: trip.diemDi,
+      diemDen: trip.diemDen,
+      gioKhoiHanh: trip.gioKhoiHanh,
+      gioKetThuc: trip.gioKetThuc,
+      ngayKhoiHanh: trip.ngayKhoiHanh,
+      giaVe: trip.giaVe,
+      selectedSeats: selectedSeats,
+      totalPrice: totalPrice,
+      tenLoaiXe: trip.tenLoaiXe,
+    };
+
+    onContinueBooking(tripInfo, activeTab);
   };
 
   const TripTime = ({ start, end, duration }) => (
@@ -190,7 +210,10 @@ const TripItem = ({
                         {totalPrice.toLocaleString()}đ
                       </span>
                     </div>
-                    <button className="font-medium px-6 py-2 rounded-lg bg-orange-500 text-white">
+                    <button
+                      onClick={handleContinue}
+                      className="font-medium px-6 py-2 rounded-lg bg-orange-500 text-white"
+                    >
                       Tiếp tục
                     </button>
                   </div>

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 const BookingPage = () => {
   const location = useLocation();
-  const navigate = useNavigate(); // Thêm useNavigate
+  const navigate = useNavigate();
 
   const queryParams = new URLSearchParams(location.search);
 
@@ -20,6 +20,11 @@ const BookingPage = () => {
 
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [bookingInfo, setBookingInfo] = useState({
+    outboundTrip: null,
+    returnTrip: null,
+  });
+  const [activeTab, setActiveTab] = useState("outbound");
 
   // Hàm xử lý tìm kiếm
   const handleSearch = (
@@ -34,16 +39,58 @@ const BookingPage = () => {
       destination,
       departureDate,
       returnDate,
-      isReturn: !!isReturn, // ép về boolean
+      isReturn: !!isReturn,
     };
 
     setSearchParams(updatedParams);
 
     const newQueryParams = new URLSearchParams({
       ...updatedParams,
-      isReturn: isReturn ? "true" : "false", // lưu lên URL vẫn là string
+      isReturn: isReturn ? "true" : "false",
     });
     navigate(`?${newQueryParams.toString()}`);
+  };
+
+  // Hàm xử lý khi chọn ghế và tiếp tục
+  const handleContinueBooking = (tripInfo, currentTab) => {
+    if (searchParams.isReturn) {
+      if (currentTab === "outbound") {
+        // Lưu thông tin chuyến đi và chuyển sang tab chiều về
+        setBookingInfo((prev) => ({
+          ...prev,
+          outboundTrip: tripInfo,
+        }));
+        // Chuyển sang tab chiều về
+        setActiveTab("return");
+      } else {
+        // Lưu thông tin chuyến về và chuyển sang trang đặt vé
+        setBookingInfo((prev) => ({
+          ...prev,
+          returnTrip: tripInfo,
+        }));
+        // Chuyển sang trang đặt vé với thông tin đã lưu
+        navigate("/BookingDetail", {
+          state: {
+            bookingInfo: {
+              ...bookingInfo,
+              returnTrip: tripInfo,
+            },
+          },
+        });
+      }
+    } else {
+      // Chuyến một chiều, lưu thông tin và chuyển sang trang đặt vé
+      setBookingInfo({
+        outboundTrip: tripInfo,
+      });
+      navigate("/BookingDetail", {
+        state: {
+          bookingInfo: {
+            outboundTrip: tripInfo,
+          },
+        },
+      });
+    }
   };
 
   // Fetch dữ liệu chuyến xe
@@ -132,6 +179,9 @@ const BookingPage = () => {
               isReturn={!!searchParams.isReturn}
               departureDate={searchParams.departureDate}
               returnDate={searchParams.returnDate}
+              onContinueBooking={handleContinueBooking}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
           ) : (
             <div className="text-center py-8">

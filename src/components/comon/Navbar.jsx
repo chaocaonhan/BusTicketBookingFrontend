@@ -43,7 +43,7 @@ export const Navbar = () => {
             }
           );
 
-          if (response.data.code === 0) {
+          if (response.data.code === 200) {
             const userData = response.data.result;
             setUserInfo({
               hoTen: userData.hoTen,

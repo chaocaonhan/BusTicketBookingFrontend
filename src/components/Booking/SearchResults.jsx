@@ -12,6 +12,9 @@ const SearchResults = ({
   isReturn,
   departureDate,
   returnDate,
+  onContinueBooking,
+  activeTab,
+  setActiveTab,
 }) => {
   const [filteredResults, setFilteredResults] = useState(results);
   const [timeFilters, setTimeFilters] = useState({
@@ -44,8 +47,6 @@ const SearchResults = ({
     () => results.filter((trip) => trip.ngayKhoiHanh === returnDate),
     [results, returnDate]
   );
-
-  const [activeTab, setActiveTab] = useState("outbound"); // "outbound" hoặc "return"
 
   const tripsToShow = useMemo(
     () =>
@@ -169,6 +170,9 @@ const SearchResults = ({
                   onSeatMapToggle={(tripId) => {
                     setOpenSeatMapId(openSeatMapId === tripId ? null : tripId);
                   }}
+                  isReturn={isReturn}
+                  activeTab={activeTab}
+                  onContinueBooking={onContinueBooking}
                 />
               ))
             ) : (
