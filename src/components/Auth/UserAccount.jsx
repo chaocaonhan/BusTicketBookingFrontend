@@ -31,7 +31,7 @@ const UserAccount = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
 
-        if (data.code === 0) setUserData(data.result);
+        if (data.code === 200) setUserData(data.result);
         else setError("Failed to fetch user data");
 
         setLoading(false);

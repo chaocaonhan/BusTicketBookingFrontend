@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import success from "../../assets/success.png";
 import axios from "axios";
 
 const BookingDetail = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { bookingInfo } = location.state || {};
   const [form, setForm] = useState({
     name: "",
@@ -217,10 +218,24 @@ const BookingDetail = () => {
       );
 
       if (response.data.code === 200) {
-        // Xử lý sau khi đặt vé thành công
-        alert("Đặt vé thành công! Vui lòng thanh toán khi lên xe.");
-        // Có thể chuyển hướng đến trang xác nhận đặt vé
-        // window.location.href = `/booking-confirmation/${response.data.bookingId}`;
+        // Chuẩn bị dữ liệu để chuyển đến trang PaySuccess
+        const successData = {
+          bookingData: {
+            name: form.name,
+            phone: form.phone,
+            email: form.email,
+            total: total,
+            paymentMethod: "Thanh toán khi lên xe",
+          },
+          tripData: {
+            outboundTrip: outboundTrip,
+            ...(isReturn && { returnTrip: returnTrip }),
+          },
+          isReturn: isReturn,
+        };
+
+        // Chuyển hướng đến trang PaySuccess với dữ liệu
+        navigate("/payment-success", { state: successData });
       } else {
         setError(response.data.message || "Có lỗi xảy ra khi đặt vé");
       }

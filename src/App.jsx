@@ -32,6 +32,7 @@ import TripManagement from "./components/Admin/TripManagement";
 import SearchBar from "./components/comon/BusSearch";
 import BookingPage from "./pages/BookingPage";
 import BookingDetail from "./components/Booking/BookingDetail";
+import PaySuccess from "./components/Booking/PaySuccess";
 
 // React App
 const App = () => {
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/verify" element={<VerifyAccount />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/user/profile" element={<UserAccount />} />
+            <Route path="/payment-success" element={<PaySuccess />} />
           </Route>
 
           {/* ADMIN LAYOUT ROUTES */}
