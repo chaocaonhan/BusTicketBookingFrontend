@@ -126,11 +126,6 @@ const UserAccount = () => {
               Thông tin cá nhân
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-gray-500">Tài khoản</div>
-              <div className="font-medium text-gray-700">
-                {userData.id ? `cnhan${userData.id}` : "-"}
-              </div>
-
               <div className="text-gray-500">Họ tên</div>
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-700">

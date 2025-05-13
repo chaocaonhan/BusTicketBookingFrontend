@@ -140,107 +140,152 @@ const PaySuccess = () => {
 
           {/* Ticket Info */}
           <div className="space-y-6">
-            {/* Outbound Trip */}
-            <div className="space-y-4">
-              <h4 className="font-bold text-lg">Chuyến đi</h4>
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex justify-between">
+            <h3 className="text-xl font-bold text-gray-800">THÔNG TIN VÉ</h3>
+            <div
+              className={`grid ${
+                isReturn ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+              } gap-6`}
+            >
+              {/* Outbound Trip */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <h4 className="font-bold text-lg mb-4">Chuyến đi</h4>
+                <div className="space-y-4">
+                  <div className="lineInfo flex justify-between items-start">
                     <span className="text-gray-600">Tuyến:</span>
-                    <span className="font-medium">
-                      {tripData.outboundTrip.diemDi} -{" "}
-                      {tripData.outboundTrip.diemDen}
-                    </span>
+                    <div className="rightInfo">
+                      <span className="font-medium">
+                        {tripData.outboundTrip.diemDi} -{" "}
+                        {tripData.outboundTrip.diemDen}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="lineInfo flex justify-between items-start">
+                    <span className="text-gray-600">Loại xe:</span>
+                    <div className="rightInfo">
+                      <span className="font-medium">
+                        {tripData.outboundTrip.tenLoaiXe}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="lineInfo flex justify-between items-start">
                     <span className="text-gray-600">Ngày:</span>
-                    <span className="font-medium">
-                      {console.log(tripData.outboundTrip.ngayKhoiHanh)}
-                      {console.log(typeof tripData.outboundTrip.ngayKhoiHanh)}
-                      {formatDate(tripData.outboundTrip.ngayKhoiHanh)}
-                    </span>
+                    <div className="rightInfo">
+                      <span className="font-medium">
+                        {formatDate(tripData.outboundTrip.ngayKhoiHanh)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="lineInfo flex justify-between items-start">
                     <span className="text-gray-600">Thời gian:</span>
-                    <span className="font-medium">
-                      {tripData.outboundTrip.gioKhoiHanh}
-                    </span>
+                    <div className="rightInfo">
+                      <span className="font-medium">
+                        {tripData.outboundTrip.gioKhoiHanh}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="lineInfo flex justify-between items-start">
                     <span className="text-gray-600">Số ghế:</span>
-                    <span className="font-medium">
-                      {tripData.outboundTrip.selectedSeats.length}
-                    </span>
+                    <div className="rightInfo">
+                      <span className="font-medium">
+                        {tripData.outboundTrip.selectedSeats.length}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="lineInfo flex justify-between items-start">
                     <span className="text-gray-600">Ghế đã đặt:</span>
-                    <span className="font-medium">
-                      {tripData.outboundTrip.selectedSeats
-                        .map((seat) => seat.chair)
-                        .join(", ")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Giá:</span>
-                    <span className="font-medium">
-                      {tripData.outboundTrip.totalPrice.toLocaleString("vi-VN")}{" "}
-                      VND
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Return Trip (if exists) */}
-            {isReturn && tripData.returnTrip && (
-              <div className="space-y-4">
-                <h4 className="font-bold text-lg">Chuyến về</h4>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Tuyến:</span>
+                    <div className="seatInfo">
                       <span className="font-medium">
-                        {tripData.returnTrip.diemDi} -{" "}
-                        {tripData.returnTrip.diemDen}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Ngày:</span>
-                      <span className="font-medium">
-                        {formatDate(tripData.returnTrip.ngayKhoiHanh)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Thời gian:</span>
-                      <span className="font-medium">
-                        {tripData.returnTrip.gioKhoiHanh}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Số ghế:</span>
-                      <span className="font-medium">
-                        {tripData.returnTrip.selectedSeats.length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Ghế đã đặt:</span>
-                      <span className="font-medium">
-                        {tripData.returnTrip.selectedSeats
+                        {tripData.outboundTrip.selectedSeats
                           .map((seat) => seat.chair)
                           .join(", ")}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Giá:</span>
+                  </div>
+                  <div className="lineInfo flex justify-between items-start">
+                    <span className="text-gray-600">Giá:</span>
+                    <div className="rightInfo">
                       <span className="font-medium">
-                        {tripData.returnTrip.totalPrice.toLocaleString("vi-VN")}{" "}
+                        {tripData.outboundTrip.totalPrice.toLocaleString(
+                          "vi-VN"
+                        )}{" "}
                         VND
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
+
+              {/* Return Trip (if exists) */}
+              {isReturn && tripData.returnTrip && (
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h4 className="font-bold text-lg mb-4">Chuyến về</h4>
+                  <div className="space-y-4">
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Tuyến:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.diemDi} -{" "}
+                          {tripData.returnTrip.diemDen}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Loại xe:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.tenLoaiXe}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Ngày:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {formatDate(tripData.returnTrip.ngayKhoiHanh)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Thời gian:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.gioKhoiHanh}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Số ghế:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.selectedSeats.length}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Ghế đã đặt:</span>
+                      <div className="seatInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.selectedSeats
+                            .map((seat) => seat.chair)
+                            .join(", ")}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lineInfo flex justify-between items-start">
+                      <span className="text-gray-600">Giá:</span>
+                      <div className="rightInfo">
+                        <span className="font-medium">
+                          {tripData.returnTrip.totalPrice.toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VND
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="border-t border-gray-200 my-6"></div>

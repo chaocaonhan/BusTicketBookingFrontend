@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import TableActions from "./TableActions";
+import OrderTickets from "./OrderTickets";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -8,6 +9,7 @@ const OrderManagement = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [formData, setFormData] = useState({
     tenNguoiDat: "",
     tongTien: 0,
@@ -108,6 +110,10 @@ const OrderManagement = () => {
     }
   };
 
+  const handleRowClick = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
       <div className="flex justify-between items-center mb-6">
@@ -148,6 +154,9 @@ const OrderManagement = () => {
                   Số lượng vé
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Tổng tiền
+                </th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Trạng thái thanh toán
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
@@ -157,34 +166,51 @@ const OrderManagement = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.id}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.tenHanhKhach || order.tenNguoiDat || "N/A"}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.sdt || "N/A"}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.soLuongVe || 0}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        order.trangThaiThanhToan === "Đã thanh toán"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {order.trangThaiThanhToan}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    <TableActions onEdit={() => handleEditOrder(order)} />
-                  </td>
-                </tr>
+                <>
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleRowClick(order.id)}
+                  >
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      {order.id}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      {order.tenHanhKhach || order.tenNguoiDat || "N/A"}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      {order.sdt || "N/A"}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      {order.soLuongVe || 0}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      {order.tongTien || 0} VND
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          order.trangThaiThanhToan === "Đã thanh toán"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {order.trangThaiThanhToan}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900">
+                      <TableActions onEdit={() => handleEditOrder(order)} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="6" className="p-0">
+                      <OrderTickets
+                        orderId={order.id}
+                        isExpanded={expandedOrderId === order.id}
+                      />
+                    </td>
+                  </tr>
+                </>
               ))}
             </tbody>
           </table>
