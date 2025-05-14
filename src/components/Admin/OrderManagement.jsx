@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import TableActions from "./TableActions";
 import OrderTickets from "./OrderTickets";
+import React from "react";
+import Paid2 from "../../assets/Paid2.png";
+import Paid from "../../assets/Paid.png";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -114,6 +117,15 @@ const OrderManagement = () => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
       <div className="flex justify-between items-center mb-6">
@@ -151,13 +163,16 @@ const OrderManagement = () => {
                   Số điện thoại
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Số lượng vé
+                  Trạng thái
+                </th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Ngày đặt
+                </th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                  Kiểu thanh toán
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Tổng tiền
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Trạng thái thanh toán
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Thao tác
@@ -166,9 +181,9 @@ const OrderManagement = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {orders.map((order) => (
-                <>
+                <React.Fragment key={order.id}>
                   <tr
-                    key={order.id}
+                    key={order.id + "-main"}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleRowClick(order.id)}
                   >
@@ -182,35 +197,43 @@ const OrderManagement = () => {
                       {order.sdt || "N/A"}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900">
-                      {order.soLuongVe || 0}
+                      {order.trangThai || 0}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900">
-                      {order.tongTien || 0} VND
+                      {formatDate(order.ngayDat)}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          order.trangThaiThanhToan === "Đã thanh toán"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {order.trangThaiThanhToan}
-                      </span>
+                      {order.kieuThanhToan === "CASH" ? "Tiền mặt" : "VNPAY"}
+                    </td>
+                    <td
+                      className={`py-3 px-4 min-w-[200px] text-sm text-gray-900`}
+                      style={
+                        order.trangThaiThanhToan === "PAID"
+                          ? {
+                              backgroundImage: `url(${Paid})`,
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: "calc(100% - 40px) center",
+                              backgroundSize: "52px 40px", // Thêm dòng này để thu nhỏ ảnh
+                            }
+                          : {}
+                      }
+                    >
+                      {(order.tongTien || 0).toLocaleString("vi-VN")} VND
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900">
                       <TableActions onEdit={() => handleEditOrder(order)} />
                     </td>
                   </tr>
-                  <tr>
-                    <td colSpan="6" className="p-0">
+                  <tr key={order.id + "-expand"}>
+                    <td colSpan="6" className="p-0 w-full">
                       <OrderTickets
+                        className=""
                         orderId={order.id}
                         isExpanded={expandedOrderId === order.id}
                       />
                     </td>
                   </tr>
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -320,9 +343,7 @@ const OrderManagement = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-600">
-                    Trạng thái thanh toán
-                  </label>
+                  <label className="text-sm text-gray-600">Thanh toán</label>
                   <select
                     name="trangThaiThanhToan"
                     value={formData.trangThaiThanhToan}
