@@ -1,9 +1,74 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const PaySuccess = () => {
   const location = useLocation();
-  const { bookingData, tripData, isReturn } = location.state || {};
+  const navigate = useNavigate();
+  const [bookingData, setBookingData] = useState(null);
+  const [tripData, setTripData] = useState(null);
+  const [isReturn, setIsReturn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        // Kiểm tra xem có state từ navigation không
+        if (location.state) {
+          setBookingData(location.state.bookingData);
+          setTripData(location.state.tripData);
+          setIsReturn(location.state.isReturn);
+          setLoading(false);
+          return;
+        }
+
+        // Nếu không có state, kiểm tra URL params (từ VNPAY callback)
+        const params = new URLSearchParams(location.search);
+        const bookingId = params.get("bookingId");
+        const paymentMethod = params.get("paymentMethod");
+        const status = params.get("status");
+
+        if (bookingId && paymentMethod === "VNPAY" && status === "success") {
+          // Lấy dữ liệu từ localStorage
+          const savedBooking = localStorage.getItem("currentBooking");
+          if (savedBooking) {
+            const parsedData = JSON.parse(savedBooking);
+            setBookingData(parsedData.bookingData);
+            setTripData(parsedData.tripData);
+            setIsReturn(parsedData.isReturn);
+          } else {
+            // Nếu không có trong localStorage, fetch từ API
+            const response = await axios.get(
+              `http://localhost:8081/api/datve/${bookingId}`
+            );
+            if (response.data.code === 200) {
+              const bookingInfo = response.data.result;
+              // Format dữ liệu để phù hợp với cấu trúc hiện tại
+              setBookingData({
+                name: bookingInfo.hoTen,
+                phone: bookingInfo.sdt,
+                email: bookingInfo.email,
+                total: bookingInfo.tongTien,
+                paymentMethod: "VNPAY",
+                paymentStatus: "Đã thanh toán",
+                bookingDate: new Date(bookingInfo.ngayDat).toLocaleString(
+                  "vi-VN"
+                ),
+              });
+              // Cần thêm logic để lấy thông tin chuyến đi từ API
+              // setTripData(...)
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading booking data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeData();
+  }, [location]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -31,6 +96,17 @@ const PaySuccess = () => {
 
     return date.toLocaleDateString("vi-VN");
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4">Đang tải thông tin đặt vé...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!bookingData || !tripData) {
     return (

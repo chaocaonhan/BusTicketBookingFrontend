@@ -124,46 +124,129 @@ const BookingDetail = () => {
       setLoading(true);
       // Chuẩn bị dữ liệu đặt vé
       const bookingData = {
-        customerInfo: {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
+        // Thông tin người dùng
+        userId: userId,
+        hoTen: form.name,
+        sdt: form.phone,
+        email: form.email,
+
+        // Thông tin thanh toán
+        tongTien: total,
+        kieuThanhToan: "VNPAY",
+        trangThaiThanhToan: 0,
+
+        // Thông tin chuyến đi
+        loaiChuyenDi: isReturn ? 1 : 0,
+
+        // Thông tin chuyến đi
+        chuyenDi: {
+          idChuyenXe: outboundTrip.id,
+          danhSachGheMuonDat: outboundTrip.selectedSeats.map((seat) => seat.id),
         },
-        outboundTrip: {
-          tripId: outboundTrip.id,
-          seats: outboundTrip.selectedSeats.map((seat) => ({
-            seatId: seat.id,
-            seatNumber: seat.chair,
-          })),
-        },
+
+        // Thông tin chuyến về (nếu có)
         ...(isReturn && {
-          returnTrip: {
-            tripId: returnTrip.id,
-            seats: returnTrip.selectedSeats.map((seat) => ({
-              seatId: seat.id,
-              seatNumber: seat.chair,
-            })),
+          chuyenVe: {
+            idChuyenXe: returnTrip.id,
+            danhSachGheMuonDat: returnTrip.selectedSeats.map((seat) => seat.id),
           },
         }),
-        paymentMethod: "VNPAY",
-        totalAmount: total,
       };
 
-      // Gọi API đặt vé với VNPAY
-      const response = await axios.post(
-        "http://localhost:8081/api/datve/thanh-toan-vnpay",
-        bookingData
+      console.log("Booking data:", bookingData);
+
+      // Gọi API đặt vé trước
+      const bookingResponse = await axios.post(
+        "http://localhost:8081/api/datve",
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
 
-      if (response.data.code === 200) {
-        // Xử lý redirect đến trang thanh toán VNPAY
-        window.location.href = response.data.paymentUrl;
+      console.log("Booking response:", bookingResponse.data);
+
+      if (bookingResponse.data.code === 200 && bookingResponse.data.result) {
+        // Lấy bookingId từ response - result giờ là string ID trực tiếp
+        const bookingId = bookingResponse.data.result;
+
+        if (!bookingId) {
+          throw new Error("Không thể lấy được ID đặt vé từ server");
+        }
+
+        console.log("Booking ID:", bookingId);
+
+        // Chuẩn bị dữ liệu để chuyển đến trang PaySuccess
+        const successData = {
+          bookingData: {
+            name: form.name,
+            phone: form.phone,
+            email: form.email,
+            total: total,
+            paymentMethod: "VNPAY",
+            paymentStatus: "Đã thanh toán",
+            bookingDate: new Date().toLocaleString("vi-VN"),
+          },
+          tripData: {
+            outboundTrip: {
+              ...outboundTrip,
+              selectedSeats: outboundTrip.selectedSeats,
+              tenLoaiXe: outboundTrip.tenLoaiXe || "Xe giường nằm",
+              diemDi: outboundTrip.diemDi,
+              diemDen: outboundTrip.diemDen,
+              ngayKhoiHanh: outboundTrip.ngayKhoiHanh,
+              gioKhoiHanh: outboundTrip.gioKhoiHanh,
+              totalPrice: outboundTrip.totalPrice,
+            },
+            ...(isReturn && {
+              returnTrip: {
+                ...returnTrip,
+                selectedSeats: returnTrip.selectedSeats,
+                tenLoaiXe: returnTrip.tenLoaiXe || "Xe giường nằm",
+                diemDi: returnTrip.diemDi,
+                diemDen: returnTrip.diemDen,
+                ngayKhoiHanh: returnTrip.ngayKhoiHanh,
+                gioKhoiHanh: returnTrip.gioKhoiHanh,
+                totalPrice: returnTrip.totalPrice,
+              },
+            }),
+          },
+          isReturn: isReturn,
+        };
+
+        // Lưu thông tin booking vào localStorage
+        localStorage.setItem("currentBooking", JSON.stringify(successData));
+
+        // Gọi API thanh toán VNPAY
+        const paymentResponse = await axios.get(
+          `http://localhost:8081/api/payment/pay-boooking?total=${total}&bookingId=${bookingId}`
+        );
+
+        console.log("Payment response:", paymentResponse.data);
+
+        if (paymentResponse.data) {
+          // Hiển thị thông báo trước khi chuyển hướng
+          alert(
+            "Bạn sẽ được chuyển đến trang thanh toán VNPAY. Vui lòng không đóng trình duyệt cho đến khi hoàn tất thanh toán."
+          );
+
+          // Chuyển hướng đến trang thanh toán VNPAY
+          window.location.href = paymentResponse.data;
+        } else {
+          throw new Error("Không thể tạo URL thanh toán VNPAY");
+        }
       } else {
-        setError(response.data.message || "Có lỗi xảy ra khi thanh toán");
+        throw new Error(
+          bookingResponse.data.message || "Có lỗi xảy ra khi đặt vé"
+        );
       }
     } catch (err) {
+      console.error("Payment error:", err);
       setError(
-        err.response?.data?.message ||
+        err.message ||
+          err.response?.data?.message ||
           "Không thể xử lý thanh toán. Vui lòng thử lại sau."
       );
     } finally {
