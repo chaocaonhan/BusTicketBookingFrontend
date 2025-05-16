@@ -47,7 +47,7 @@ export const Navbar = () => {
             const userData = response.data.result;
             setUserInfo({
               hoTen: userData.hoTen,
-              avatar: userData.avatar || "/default-avatar.png",
+              avatar: userData.avatar || avatar,
             });
             setIsAdmin(userData.vaiTro.includes("ADMIN"));
             setIsLoggedIn(true);
@@ -71,9 +71,20 @@ export const Navbar = () => {
       fetchUserInfo();
     };
 
+    // Thêm event listener cho avatarUpdated
+    const handleAvatarUpdate = (event) => {
+      setUserInfo((prev) => ({
+        ...prev,
+        avatar: event.detail.avatar,
+      }));
+    };
+
     window.addEventListener("authChange", handleAuthChange);
+    window.addEventListener("avatarUpdated", handleAvatarUpdate);
+
     return () => {
       window.removeEventListener("authChange", handleAuthChange);
+      window.removeEventListener("avatarUpdated", handleAvatarUpdate);
     };
   }, []);
 
@@ -187,7 +198,7 @@ export const Navbar = () => {
                       className="flex items-center text-gray-700 hover:text-blue-600"
                     >
                       <img
-                        src={avatar}
+                        src={userInfo?.avatar || avatar}
                         alt="Avatar"
                         className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                       />

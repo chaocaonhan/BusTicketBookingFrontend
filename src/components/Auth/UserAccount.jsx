@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 import OrderTickets from "../Admin/OrderTickets";
 import Paid from "../../assets/Paid.png";
+import axios from "axios";
 
 const UserAccount = () => {
   const [userData, setUserData] = useState(null);
@@ -26,6 +27,9 @@ const UserAccount = () => {
     newPassword: "",
     confirmPassword: "",
   });
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -240,6 +244,50 @@ const UserAccount = () => {
     });
   };
 
+  const onFileChange = (e) => {
+    const f = e.target.files[0];
+    if (f) {
+      setFile(f);
+      setPreview(URL.createObjectURL(f));
+    }
+  };
+
+  const onUpload = async () => {
+    if (!file) return;
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:8081/api/nguoidung/upload-avatar",
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.code === 200) {
+        setUserData({ ...userData, avatar: response.data.result });
+        setShowImageModal(false);
+        toast.success("Cập nhật ảnh đại diện thành công!");
+
+        // Phát event để thông báo cập nhật avatar
+        window.dispatchEvent(
+          new CustomEvent("avatarUpdated", {
+            detail: { avatar: response.data.result },
+          })
+        );
+      } else {
+        throw new Error(response.data.message || "Upload failed");
+      }
+    } catch (err) {
+      toast.error(err.message || "Có lỗi xảy ra khi tải ảnh lên");
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -269,22 +317,25 @@ const UserAccount = () => {
       {/* Sidebar */}
       <div className="w-64 rounded-lg bg-white shadow-md border border-orange-200">
         <div className="p-6 flex flex-col items-center border-b border-orange-100">
-          <div className="w-28 h-28 rounded-full overflow-hidden bg-orange-100 mb-3">
+          <div
+            className="w-28 h-28 rounded-full overflow-hidden bg-orange-100 mb-3 cursor-pointer hover:opacity-80 transition"
+            onClick={() => setShowImageModal(true)}
+          >
             <img
-              src={avatar}
+              src={userData?.avatar || avatar}
               alt="User Avatar"
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="text-lg font-semibold">{userData.hoTen || "User"}</h2>
+          <h2 className="text-lg font-semibold">{userData?.hoTen || "User"}</h2>
           <p className="text-sm text-gray-500">
-            {userData.sdt
+            {userData?.sdt
               ? userData.sdt.substring(0, 3) + "***" + userData.sdt.slice(-4)
               : "-"}
           </p>
 
           <p className="text-sm text-gray-500">
-            {extractTenVaiTro(userData.vaiTro)}
+            {extractTenVaiTro(userData?.vaiTro)}
           </p>
         </div>
 
@@ -726,6 +777,69 @@ const UserAccount = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Image Upload Modal */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Thay đổi ảnh đại diện
+              </h3>
+              <button
+                onClick={() => setShowImageModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex flex-col items-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={onFileChange}
+                  className="mb-4"
+                />
+                {preview && (
+                  <img
+                    src={preview}
+                    alt="preview"
+                    className="max-w-[300px] rounded-lg mb-4"
+                  />
+                )}
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowImageModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={onUpload}
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600"
+                >
+                  Tải lên
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

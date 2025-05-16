@@ -66,7 +66,7 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
                 className="flex items-center text-gray-700 hover:text-blue-600"
               >
                 <img
-                  src={avatar}
+                  src={userInfo?.avatar ? userInfo.avatar : avatar}
                   alt="Avatar"
                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                 />
