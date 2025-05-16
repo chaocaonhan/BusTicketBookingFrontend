@@ -68,34 +68,31 @@ const SearchResults = ({
     let filtered = [...tripsToShow];
 
     // Time filter
-    filtered = filtered.filter((trip) => {
-      const time = parseTime(trip.gioKhoiHanh);
-      const timeChecks = [
-        timeFilters.morningEarly && time >= 0 && time < 6,
-        timeFilters.morning && time >= 6 && time < 12,
-        timeFilters.afternoon && time >= 12 && time < 18,
-        timeFilters.evening && time >= 18 && time <= 24,
-      ];
-
-      if (Object.values(timeFilters).every((v) => !v)) return true;
-      return timeChecks.some(Boolean);
-    });
+    if (Object.values(timeFilters).some(Boolean)) {
+      filtered = filtered.filter((trip) => {
+        const time = parseTime(trip.gioKhoiHanh);
+        return (
+          (timeFilters.morningEarly && time >= 0 && time < 6) ||
+          (timeFilters.morning && time >= 6 && time < 12) ||
+          (timeFilters.afternoon && time >= 12 && time < 18) ||
+          (timeFilters.evening && time >= 18 && time <= 24)
+        );
+      });
+    }
 
     // Type filter
-    filtered = filtered.filter((trip) => {
-      const type = trip.tenLoaiXe?.toLowerCase() || "";
-      const typeChecks = [
-        typeFilters.seat && type.includes("economy"),
-        typeFilters.bed && type.includes("bed"),
-        typeFilters.limousine && type.includes("limousine"),
-      ];
-
-      if (Object.values(typeFilters).every((v) => !v)) return true;
-      return typeChecks.some(Boolean);
-    });
+    if (Object.values(typeFilters).some(Boolean)) {
+      filtered = filtered.filter((trip) => {
+        const type = trip.tenLoaiXe?.toLowerCase() || "";
+        return (
+          (typeFilters.seat && type.includes("economy")) ||
+          (typeFilters.bed && type.includes("vip")) ||
+          (typeFilters.limousine && type.includes("royal"))
+        );
+      });
+    }
 
     setFilteredResults(filtered);
-    // eslint-disable-next-line
   }, [timeFilters, typeFilters, rowFilters, floorFilters, tripsToShow]);
 
   // Filter handlers

@@ -227,11 +227,6 @@ const BookingDetail = () => {
         console.log("Payment response:", paymentResponse.data);
 
         if (paymentResponse.data) {
-          // Hiển thị thông báo trước khi chuyển hướng
-          alert(
-            "Bạn sẽ được chuyển đến trang thanh toán VNPAY. Vui lòng không đóng trình duyệt cho đến khi hoàn tất thanh toán."
-          );
-
           // Chuyển hướng đến trang thanh toán VNPAY
           window.location.href = paymentResponse.data;
         } else {

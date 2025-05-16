@@ -7,6 +7,14 @@ const TuyenXe = () => {
   const [records, setRecords] = useState([]);
   const navigate = useNavigate();
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = [
     {
       name: (
@@ -56,9 +64,7 @@ const TuyenXe = () => {
         <div className="text-center w-full">
           <button
             className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
-            onClick={() =>
-              handleSearchRouteClick(row.tinhDi.id, row.tinhDen.id)
-            }
+            onClick={() => handleSearchRouteClick(row)}
           >
             Tìm tuyến xe
           </button>
@@ -104,13 +110,16 @@ const TuyenXe = () => {
     );
   };
 
-  const handleSearchRouteClick = (originId, destinationId) => {
-    navigate("/lich-trinh", {
-      state: {
-        diemdiId: originId,
-        diemdenId: destinationId,
-      },
-    });
+  const handleSearchRouteClick = (route) => {
+    const today = new Date();
+    const queryParams = new URLSearchParams();
+    queryParams.append("departure", route.tinhDi.tenTinhThanh);
+    queryParams.append("destination", route.tinhDen.tenTinhThanh);
+    queryParams.append("departureDate", formatDate(today));
+    queryParams.append("returnDate", "");
+    queryParams.append("isReturn", "false");
+
+    navigate(`/dat-ve?${queryParams.toString()}`);
   };
 
   return (
