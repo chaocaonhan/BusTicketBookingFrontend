@@ -17,6 +17,11 @@ const ProvinceManagement = () => {
   const [showOptions, setShowOptions] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newProvinceName, setNewProvinceName] = useState("");
+  const [showAddStationModal, setShowAddStationModal] = useState(false);
+  const [newStation, setNewStation] = useState({
+    tenDiemDon: "",
+    diaChi: "",
+  });
 
   const fetchProvinces = async () => {
     try {
@@ -154,6 +159,65 @@ const ProvinceManagement = () => {
     }
   };
 
+  const handleDeleteStation = async (stationId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa điểm đón này?")) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:8081/api/Station/id?id=${stationId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Không thể xóa điểm đón");
+        }
+
+        toast.success("Xóa điểm đón thành công!");
+        fetchPickupPoints(selectedProvince.tenTinhThanh);
+      } catch (err) {
+        toast.error(err.message || "Có lỗi xảy ra khi xóa điểm đón");
+      }
+    }
+  };
+
+  const handleAddStation = async () => {
+    if (!newStation.tenDiemDon.trim() || !newStation.diaChi.trim()) {
+      toast.error("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8081/api/Station/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...newStation,
+          tinhThanh: selectedProvince.tenTinhThanh,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể thêm điểm đón");
+      }
+
+      toast.success("Thêm điểm đón thành công!");
+      setShowAddStationModal(false);
+      setNewStation({ tenDiemDon: "", diaChi: "" });
+      fetchPickupPoints(selectedProvince.tenTinhThanh);
+    } catch (err) {
+      toast.error(err.message || "Có lỗi xảy ra khi thêm điểm đón");
+    }
+  };
+
   useEffect(() => {
     fetchProvinces();
   }, []);
@@ -166,7 +230,7 @@ const ProvinceManagement = () => {
             ? `Danh sách điểm đón tại ${selectedProvince.tenTinhThanh}`
             : "Danh sách tỉnh thành"}
         </h1>
-        {!selectedProvince && (
+        {!selectedProvince ? (
           <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
@@ -185,6 +249,45 @@ const ProvinceManagement = () => {
             </svg>
             Thêm tỉnh thành
           </button>
+        ) : (
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Quay lại
+            </button>
+            <button
+              onClick={() => setShowAddStationModal(true)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Thêm điểm đón
+            </button>
+          </div>
         )}
       </div>
 
@@ -268,23 +371,35 @@ const ProvinceManagement = () => {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4"
               >
-                <button
-                  onClick={handleBack}
-                  className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
-                >
-                  ← Quay lại
-                </button>
-
                 {pickupPoints.length > 0 ? (
                   pickupPoints.map((point) => (
                     <div
                       key={point.id}
-                      className="bg-white shadow rounded-lg p-4 border border-gray-200"
+                      className="bg-white shadow rounded-lg p-4 border border-gray-200 flex justify-between items-center"
                     >
-                      <h3 className="text-lg font-bold text-gray-800">
-                        {point.tenDiemDon}
-                      </h3>
-                      <p className="text-gray-600">{point.diaChi}</p>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">
+                          {point.tenDiemDon}
+                        </h3>
+                        <p className="text-gray-600">{point.diaChi}</p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteStation(point.id)}
+                        className="p-2 text-red-500 hover:text-red-700 transition"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
                     </div>
                   ))
                 ) : (
@@ -423,6 +538,88 @@ const ProvinceManagement = () => {
                 </button>
                 <button
                   onClick={handleAddProvince}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                >
+                  Thêm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Station Modal */}
+      {showAddStationModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Thêm điểm đón mới
+              </h2>
+              <button
+                onClick={() => {
+                  setShowAddStationModal(false);
+                  setNewStation({ tenDiemDon: "", diaChi: "" });
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tên điểm đón
+                </label>
+                <input
+                  type="text"
+                  value={newStation.tenDiemDon}
+                  onChange={(e) =>
+                    setNewStation({ ...newStation, tenDiemDon: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
+                  placeholder="Nhập tên điểm đón"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Địa chỉ
+                </label>
+                <input
+                  type="text"
+                  value={newStation.diaChi}
+                  onChange={(e) =>
+                    setNewStation({ ...newStation, diaChi: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
+                  placeholder="Nhập địa chỉ"
+                />
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowAddStationModal(false);
+                    setNewStation({ tenDiemDon: "", diaChi: "" });
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleAddStation}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
                 >
                   Thêm
