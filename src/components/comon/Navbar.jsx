@@ -24,7 +24,6 @@ export const Navbar = () => {
     { label: "LỊCH TRÌNH", link: "/lich-trinh" },
     { label: "TRA CỨU VÉ", link: "/" },
     { label: "TIN TỨC", link: "/" },
-    { label: "Test", link: "/test" },
   ];
 
   // Fetch user information
