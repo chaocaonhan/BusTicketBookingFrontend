@@ -21,7 +21,7 @@ const TripManagement = () => {
     taiXe: "",
     diemDi: "",
     diemDen: "",
-    ngayKhoiHanh: "2025-04-18", // LocalDate
+    ngayKhoiHanh: "", // LocalDate
     gioKhoiHanh: { hour: 0, minute: 0, second: 0, nano: 0 }, // Sẽ chuyển thành LocalTime
     gioKetThuc: { hour: 0, minute: 0, second: 0, nano: 0 }, // Sẽ chuyển thành LocalTime
     giaVe: 0,
@@ -240,7 +240,7 @@ const TripManagement = () => {
       taiXe: "",
       diemDi: "",
       diemDen: "",
-      ngayKhoiHanh: "2025-04-18",
+      ngayKhoiHanh: "",
       gioKhoiHanh: { hour: 0, minute: 0, second: 0, nano: 0 },
       gioKetThuc: { hour: 0, minute: 0, second: 0, nano: 0 },
       giaVe: 0,
@@ -281,7 +281,7 @@ const TripManagement = () => {
   function formatDateToInput(dateStr) {
     if (!dateStr) return "";
     const [day, month, year] = dateStr.split("/");
-    return `20${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   }
 
   // Hàm chuyển "06:00" => { hour: 6, minute: 0, second: 0, nano: 0 }

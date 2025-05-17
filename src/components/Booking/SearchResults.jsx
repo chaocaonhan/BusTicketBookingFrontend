@@ -38,6 +38,7 @@ const SearchResults = ({
     lower: false,
   });
   const [openSeatMapId, setOpenSeatMapId] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
 
   const outboundTrips = useMemo(
     () => results.filter((trip) => trip.ngayKhoiHanh === departureDate),
@@ -63,7 +64,7 @@ const SearchResults = ({
     setOpenSeatMapId(null);
   }, [activeTab]);
 
-  // Filter logic
+  // Sort and filter logic
   useEffect(() => {
     let filtered = [...tripsToShow];
 
@@ -92,8 +93,24 @@ const SearchResults = ({
       });
     }
 
+    // Sort results
+    if (sortBy) {
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case "price":
+            return a.giaVe - b.giaVe;
+          case "time":
+            return parseTime(a.gioKhoiHanh) - parseTime(b.gioKhoiHanh);
+          case "seats":
+            return b.soGheTrong - a.soGheTrong;
+          default:
+            return 0;
+        }
+      });
+    }
+
     setFilteredResults(filtered);
-  }, [timeFilters, typeFilters, rowFilters, floorFilters, tripsToShow]);
+  }, [timeFilters, typeFilters, rowFilters, floorFilters, tripsToShow, sortBy]);
 
   // Filter handlers
   const handleFilterChange = (filterType, filterName) => {
@@ -108,6 +125,20 @@ const SearchResults = ({
       ...prev,
       [filterName]: !prev[filterName],
     }));
+  };
+
+  const handleSortChange = (sortType) => {
+    setSortBy(sortBy === sortType ? null : sortType);
+  };
+
+  const handleSeatMapToggle = (tripId) => {
+    // Nếu click vào chuyến xe đang mở, đóng nó lại
+    if (openSeatMapId === tripId) {
+      setOpenSeatMapId(null);
+    } else {
+      // Nếu click vào chuyến xe khác, đóng chuyến xe cũ và mở chuyến xe mới
+      setOpenSeatMapId(tripId);
+    }
   };
 
   const resetFilters = () => {
@@ -131,6 +162,7 @@ const SearchResults = ({
       upper: false,
       lower: false,
     });
+    setSortBy(null);
   };
 
   return (
@@ -155,6 +187,8 @@ const SearchResults = ({
             returnDate={returnDate}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
           />
           <div className="space-y-4">
             {filteredResults.length > 0 ? (
@@ -164,9 +198,7 @@ const SearchResults = ({
                   trip={trip}
                   calculateDuration={calculateDuration}
                   isSeatMapOpen={openSeatMapId === trip.id}
-                  onSeatMapToggle={(tripId) => {
-                    setOpenSeatMapId(openSeatMapId === tripId ? null : tripId);
-                  }}
+                  onSeatMapToggle={handleSeatMapToggle}
                   isReturn={isReturn}
                   activeTab={activeTab}
                   onContinueBooking={onContinueBooking}

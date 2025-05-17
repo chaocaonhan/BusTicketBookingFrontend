@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import SeatTable from "./SeatTable";
+import TripSchedule from "./TripSchedule";
 
 const TripItem = ({
   trip,
@@ -15,16 +16,19 @@ const TripItem = ({
   const [seatData, setSeatData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeTabLocal, setActiveTabLocal] = useState(null); // 'seat', 'schedule', 'policy'
 
   // Tính tổng tiền
   const totalPrice = selectedSeats.length * trip.giaVe;
 
   const handleShowSeatMap = async () => {
-    if (isSeatMapOpen) {
+    if (activeTabLocal === "seat") {
+      setActiveTabLocal(null);
       onSeatMapToggle(trip.id);
       return;
     }
 
+    setActiveTabLocal("seat");
     onSeatMapToggle(trip.id);
     setLoading(true);
     try {
@@ -55,6 +59,28 @@ const TripItem = ({
     }
   };
 
+  const handleShowSchedule = () => {
+    if (activeTabLocal === "schedule") {
+      setActiveTabLocal(null);
+    } else {
+      setActiveTabLocal("schedule");
+      if (isSeatMapOpen) {
+        onSeatMapToggle(trip.id);
+      }
+    }
+  };
+
+  const handleShowPolicy = () => {
+    if (activeTabLocal === "policy") {
+      setActiveTabLocal(null);
+    } else {
+      setActiveTabLocal("policy");
+      if (isSeatMapOpen) {
+        onSeatMapToggle(trip.id);
+      }
+    }
+  };
+
   const handleSeatsSelected = (seats) => {
     setSelectedSeats(seats);
   };
@@ -75,6 +101,13 @@ const TripItem = ({
 
     onContinueBooking(tripInfo, activeTab);
   };
+
+  // Reset activeTabLocal when isSeatMapOpen changes
+  React.useEffect(() => {
+    if (!isSeatMapOpen) {
+      setActiveTabLocal(null);
+    }
+  }, [isSeatMapOpen]);
 
   const TripTime = ({ start, end, duration }) => (
     <div className="grid grid-cols-3 items-center w-full mb-2">
@@ -129,19 +162,37 @@ const TripItem = ({
     </div>
   );
 
-  const TripActions = ({ onShowSeatMap, selectedSeats }) => (
+  const TripActions = () => (
     <div className="flex border-t pt-4">
       <div className="flex space-x-4">
         <button
-          className="px-4 py-2 text-orange-600 font-medium"
-          onClick={onShowSeatMap}
+          className={`px-4 py-2 font-medium ${
+            activeTabLocal === "seat"
+              ? "text-orange-500 border-b-2 border-orange-500"
+              : "text-orange-600"
+          }`}
+          onClick={handleShowSeatMap}
         >
           Chọn ghế
         </button>
-        <button className="px-4 py-2 text-orange-600 font-medium">
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTabLocal === "schedule"
+              ? "text-orange-500 border-b-2 border-orange-500"
+              : "text-orange-600"
+          }`}
+          onClick={handleShowSchedule}
+        >
           Lịch trình
         </button>
-        <button className="px-4 py-2 text-orange-600 font-medium">
+        <button
+          className={`px-4 py-2 font-medium ${
+            activeTabLocal === "policy"
+              ? "text-orange-500 border-b-2 border-orange-500"
+              : "text-orange-600"
+          }`}
+          onClick={handleShowPolicy}
+        >
           Chính sách
         </button>
       </div>
@@ -178,12 +229,9 @@ const TripItem = ({
         />
       </div>
 
-      <TripActions
-        onShowSeatMap={handleShowSeatMap}
-        selectedSeats={selectedSeats}
-      />
+      <TripActions />
 
-      {isSeatMapOpen && (
+      {activeTabLocal === "seat" && (
         <div className="mb-4 relative">
           {loading ? (
             <div className="text-center py-4">Đang tải...</div>
@@ -221,6 +269,38 @@ const TripItem = ({
               )}
             </>
           )}
+        </div>
+      )}
+
+      {activeTabLocal === "schedule" && (
+        <div className="mt-4 border-t pt-4">
+          <TripSchedule tripId={trip.id} />
+        </div>
+      )}
+
+      {activeTabLocal === "policy" && (
+        <div className="mt-4 border-t pt-4">
+          <div className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Chính sách chuyến xe</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">Chính sách hủy vé:</h4>
+                <ul className="list-disc list-inside text-gray-600">
+                  <li>Hủy trước 24h: Hoàn tiền 100%</li>
+                  <li>Hủy trước 12h: Hoàn tiền 50%</li>
+                  <li>Hủy sau 12h: Không hoàn tiền</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Chính sách đổi vé:</h4>
+                <ul className="list-disc list-inside text-gray-600">
+                  <li>Đổi vé trước 24h: Miễn phí</li>
+                  <li>Đổi vé trước 12h: Phí 10% giá vé</li>
+                  <li>Đổi vé sau 12h: Phí 20% giá vé</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
