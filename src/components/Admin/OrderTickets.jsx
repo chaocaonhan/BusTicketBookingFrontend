@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { QrCode, Bus, Calendar } from "lucide-react";
+import { QrCode, Bus } from "lucide-react";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -12,7 +12,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [expandedTicket, setExpandedTicket] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState(null);
 
@@ -52,10 +51,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
     fetchTickets();
   }, [orderId, isExpanded]);
 
-  const toggleTicket = (ticketId) => {
-    setExpandedTicket(expandedTicket === ticketId ? null : ticketId);
-  };
-
   const handleCancelTicket = async (ticketId) => {
     try {
       const token = localStorage.getItem("token");
@@ -74,7 +69,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
         throw new Error("Không thể huỷ vé");
       }
 
-      // Update the ticket status in the local state
       setTickets(
         tickets.map((ticket) =>
           ticket.maVeXe === ticketId
@@ -95,7 +89,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
     setShowCancelModal(true);
   };
 
-  // Utility function to format time to HH:mm
   const formatTime = (timeStr) => {
     if (!timeStr) return "";
     const [h, m] = timeStr.split(":");
@@ -122,7 +115,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg mt-2">
-      {/* Cancel Confirmation Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
@@ -157,7 +149,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
             key={ticket.maVeXe}
             className="relative bg-white rounded-lg overflow-hidden shadow-md"
           >
-            {/* Header */}
             <div className="bg-gradient-to-r from-gray-600 to-gray-800 text-white p-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -175,7 +166,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                 </div>
               </div>
             </div>
-            {/* Body */}
             <div className="p-2">
               <div className="flex justify-between items-start mb-2 pl-2">
                 <div className="flex flex-col gap-1">
@@ -184,32 +174,23 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                       {ticket.tenTuyen}
                     </h3>
                   </div>
-                  <div className="mb-1">
-                    <div className="text-sm text-gray-500">
-                      Hạng xe : {ticket.loaiXe}
-                    </div>
+                  <div className="mb-1 text-sm text-gray-500">
+                    Hạng xe : {ticket.loaiXe}
                   </div>
-                  <div className="mb-1">
-                    <div className="text-sm text-gray-500">
-                      Biển kiểm soát : {ticket.bienSoXe}
-                    </div>
+                  <div className="mb-1 text-sm text-gray-500">
+                    Biển kiểm soát : {ticket.bienSoXe}
                   </div>
-                  <div className="mb-1">
-                    <div className="text-sm text-gray-500">
-                      Số ghế : {ticket.tenGhe}
-                    </div>
+                  <div className="mb-1 text-sm text-gray-500">
+                    Số ghế : {ticket.tenGhe}
                   </div>
                 </div>
-                <div className="flex flex-col ">
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Mã vé</div>
-                  </div>
+                <div className="flex flex-col text-right">
+                  <div className="text-xs text-gray-500">Mã vé</div>
                   <div className="font-bold text-gray-500 text-3xl">
                     {ticket.maVeXe}
                   </div>
                 </div>
               </div>
-              {/* Timeline */}
               <div className="w-full py-4">
                 <Timeline
                   position="right"
@@ -229,7 +210,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                       <div className="text-sm">{ticket.trungChuyenTu}</div>
                     </TimelineContent>
                   </TimelineItem>
-
                   <TimelineItem>
                     <TimelineSeparator>
                       <TimelineDot color="grey" />
@@ -246,7 +226,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                       </div>
                     </TimelineContent>
                   </TimelineItem>
-
                   <TimelineItem>
                     <TimelineSeparator>
                       <TimelineDot color="grey" />
@@ -263,7 +242,6 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                       </div>
                     </TimelineContent>
                   </TimelineItem>
-
                   <TimelineItem>
                     <TimelineSeparator>
                       <TimelineDot color="grey" />
@@ -274,13 +252,11 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                   </TimelineItem>
                 </Timeline>
               </div>
-              {/* Đường đục lỗ */}
               <div className="relative py-1">
                 <div className="absolute left-0 top-1/2 -ml-2 w-3 h-3 bg-gray-50 rounded-full"></div>
                 <div className="border-t-2 border-dashed border-gray-300"></div>
                 <div className="absolute right-0 top-1/2 -mr-2 w-3 h-3 bg-gray-50 rounded-full"></div>
               </div>
-              {/* Footer */}
               <div className="pt-1 flex justify-between items-center">
                 <div>
                   <div className="text-xs text-gray-500">Giá vé</div>
@@ -295,54 +271,14 @@ const OrderTickets = ({ orderId, isExpanded }) => {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                {/* Nút Đánh giá - chiếm phần lớn chiều ngang */}
-                <button
-                  onClick={() => toggleTicket(ticket.maVeXe)}
-                  className="flex-1 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  {expandedTicket === ticket.maVeXe
-                    ? "Ẩn thông tin"
-                    : "Đánh giá chuyến đi"}
-                </button>
-
-                {/* Nút Huỷ vé - nhỏ hơn, không giãn */}
-                {ticket.trangThaiVe === "BOOKED" && (
+              {ticket.trangThaiVe === "BOOKED" && (
+                <div className="flex items-center justify-end mt-2">
                   <button
                     onClick={() => openCancelModal(ticket.maVeXe)}
                     className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Huỷ
                   </button>
-                )}
-              </div>
-
-              {/* Phần mở rộng */}
-              {expandedTicket === ticket.maVeXe && (
-                <div className="mt-2 p-2 bg-gray-50 rounded-md">
-                  <div className="text-sm font-medium mb-2">
-                    Đánh giá chuyến đi
-                  </div>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        className="text-2xl text-gray-300 hover:text-yellow-400"
-                      >
-                        ★
-                      </button>
-                    ))}
-                  </div>
-                  <textarea
-                    className="w-full mt-2 p-2 border border-gray-200 rounded-md text-sm"
-                    placeholder="Nhập đánh giá của bạn..."
-                    rows={3}
-                  />
-                  <div className="flex gap-2 mt-2">
-                    <button className="bg-gray-600 text-white px-3 py-1 rounded-md text-xs">
-                      Gửi đánh giá
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

@@ -31,6 +31,12 @@ const UserAccount = () => {
   const [preview, setPreview] = useState("");
   const [showImageModal, setShowImageModal] = useState(false);
   const navigate = useNavigate();
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [existingRating, setExistingRating] = useState(null);
+  const [expandedRatingOrderId, setExpandedRatingOrderId] = useState(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -231,7 +237,11 @@ const UserAccount = () => {
     }
   };
 
-  const handleRowClick = (orderId) => {
+  const handleRowClick = (orderId, event) => {
+    // Prevent row click if clicking on rating button
+    if (event.target.closest("button")) {
+      return;
+    }
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
@@ -286,6 +296,83 @@ const UserAccount = () => {
     } catch (err) {
       toast.error(err.message || "Có lỗi xảy ra khi tải ảnh lên");
     }
+  };
+
+  const handleRatingSubmit = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8081/api/danhGia", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          soSao: rating,
+          noiDung: comment,
+          maDonDatVe: orderId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể gửi đánh giá");
+      }
+
+      const data = await response.json();
+      if (data.code === 200) {
+        toast.success("Gửi đánh giá thành công!");
+        setExpandedRatingOrderId(null);
+        setRating(0);
+        setComment("");
+        // Refresh orders to update daDanhGia status
+        fetchOrders();
+      } else {
+        throw new Error(data.message || "Lỗi khi gửi đánh giá");
+      }
+    } catch (err) {
+      toast.error(err.message || "Có lỗi xảy ra khi gửi đánh giá");
+    }
+  };
+
+  const fetchExistingRating = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/danhGia/getByIdDonDat/${orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể lấy thông tin đánh giá");
+      }
+
+      const data = await response.json();
+      if (data.code === 200) {
+        setExistingRating(data.result);
+      }
+    } catch (err) {
+      console.error("Error fetching rating:", err);
+    }
+  };
+
+  const handleRatingClick = (orderId) => {
+    setSelectedOrderId(orderId);
+    setShowRatingModal(true);
+    if (orders.find((o) => o.id === orderId)?.daDanhGia) {
+      fetchExistingRating(orderId);
+    }
+  };
+
+  const handleCloseRatingModal = () => {
+    setShowRatingModal(false);
+    setSelectedOrderId(null);
+    setRating(0);
+    setComment("");
+    setExistingRating(null);
   };
 
   if (loading)
@@ -609,13 +696,7 @@ const UserAccount = () => {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        ID
-                      </th>
-                      <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Tên khách hàng
-                      </th>
-                      <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                        Số điện thoại
+                        Mã đơn hàng
                       </th>
                       <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                         Trạng thái
@@ -629,6 +710,9 @@ const UserAccount = () => {
                       <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                         Tổng tiền
                       </th>
+                      <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                        Đánh giá
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -636,16 +720,10 @@ const UserAccount = () => {
                       <React.Fragment key={order.id}>
                         <tr
                           className="hover:bg-gray-50 cursor-pointer"
-                          onClick={() => handleRowClick(order.id)}
+                          onClick={(e) => handleRowClick(order.id, e)}
                         >
                           <td className="py-3 px-4 text-sm text-gray-900">
                             {order.id}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-gray-900">
-                            {order.tenHanhKhach || order.tenNguoiDat || "N/A"}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-gray-900">
-                            {order.sdt || "N/A"}
                           </td>
                           <td className="py-3 px-4 text-sm text-gray-900">
                             {order.trangThai || 0}
@@ -673,6 +751,29 @@ const UserAccount = () => {
                             }
                           >
                             {(order.tongTien || 0).toLocaleString("vi-VN")} VND
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent row click
+                                handleRatingClick(order.id);
+                              }}
+                              className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              {order.daDanhGia ? "Xem đánh giá" : "Đánh giá"}
+                            </button>
                           </td>
                         </tr>
                         <tr>
@@ -839,6 +940,93 @@ const UserAccount = () => {
                   Tải lên
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {orders.find((o) => o.id === selectedOrderId)?.daDanhGia
+                  ? "Đánh giá của bạn"
+                  : "Đánh giá chuyến đi"}
+              </h3>
+              <button
+                onClick={handleCloseRatingModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex gap-1 justify-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() =>
+                      !orders.find((o) => o.id === selectedOrderId)
+                        ?.daDanhGia && setRating(star)
+                    }
+                    className={`text-3xl ${
+                      star <= (existingRating?.soSao || rating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    } ${
+                      !orders.find((o) => o.id === selectedOrderId)?.daDanhGia
+                        ? "hover:text-yellow-400"
+                        : ""
+                    }`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              <textarea
+                className="w-full p-3 border border-gray-200 rounded-md text-sm"
+                placeholder="Nhập đánh giá của bạn..."
+                rows={4}
+                value={existingRating?.noiDung || comment}
+                onChange={(e) =>
+                  !orders.find((o) => o.id === selectedOrderId)?.daDanhGia &&
+                  setComment(e.target.value)
+                }
+                disabled={
+                  orders.find((o) => o.id === selectedOrderId)?.daDanhGia
+                }
+              />
+              {!orders.find((o) => o.id === selectedOrderId)?.daDanhGia && (
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={handleCloseRatingModal}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    onClick={() => handleRatingSubmit(selectedOrderId)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600"
+                  >
+                    Gửi đánh giá
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

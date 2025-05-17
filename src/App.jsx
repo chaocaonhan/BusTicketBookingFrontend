@@ -33,6 +33,7 @@ import SearchBar from "./components/comon/BusSearch";
 import BookingPage from "./pages/BookingPage";
 import BookingDetail from "./components/Booking/BookingDetail";
 import PaySuccess from "./components/Booking/PaySuccess";
+import RatingManagement from "./components/Admin/RatingManagement";
 
 // React App
 const App = () => {
@@ -65,6 +66,7 @@ const App = () => {
           >
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<UsersManagement />} />
+            <Route path="rating" element={<RatingManagement />} />
             <Route path="routes" element={<RoutesManagement />} />
             <Route path="manage-trips" element={<TripManagement />} />
             <Route path="manage-orders" element={<OrderManagement />} />
