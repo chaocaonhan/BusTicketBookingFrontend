@@ -249,7 +249,7 @@ const BookingDetail = () => {
     }
   };
 
-  const handleChoosePayment = async () => {
+  const handleChooseCashPayment = async () => {
     try {
       setLoading(true);
 
@@ -334,17 +334,23 @@ const BookingDetail = () => {
           {/* Thông tin chuyến đi - 2 cột */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Thông tin lượt đi */}
-            <div className="bg-white rounded-xl shadow p-4">
-              <div className="font-bold text-xl text-black mb-3">
+            <div className="bg-white rounded-xl shadow p-8">
+              <div className="font-bold text-xl text-black mb-6">
                 Thông tin lượt đi
               </div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-[#3b4a54]">Tuyến xe</span>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-[#3b4a54]">Tuyến</span>
                 <span className="font-semibold text-black">
                   {outboundTrip.diemDi} - {outboundTrip.diemDen}
                 </span>
               </div>
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-[#3b4a54]">Loại xe</span>
+                <span className="font-semibold text-black">
+                  {outboundTrip.tenLoaiXe}
+                </span>
+              </div>
+              <div className="flex justify-between items-center mb-4">
                 <span className="text-[#3b4a54]">Thời gian xuất bến</span>
                 <span className="font-semibold text-green-700">
                   {formatDateTime(
@@ -353,19 +359,19 @@ const BookingDetail = () => {
                   )}
                 </span>
               </div>
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-4">
                 <span className="text-[#3b4a54]">Số lượng ghế</span>
                 <span className="font-semibold text-black">
                   {outboundTrip.selectedSeats.length} Ghế
                 </span>
               </div>
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-4">
                 <span className="text-[#3b4a54]">Số ghế</span>
                 <span className="font-semibold text-green-700">
                   {outboundTrip.selectedSeats.map((s) => s.chair).join(", ")}
                 </span>
               </div>
-              <div className="flex justify-between items-center mt-2">
+              <div className="flex justify-between items-center mt-6 pt-4 border-t">
                 <span className="text-[#3b4a54] font-semibold">
                   Tổng tiền lượt đi
                 </span>
@@ -376,17 +382,23 @@ const BookingDetail = () => {
             </div>
             {/* Thông tin lượt về */}
             {isReturn && (
-              <div className="bg-white rounded-xl shadow p-4">
-                <div className="font-bold text-xl text-black mb-3">
+              <div className="bg-white rounded-xl shadow p-8">
+                <div className="font-bold text-xl text-black mb-6">
                   Thông tin lượt về
                 </div>
-                <div className="flex justify-between items-center mb-1">
+                <div className="flex justify-between items-center mb-4">
                   <span className="text-[#3b4a54]">Tuyến xe</span>
                   <span className="font-semibold text-black">
                     {returnTrip.diemDi} - {returnTrip.diemDen}
                   </span>
                 </div>
-                <div className="flex justify-between items-center mb-1">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-[#3b4a54]">Loại xe</span>
+                  <span className="font-semibold text-black">
+                    {returnTrip.tenLoaiXe}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mb-4">
                   <span className="text-[#3b4a54]">Thời gian xuất bến</span>
                   <span className="font-semibold text-green-700">
                     {formatDateTime(
@@ -395,19 +407,19 @@ const BookingDetail = () => {
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between items-center mb-1">
+                <div className="flex justify-between items-center mb-4">
                   <span className="text-[#3b4a54]">Số lượng ghế</span>
                   <span className="font-semibold text-black">
                     {returnTrip.selectedSeats.length} Ghế
                   </span>
                 </div>
-                <div className="flex justify-between items-center mb-1">
+                <div className="flex justify-between items-center mb-4">
                   <span className="text-[#3b4a54]">Số ghế</span>
                   <span className="font-semibold text-green-700">
                     {returnTrip.selectedSeats.map((s) => s.chair).join(", ")}
                   </span>
                 </div>
-                <div className="flex justify-between items-center mt-2">
+                <div className="flex justify-between items-center mt-6 pt-4 border-t">
                   <span className="text-[#3b4a54] font-semibold">
                     Tổng tiền lượt về
                   </span>
@@ -586,7 +598,7 @@ const BookingDetail = () => {
                   </button>
                   <button
                     className="w-full py-3 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={handleChoosePayment}
+                    onClick={handleChooseCashPayment}
                   >
                     Thanh toán khi lên xe
                   </button>

@@ -367,6 +367,34 @@ const TripManagement = () => {
     }
   };
 
+  const handleDeleteTrip = async (trip) => {
+    if (window.confirm(`Bạn có chắc chắn muốn hủy chuyến xe này?`)) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:8081/api/chuyenxe/huyChuyen/${trip.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok || data.code !== 200) {
+          throw new Error(data.message || "Có lỗi xảy ra khi hủy chuyến xe!");
+        }
+
+        setSuccessMessage("Hủy chuyến xe thành công!");
+        fetchTrips();
+        setTimeout(() => setSuccessMessage(""), 3000);
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+  };
+
   const filteredVehicles = vehicles.filter(
     (vehicle) => vehicle.loaiXe === formData.loaiXe
   );
@@ -469,7 +497,10 @@ const TripManagement = () => {
                     {trip.soGheTrong}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    <TableActions onEdit={() => handleEditTrip(trip)} />
+                    <TableActions
+                      onEdit={() => handleEditTrip(trip)}
+                      onDelete={() => handleDeleteTrip(trip)}
+                    />
                   </td>
                 </tr>
               ))}

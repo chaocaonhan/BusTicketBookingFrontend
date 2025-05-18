@@ -375,6 +375,33 @@ const UserAccount = () => {
     setExistingRating(null);
   };
 
+  const handleCancelOrder = async (orderId) => {
+    if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:8081/api/datve/huyDon/${orderId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok || data.code !== 200) {
+          throw new Error(data.message || "Có lỗi xảy ra khi hủy đơn hàng!");
+        }
+
+        toast.success("Hủy đơn hàng thành công!");
+        fetchOrders(); // Refresh the orders list
+      } catch (err) {
+        toast.error(err.message || "Có lỗi xảy ra khi hủy đơn hàng");
+      }
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -713,6 +740,9 @@ const UserAccount = () => {
                       <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                         Đánh giá
                       </th>
+                      <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
+                        Thao tác
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -773,6 +803,17 @@ const UserAccount = () => {
                                 />
                               </svg>
                               {order.daDanhGia ? "Xem đánh giá" : "Đánh giá"}
+                            </button>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent row click
+                                handleCancelOrder(order.id);
+                              }}
+                              className="text-red-600 hover:text-red-800 transition-colors"
+                            >
+                              Hủy đơn
                             </button>
                           </td>
                         </tr>
