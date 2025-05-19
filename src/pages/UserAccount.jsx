@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../components/UserAccount/Sidebar";
 import MyAccount from "../components/UserAccount/MyAccount";
@@ -41,6 +42,14 @@ const UserAccount = () => {
   const [existingRating, setExistingRating] = useState(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/user/bookings") {
+      setShowTicketHistory(true);
+      fetchOrders();
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -404,6 +413,9 @@ const UserAccount = () => {
   };
 
   const handleMenuClick = (item) => {
+    if (item === "Thông tin tài khoản") {
+      setShowTicketHistory(false);
+    }
     if (item === "Đổi mật khẩu") {
       setShowPasswordModal(true);
     } else if (item === "Đăng xuất") {
@@ -411,6 +423,33 @@ const UserAccount = () => {
     } else if (item === "Lịch sử mua vé") {
       setShowTicketHistory(true);
       fetchOrders();
+    }
+  };
+
+  const handleRepayment = async (orderId, total) => {
+    setLoading(true);
+    try {
+      const paymentResponse = await axios.get(
+        `http://localhost:8081/api/payment/pay-boooking?total=${total}&bookingId=${orderId}`
+      );
+
+      console.log("Payment response:", paymentResponse.data);
+
+      if (paymentResponse.data) {
+        // Chuyển hướng đến trang thanh toán VNPAY
+        window.location.href = paymentResponse.data;
+      } else {
+        throw new Error("Không thể tạo URL thanh toán VNPAY");
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      setError(
+        err.message ||
+          err.response?.data?.message ||
+          "Không thể xử lý thanh toán. Vui lòng thử lại sau."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -450,6 +489,7 @@ const UserAccount = () => {
             handleRatingClick={handleRatingClick}
             handleCancelOrder={handleCancelOrder}
             formatDate={formatDate}
+            handleRepayment={handleRepayment}
           />
         ) : (
           <MyAccount

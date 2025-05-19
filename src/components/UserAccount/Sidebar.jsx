@@ -32,7 +32,12 @@ const Sidebar = ({ userData, onMenuClick, onAvatarClick }) => {
       </div>
 
       <ul className="p-4 space-y-2">
-        {["Đổi mật khẩu", "Lịch sử mua vé", "Đăng xuất"].map((item) => (
+        {[
+          "Thông tin tài khoản",
+          "Đổi mật khẩu",
+          "Lịch sử mua vé",
+          "Đăng xuất",
+        ].map((item) => (
           <li
             key={item}
             className="py-2 px-3 rounded-lg hover:bg-orange-100 flex justify-between items-center cursor-pointer transition"

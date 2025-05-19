@@ -2,12 +2,20 @@ import React from "react";
 import OrderTickets from "../Admin/OrderTickets";
 import Paid from "../../assets/Paid.png";
 
+function isWithin10Minutes(dateString) {
+  const now = new Date();
+  const orderDate = new Date(dateString);
+  const diffMs = now - orderDate;
+  return diffMs >= 0 && diffMs <= 10 * 60 * 1000;
+}
+
 const MyBooking = ({
   orders,
   expandedOrderId,
   handleRowClick,
   handleRatingClick,
   handleCancelOrder,
+  handleRepayment,
   formatDate,
 }) => {
   return (
@@ -76,6 +84,19 @@ const MyBooking = ({
                     }
                   >
                     {(order.tongTien || 0).toLocaleString("vi-VN")} VND
+                    {/* Hiển thị nút Thanh toán nếu đủ điều kiện */}
+                    {order.kieuThanhToan === "VNPAY" &&
+                      order.trangThaiThanhToan === "UNPAID" &&
+                      isWithin10Minutes(order.ngayDat) && (
+                        <button
+                          className="ml-2 px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-xs"
+                          onClick={() =>
+                            handleRepayment(order.id, order.tongTien)
+                          }
+                        >
+                          Thanh toán
+                        </button>
+                      )}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     <button
