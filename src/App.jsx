@@ -27,13 +27,14 @@ import OrderManagement from "./components/Admin/OrderManagement";
 
 // Route guard
 import PrivateRoute from "./components/Auth/PrivateRoute";
-import UserAccount from "./components/Auth/UserAccount";
+import UserAccount from "./pages/UserAccount";
 import TripManagement from "./components/Admin/TripManagement";
 import SearchBar from "./components/comon/BusSearch";
 import BookingPage from "./pages/BookingPage";
 import BookingDetail from "./components/Booking/BookingDetail";
 import PaySuccess from "./components/Booking/PaySuccess";
 import RatingManagement from "./components/Admin/RatingManagement";
+import PayFail from "./components/Booking/PayFail";
 
 // React App
 const App = () => {
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/user/profile" element={<UserAccount />} />
             <Route path="/payment-success" element={<PaySuccess />} />
+            <Route path="/payment-failed" element={<PayFail />} />
           </Route>
 
           {/* ADMIN LAYOUT ROUTES */}

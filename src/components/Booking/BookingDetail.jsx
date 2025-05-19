@@ -12,11 +12,13 @@ const BookingDetail = () => {
     phone: "",
     email: "",
     agree: false,
+    promotionCode: "",
   });
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   // Lấy thông tin người dùng khi component được khởi tạo
   useEffect(() => {
@@ -73,7 +75,9 @@ const BookingDetail = () => {
     `${time} ${date.split("-").reverse().join("/")}`;
 
   // Tổng tiền
-  const total = (outboundTrip?.totalPrice || 0) + (returnTrip?.totalPrice || 0);
+  const total =
+    ((outboundTrip?.totalPrice || 0) + (returnTrip?.totalPrice || 0)) *
+    (1 - discountAmount / 100);
 
   const checkSeatsAvailability = async () => {
     try {
@@ -326,6 +330,51 @@ const BookingDetail = () => {
     }
   };
 
+  // Add promotion code validation function
+  const validatePromotionCode = async (code) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8081/api/khuyen-mai/check?maKm=${code}`
+      );
+      if (
+        response.data.code === 200 &&
+        response.data.message === "Áp mã thành công"
+      ) {
+        const discount = response.data.result;
+        setDiscountAmount(discount);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error("Error validating promotion code:", err);
+      return false;
+    }
+  };
+
+  // Add promotion code handler
+  const handlePromotionCode = async () => {
+    if (!form.promotionCode) {
+      setError("Vui lòng nhập mã khuyến mãi");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const isValid = await validatePromotionCode(form.promotionCode);
+      if (isValid) {
+        setError(null);
+      } else {
+        setError("Mã khuyến mãi không hợp lệ");
+        setDiscountAmount(0);
+      }
+    } catch (err) {
+      setError("Có lỗi xảy ra khi kiểm tra mã khuyến mãi");
+      setDiscountAmount(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-[#f7f7f8] min-h-screen py-6">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
@@ -496,6 +545,25 @@ const BookingDetail = () => {
                   required
                 />
               </div>
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    className="w-48 h-10 border rounded px-2 py-1 text-sm"
+                    value={form.promotionCode}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, promotionCode: e.target.value }))
+                    }
+                    placeholder="Nhập mã KM"
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePromotionCode}
+                    className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
+                  >
+                    Áp dụng
+                  </button>
+                </div>
+              </div>
             </form>
           </div>
           {/* Chi tiết giá */}
@@ -519,6 +587,12 @@ const BookingDetail = () => {
                   <span className="text-orange-600">
                     {returnTrip.totalPrice.toLocaleString()}đ
                   </span>
+                </div>
+              )}
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Giảm giá</span>
+                  <span>-{discountAmount.toLocaleString()}%</span>
                 </div>
               )}
               <div className="flex justify-between">
