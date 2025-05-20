@@ -36,6 +36,7 @@ import PaySuccess from "./components/Booking/PaySuccess";
 import RatingManagement from "./components/Admin/RatingManagement";
 import PayFail from "./components/Booking/PayFail";
 import AboutUsPage from "./pages/AboutUsPage";
+import FindMyBooking from "./components/comon/FindMyBooking";
 
 // React App
 const App = () => {
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/user/bookings" element={<UserAccount />} />
             <Route path="/payment-success" element={<PaySuccess />} />
             <Route path="/payment-failed" element={<PayFail />} />
+            <Route path="/tra-cuu-ve" element={<FindMyBooking />} />
             <Route path="/about-us" element={<AboutUsPage />}></Route>
           </Route>
 
@@ -85,7 +87,7 @@ const App = () => {
           </Route>
         </Routes>
       </main>
-      <ToastContainer limit={3} />
+      <ToastContainer limit={1} />
     </Router>
   );
 };

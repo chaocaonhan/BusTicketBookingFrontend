@@ -123,7 +123,7 @@ const TuyenXe = () => {
   };
 
   return (
-    <section className="container mx-auto p-6">
+    <section className="container mx-auto my-9 w-[80%] ">
       <div className="bg-white shadow-lg rounded-lg p-6">
         <div className="text-2xl font-bold text-gray-700 mb-4">
           Các chuyến đi phổ biến
@@ -133,13 +133,13 @@ const TuyenXe = () => {
             type="text"
             onChange={handleStartFilter}
             placeholder="Tìm kiếm điểm đi"
-            className="border border-gray-300 rounded-lg px-4 py-2 w-1/2"
+            className="border border-gray-300 rounded-lg px-4 py-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
           <input
             type="text"
             onChange={handleEndFilter}
             placeholder="Tìm kiếm điểm đến"
-            className="border border-gray-300 rounded-lg px-4 py-2 w-1/2"
+            className="border border-gray-300 rounded-lg px-4 py-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
         <div className="border-b mb-4"></div>
