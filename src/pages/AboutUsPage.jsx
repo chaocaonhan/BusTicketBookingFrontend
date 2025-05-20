@@ -2,7 +2,7 @@ import React from "react";
 
 const AboutUsPage = () => {
   return (
-    <div className="px-5 py-6 font-sans bg-white">
+    <div className="px-5 py-6 font-sans bg-amber-50">
       <section className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 py-6">
         <div className="flex-1 flex justify-start">
           <img

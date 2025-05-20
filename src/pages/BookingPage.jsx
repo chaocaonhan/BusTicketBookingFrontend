@@ -147,7 +147,7 @@ const BookingPage = () => {
   );
 
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-screen bg-orange-100">
       {/* Phần BusSearch */}
       <div
         className="w-full grid place-items-center"
@@ -167,7 +167,7 @@ const BookingPage = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 ">
         {loading ? (
           <LoadingSpinner />
         ) : searchResults ? (
@@ -184,16 +184,25 @@ const BookingPage = () => {
               setActiveTab={setActiveTab}
             />
           ) : (
-            <div className="text-center py-8">
-              <p className="text-xl text-gray-600">
-                Không tìm thấy chuyến xe phù hợp
+            <div className="w-full text-center flex flex-col items-center justify-center py-8 ">
+              <hr className="w-full mb-4" />
+              <p className="font-bold text-2xl mb-2">
+                Không tìm thấy chuyến xe
               </p>
-              <button
-                onClick={() => setSearchResults(null)}
-                className="mt-4 bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition"
-              >
-                Thử lại
-              </button>
+              <p className="text-gray-600 text-sm mb-4 max-w-lg mx-auto">
+                Hiện tại, hệ thống chưa tìm thấy chuyến đi theo yêu cầu của quý
+                khách, vui lòng nhập thông tin khác hoặc thử lại sau.
+              </p>
+              <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-4">
+                <div className="flex items-center gap-2"></div>
+              </div>
+              <div className="flex justify-center">
+                <img
+                  src="https://static.vexere.com/webnx/prod/img/route-no-schedule-2.png"
+                  alt=""
+                  className="max-w-xs w-full"
+                />
+              </div>
             </div>
           )
         ) : null}

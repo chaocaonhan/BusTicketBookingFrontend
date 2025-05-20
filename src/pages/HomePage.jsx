@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import BusSearch from "../components/comon/BusSearch";
 import PopularRoutes from "../components/comon/PopularRoutes";
 import BusFeatures from "../components/comon/BusFeatures";
+import vanChuyenHangHoa from "../assets/vanChuyenHangHoa.png";
 
 const Home = () => {
   const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
@@ -63,6 +64,13 @@ const Home = () => {
 
       {/* Phần PopularRoutes và BusFeatures */}
       <PopularRoutes className="px-3 " />
+      <div>
+        <img
+          src={vanChuyenHangHoa}
+          alt="Van Chuyen Hang Hoa"
+          className="w-full h-auto object-cover"
+        />
+      </div>
       <BusFeatures />
     </div>
   );
