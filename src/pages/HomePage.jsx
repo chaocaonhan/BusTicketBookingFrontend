@@ -62,7 +62,7 @@ const Home = () => {
       </div>
 
       {/* Phần PopularRoutes và BusFeatures */}
-      <PopularRoutes className="px-3" />
+      <PopularRoutes className="px-3 " />
       <BusFeatures />
     </div>
   );

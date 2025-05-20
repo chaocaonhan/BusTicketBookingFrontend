@@ -35,6 +35,7 @@ import BookingDetail from "./components/Booking/BookingDetail";
 import PaySuccess from "./components/Booking/PaySuccess";
 import RatingManagement from "./components/Admin/RatingManagement";
 import PayFail from "./components/Booking/PayFail";
+import AboutUsPage from "./pages/AboutUsPage";
 
 // React App
 const App = () => {
@@ -56,6 +57,7 @@ const App = () => {
             <Route path="/user/bookings" element={<UserAccount />} />
             <Route path="/payment-success" element={<PaySuccess />} />
             <Route path="/payment-failed" element={<PayFail />} />
+            <Route path="/about-us" element={<AboutUsPage />}></Route>
           </Route>
 
           {/* ADMIN LAYOUT ROUTES */}

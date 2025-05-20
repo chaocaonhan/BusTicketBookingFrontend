@@ -22,7 +22,8 @@ export const Navbar = () => {
   const navItems = [
     { label: "TRANG CHỦ", link: "/" },
     { label: "TUYẾN ĐƯỜNG", link: "/tuyen-duong" },
-    { label: "GIỚI THIỆU", link: "/" },
+    { label: "TRA CỨU VÉ", link: "/tra-cuu-ve" },
+    { label: "GIỚI THIỆU", link: "/about-us" },
     { label: "TIN TỨC", link: "/" },
   ];
 
