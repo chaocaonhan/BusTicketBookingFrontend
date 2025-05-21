@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import axios from "axios";
 import defaultProvinceImage from "../../assets/defaultProvinImg.jpg";
+import { CirclePlus, Undo2, Trash } from "lucide-react";
 
 const ProvinceManagement = () => {
   const [provinces, setProvinces] = useState([]);
@@ -233,20 +234,8 @@ const ProvinceManagement = () => {
         {!selectedProvince ? (
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
+            className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
             Thêm tỉnh thành
           </button>
         ) : (
@@ -255,36 +244,14 @@ const ProvinceManagement = () => {
               onClick={handleBack}
               className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition flex items-center gap-2"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Undo2 />
               Quay lại
             </button>
             <button
               onClick={() => setShowAddStationModal(true)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <CirclePlus />
               Thêm điểm đón
             </button>
           </div>
@@ -387,18 +354,7 @@ const ProvinceManagement = () => {
                         onClick={() => handleDeleteStation(point.id)}
                         className="p-2 text-red-500 hover:text-red-700 transition"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <Trash />
                       </button>
                     </div>
                   ))
@@ -484,12 +440,12 @@ const ProvinceManagement = () => {
 
       {/* Add Province Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-800">
                 Thêm tỉnh thành mới
-              </h3>
+              </h2>
               <button
                 onClick={() => {
                   setShowAddModal(false);
@@ -498,7 +454,6 @@ const ProvinceManagement = () => {
                 className="text-gray-500 hover:text-gray-700"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -507,38 +462,39 @@ const ProvinceManagement = () => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth="2"
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
               </button>
             </div>
-            <div className="space-y-4">
+
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tên tỉnh thành
-                </label>
+                <label className="text-sm text-gray-600">Tên tỉnh thành</label>
                 <input
                   type="text"
                   value={newProvinceName}
                   onChange={(e) => setNewProvinceName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                   placeholder="Nhập tên tỉnh thành"
+                  required
                 />
               </div>
-              <div className="flex justify-end space-x-3">
+
+              <div className="flex justify-end mt-6">
                 <button
                   onClick={() => {
                     setShowAddModal(false);
                     setNewProvinceName("");
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleAddProvince}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                  className="px-4 py-2 bg-green-100 text-green-800 rounded ring ring-transparent hover:ring-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                 >
                   Thêm
                 </button>
@@ -579,48 +535,46 @@ const ProvinceManagement = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tên điểm đón
-                </label>
+                <label className="text-sm text-gray-600">Tên điểm đón</label>
                 <input
                   type="text"
                   value={newStation.tenDiemDon}
                   onChange={(e) =>
                     setNewStation({ ...newStation, tenDiemDon: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                   placeholder="Nhập tên điểm đón"
+                  required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Địa chỉ
-                </label>
+                <label className="text-sm text-gray-600">Địa chỉ</label>
                 <input
                   type="text"
                   value={newStation.diaChi}
                   onChange={(e) =>
                     setNewStation({ ...newStation, diaChi: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                   placeholder="Nhập địa chỉ"
+                  required
                 />
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className="flex justify-end mt-6">
                 <button
                   onClick={() => {
                     setShowAddStationModal(false);
                     setNewStation({ tenDiemDon: "", diaChi: "" });
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  className="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleAddStation}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                  className="px-4 py-2 bg-green-100 text-green-800 rounded ring ring-transparent hover:ring-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                 >
                   Thêm
                 </button>

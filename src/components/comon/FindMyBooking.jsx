@@ -106,7 +106,7 @@ function FindMyBooking() {
       {/* Hiển thị thông tin vé nếu có */}
       {bookingInfo && (
         <div>
-          <section className="w-full mx-auto rounded-lg shadow-lg p-8 mb-8 bg-orange-200">
+          <section className="w-[80%] mx-auto rounded-lg shadow-lg p-8 mb-8 bg-orange-200">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                 <svg
@@ -186,7 +186,7 @@ function FindMyBooking() {
             {/* Hiển thị chi tiết vé bên dưới */}
           </section>
 
-          <div className="mt-8">
+          <div className="mt-8 w-[80%] mx-auto items-center ">
             <OrderTickets orderId={bookingInfo.id} isExpanded={true} />
           </div>
         </div>

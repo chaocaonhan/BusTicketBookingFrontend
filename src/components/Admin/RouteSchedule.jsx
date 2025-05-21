@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
+import Timeline from "@mui/lab/Timeline";
+import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
 
 const RouteSchedule = () => {
   const { routeId } = useParams();
@@ -17,7 +23,6 @@ const RouteSchedule = () => {
       setLoading(true);
       setError(null);
       try {
-        // Nếu không có route từ state, fetch thông tin tuyến
         if (!route) {
           const resRoute = await fetch(
             `http://localhost:8081/api/tuyenxe/${routeId}`,
@@ -33,7 +38,6 @@ const RouteSchedule = () => {
           }
         }
 
-        // Lấy điểm dừng
         const resStops = await fetch(
           `http://localhost:8081/api/diem-dung/tuyen/${routeId}`,
           {
@@ -42,7 +46,10 @@ const RouteSchedule = () => {
         );
         const dataStops = await resStops.json();
         if (dataStops.code === 200) {
-          setStops(dataStops.result);
+          const sortedStops = dataStops.result.sort(
+            (a, b) => a.thoiGianTuDiemDau - b.thoiGianTuDiemDau
+          );
+          setStops(sortedStops);
         } else {
           setStops([]);
         }
@@ -50,7 +57,6 @@ const RouteSchedule = () => {
         setError(err.message);
       } finally {
         setLoading(false);
-        // Set a slight delay before animation starts
         setTimeout(() => {
           setRendered(true);
         }, 100);
@@ -61,15 +67,6 @@ const RouteSchedule = () => {
       fetchData();
     }
   }, [routeId, route, token]);
-
-  // Function to format time based on minutes (for display purposes)
-  const formatTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}`;
-  };
 
   if (!routeId)
     return (
@@ -88,11 +85,7 @@ const RouteSchedule = () => {
 
   return (
     <div className="min-h-screen bg-white shadow-md rounded-lg p-6 mt-16">
-      {/* Main Content */}
-      {/* mx-auto để căn giữa */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Route Title with Fade In Animation */}
-
         <div
           className={`mb-6 transition-all duration-700 ease-out ${
             rendered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -104,7 +97,7 @@ const RouteSchedule = () => {
             </h1>
             <button
               onClick={() => window.history.back()}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-300"
+              className="flex items-center text-orange-400 transition-colors duration-300"
             >
               <svg
                 className="w-5 h-5 mr-1"
@@ -126,7 +119,7 @@ const RouteSchedule = () => {
           <div className="flex items-center space-x-3 mt-2 text-gray-600 text-sm">
             <div className="flex items-center">
               <svg
-                className="w-4 h-4 text-gray-500 mr-1"
+                className="w-4 h-4 text-orange-600 mr-1"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -161,96 +154,117 @@ const RouteSchedule = () => {
           </div>
         </div>
 
-        {/* Timeline with Staggered Animation */}
+        {/* Timeline with MUI */}
         <div className="relative pb-6">
           {stops.length === 0 ? (
             <p className="text-center text-gray-500">Không có điểm dừng</p>
           ) : (
-            stops.map((stop, index) => (
-              <div
-                key={stop.id}
-                className={`relative mb-6 transition-all duration-700 ease-out ${
-                  rendered
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
-                style={{
-                  transitionDelay: `${index * 150}ms`, // Staggered delay for each item
-                }}
-              >
-                {/* Line connecting dots with animation */}
-                {index < stops.length - 1 && (
-                  <div
-                    className={`absolute left-2 top-4 w-0.5 bg-blue-100 transition-all duration-1000 ease-out ${
-                      rendered ? "h-full" : "h-0"
-                    }`}
-                    style={{ transitionDelay: `${index * 150 + 300}ms` }}
-                  ></div>
-                )}
-
-                {/* Dot with pulse animation */}
-                <div
-                  className={`absolute left-0 w-4 h-4 rounded-full mt-1.5 ${
-                    index === 0
-                      ? "bg-blue-600"
-                      : index === stops.length - 1
-                      ? "bg-green-600"
-                      : "bg-blue-600"
-                  } transition-all duration-500 ease-out ${
-                    rendered ? "scale-100" : "scale-0"
-                  }`}
-                  style={{ transitionDelay: `${index * 150 + 100}ms` }}
+            <Timeline
+              sx={{
+                [`& .${timelineItemClasses.root}:before`]: {
+                  flex: 0,
+                  padding: 0,
+                },
+              }}
+            >
+              {stops.map((stop, index) => (
+                <TimelineItem
+                  key={stop.id}
+                  sx={{
+                    transition: `all 700ms ease-out ${index * 150}ms`,
+                    opacity: rendered ? 1 : 0,
+                    transform: rendered ? "translateY(0)" : "translateY(8px)",
+                  }}
                 >
-                  {/* Pulse effect for dots */}
-                  <span
-                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                      index === stops.length - 1
-                        ? "bg-green-400"
-                        : "bg-blue-400"
-                    }`}
-                  />
-                </div>
-
-                {/* Content */}
-                <div
-                  className={`ml-8 bg-white border ${
-                    index === stops.length - 1
-                      ? "border-green-100"
-                      : "border-gray-100"
-                  } rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300`}
-                >
-                  <h3 className="text-base font-semibold text-gray-800">
-                    {stop.tenDiemDon}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">{stop.diaChi}</p>
-                </div>
-
-                {/* Time */}
-                <div
-                  className={`absolute right-2 top-2 text-blue-600 font-semibold transition-all duration-700 ease-out ${
-                    rendered
-                      ? "opacity-100 translate-x-0"
-                      : "opacity-0 translate-x-4"
-                  }`}
-                  style={{ transitionDelay: `${index * 150 + 200}ms` }}
-                >
-                  {formatTime(stop.thoiGianTuDiemDau)}
-                </div>
-              </div>
-            ))
+                  <TimelineSeparator>
+                    <TimelineDot
+                      sx={{
+                        backgroundColor: "#ff9100",
+                        transform: rendered ? "scale(1)" : "scale(0)",
+                        position: "relative",
+                        "&:before": {
+                          content: '""',
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          borderRadius: "50%",
+                          backgroundColor: "orange", // Orange pulse effect
+                          opacity: 0.4,
+                          animation: rendered
+                            ? "pulse 1s infinite ease-in-out"
+                            : "none",
+                          zIndex: -1,
+                        },
+                        "@keyframes pulse": {
+                          "0%": { transform: "scale(3.5)", opacity: 0.4 },
+                          "50%": { transform: "scale(1.5)", opacity: 0 },
+                          "100%": { transform: "scale(1)", opacity: 0.4 },
+                        },
+                      }}
+                    />
+                    {index < stops.length - 1 && (
+                      <TimelineConnector
+                        sx={{
+                          backgroundColor: rendered ? "#f97316" : "transparent", // Orange connector
+                          transition: `background-color 1000ms ease-out ${
+                            index * 150 + 300
+                          }ms`,
+                        }}
+                      />
+                    )}
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <div
+                      className={`bg-white border ${
+                        index === stops.length - 1
+                          ? "border-orange-100"
+                          : "border-gray-100"
+                      } rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300 relative`}
+                    >
+                      <div
+                        className={`absolute right-2 top-2 text-sm font-semibold ${
+                          index === stops.length - 1
+                            ? "text-orange-600"
+                            : "text-orange-400"
+                        } transition-all duration-700 ease-out`}
+                        style={{
+                          transitionDelay: `${index * 150 + 200}ms`,
+                          opacity: rendered ? 1 : 0,
+                          transform: rendered
+                            ? "translateX(0)"
+                            : "translateX(4px)",
+                        }}
+                      >
+                        {/* Hiển thị số km từ điểm đầu */}
+                        {stop.khoangCachToiDiemDau != null
+                          ? `${stop.khoangCachToiDiemDau} km`
+                          : ""}
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-800">
+                        {stop.tenDiemDon}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {stop.diaChi}
+                      </p>
+                    </div>
+                  </TimelineContent>
+                </TimelineItem>
+              ))}
+            </Timeline>
           )}
         </div>
 
-        {/* Footer Info Boxes with Animation */}
+        {/* Footer Info Boxes */}
         <div
           className={`grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 transition-all duration-700 ease-out ${
             rendered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
           style={{ transitionDelay: `${stops.length * 150 + 300}ms` }}
         >
-          {/* Trip Info */}
           <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center text-blue-600 mb-2">
+            <div className="flex items-center text-orange-400 mb-2">
               <svg
                 className="w-5 h-5 mr-2"
                 fill="currentColor"
@@ -269,10 +283,8 @@ const RouteSchedule = () => {
               Xe giường nằm cao cấp, 40 chỗ, có WiFi miễn phí và ổ cắm điện.
             </p>
           </div>
-
-          {/* Price */}
           <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center text-blue-600 mb-2">
+            <div className="flex items-center text-orange-400 mb-2">
               <svg
                 className="w-5 h-5 mr-2"
                 fill="currentColor"
@@ -289,10 +301,8 @@ const RouteSchedule = () => {
             </div>
             <p className="text-sm text-gray-600">350.000 VNĐ/người/chiều</p>
           </div>
-
-          {/* Support */}
           <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center text-blue-600 mb-2">
+            <div className="flex items-center text-orange-400 mb-2">
               <svg
                 className="w-5 h-5 mr-2"
                 fill="currentColor"
@@ -303,7 +313,7 @@ const RouteSchedule = () => {
               </svg>
               <span className="font-medium">Hỗ trợ</span>
             </div>
-            <p className="text-sm text-gray-600">Hotline: 1900 xxxx</p>
+            <p className="text-sm text-gray-600">Hotline: 1900 1234</p>
           </div>
         </div>
       </div>

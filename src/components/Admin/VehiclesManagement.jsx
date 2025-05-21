@@ -256,8 +256,8 @@ const VehiclesManagement = () => {
       {/* Modal for Add/Edit Vehicle */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-800">
                 {editingVehicle
                   ? "Chỉnh sửa phương tiện"
@@ -283,93 +283,68 @@ const VehiclesManagement = () => {
               </button>
             </div>
 
-            {/* Form thêm/sửa phương tiện */}
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="tenXe"
-                >
-                  Tên xe
-                </label>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-600">Tên xe</label>
                 <input
                   type="text"
-                  id="tenXe"
                   name="tenXe"
                   value={formData.tenXe}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="bienSo"
-                >
-                  Biển số
-                </label>
+              <div>
+                <label className="text-sm text-gray-600">Biển số</label>
                 <input
                   type="text"
-                  id="bienSo"
                   name="bienSo"
                   value={formData.bienSo}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                   required
                 />
               </div>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="loaiXe"
-                >
-                  Loại xe
-                </label>
+              <div>
+                <label className="text-sm text-gray-600">Loại xe</label>
                 <select
-                  id="loaiXe"
                   name="loaiXe"
                   value={formData.loaiXe}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                 >
                   <option value="ECONOMY">Economy</option>
                   <option value="VIP">VIP</option>
                 </select>
               </div>
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="trangThai"
-                >
-                  Trạng thái
-                </label>
+              <div>
+                <label className="text-sm text-gray-600">Trạng thái</label>
                 <select
-                  id="trangThai"
                   name="trangThai"
                   value={formData.trangThai}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                 >
                   <option value="Active">Hoạt động</option>
                   <option value="Inactive">Không hoạt động</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end">
+              <div className="flex justify-end mt-6">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="mr-2 px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                  className="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  className="px-4 py-2 bg-green-100 text-green-800 rounded ring ring-transparent hover:ring-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
                 >
                   {editingVehicle ? "Cập nhật" : "Thêm mới"}
                 </button>

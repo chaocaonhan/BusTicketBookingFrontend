@@ -37,6 +37,8 @@ import RatingManagement from "./components/Admin/RatingManagement";
 import PayFail from "./components/Booking/PayFail";
 import AboutUsPage from "./pages/AboutUsPage";
 import FindMyBooking from "./components/comon/FindMyBooking";
+import DndKitList from "./components/comon/DndKitList";
+import Discount from "./components/Admin/Discount";
 
 // React App
 const App = () => {
@@ -49,7 +51,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/dat-ve" element={<BookingPage />}></Route>
             <Route path="/tuyen-duong" element={<TuyenXe />} />
-            <Route path="//BookingDetail" element={<BookingDetail />} />
+            <Route path="/BookingDetail" element={<BookingDetail />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/verify" element={<VerifyAccount />} />
@@ -77,6 +79,8 @@ const App = () => {
             <Route path="routes" element={<RoutesManagement />} />
             <Route path="manage-trips" element={<TripManagement />} />
             <Route path="manage-orders" element={<OrderManagement />} />
+            <Route path="reports" element={<DndKitList />} />
+            <Route path="discount" element={<Discount />} />
 
             <Route
               path="routes/:routeId/schedule"

@@ -12,14 +12,16 @@ const AboutUsPage = () => {
           />
         </div>
         <div className="flex-1 pl-0 md:pl-8">
-          <h1 className="text-2xl font-bold text-[#23374d] mb-2">Sao Việt</h1>
-          <h2 className="text-xl font-semibold text-black mb-4">
+          <h1 className="text-2xl font-bold text-orange-500 mb-2">Sao Việt</h1>
+          <h2 className="text-xl font-semibold text-[#2d7768] mb-4">
             "Niềm tin trên mọi nẻo đường"
           </h2>
           <p className="leading-relaxed text-[#23374d] mb-2">
-            Roadlines được thành lập năm 2000. Trải qua hơn 20 năm phát triển,
-            đặt khách hàng là trọng tâm, chúng tôi luôn không ngừng cải tiến để
-            mang đến chất lượng dịch vụ tốt nhất cho khách hàng.
+            Chúng tôi là Công ty TNHH Minh Thành Phát, hoạt động dưới thương
+            hiệu Xe SAO VIỆT, với lòng tôn trọng và sự chuyên nghiệp, chúng tôi
+            gửi tới quý khách hàng những lời chào trân trọng nhất! Với quy mô
+            lớn trong lĩnh vực vận tải hành khách, chúng tôi hiện đang hoạt động
+            chuyên tuyến Hà Nội – Lào Cai – Sapa
           </p>
           <p className="leading-relaxed text-[#23374d]">
             Với đội ngũ nhân viên chuyên nghiệp và tận tâm, chúng tôi cung cấp
@@ -31,13 +33,35 @@ const AboutUsPage = () => {
       </section>
       {/* //các dòng xe */}
       <section className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 py-6">
-        <div className="flex-1 flex justify-start">
-          <h1 className="text-2xl font-bold text-[#23374d] mb-2">ROADLINES</h1>
-          <h2 className="text-xl font-semibold text-black mb-4">
-            "Chất lượng là danh dự"
+        <div className="flex-1 pl-0 md:pl-8">
+          <h1 className="text-2xl font-bold text-orange-500 mb-2">
+            Đa dạng sự lựa chọn
+          </h1>
+          <h2 className="text-xl font-semibold text-[#2d7768] mb-4">
+            Chúng tôi cung cấp dịch vụ với 3 dòng xe chính
           </h2>
-          <p className="leading-relaxed text-[#23374d] mb-2"></p>
-          <p className="leading-relaxed text-[#23374d]"></p>
+          <div className="flex flex-row gap-4">
+            <h2 className="text-xl font-semibold text-[#2d7768] mb-2">
+              ECOMOMY :
+            </h2>
+            <p className="leading-relaxed text-[#23374d] mb-2">
+              Dịch vụ đầy đủ với mức giá ưu đãi
+            </p>
+          </div>
+          <div className="flex flex-row gap-4">
+            <h2 className="text-xl font-semibold text-[#2d7768] mb-2">VIP :</h2>
+            <p className="leading-relaxed text-[#23374d] mb-2">
+              cung cấp dịch vụ tốt nhất với mức giá hợp lý
+            </p>
+          </div>
+          <div className="flex flex-row gap-4">
+            <h2 className="text-xl font-semibold text-[#2d7768] mb-2">
+              ROYAL :
+            </h2>
+            <p className="leading-relaxed text-[#23374d] mb-2">
+              24 chỗi ngồi mỗi chuyến, không gian rộng rãi, sang trọng.
+            </p>
+          </div>
         </div>
         <div className="flex-1 pl-0 md:pl-8">
           <img
