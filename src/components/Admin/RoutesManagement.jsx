@@ -92,7 +92,7 @@ const RoutesManagement = () => {
   const handleDeleteRoute = async (id) => {
     if (!window.confirm("Xác nhận xoá tuyến xe?")) return;
     try {
-      const res = await fetch(`http://localhost:8081/api/tuyenxe/${id}`, {
+      const res = await fetch(`http://localhost:8081/api/tuyen-xe/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -108,10 +108,23 @@ const RoutesManagement = () => {
     try {
       let url, method, body;
       if (editingRoute) {
-        // Sửa tuyến xe (giữ nguyên như cũ)
-        url = `http://localhost:8081/api/tuyenxe/${editingRoute.id}`;
+        const tinhDi = provinces.find(
+          (p) => p.id === Number(formData.tinhDiId)
+        );
+        const tinhDen = provinces.find(
+          (p) => p.id === Number(formData.tinhDenId)
+        );
+        url = `http://localhost:8081/api/tuyen-xe/suaThongTinTuyen/${editingRoute.id}`;
         method = "PUT";
-        body = JSON.stringify(formData);
+        body = JSON.stringify({
+          id: editingRoute.id,
+          tenTuyen: formData.tenTuyen,
+          tinhDi: tinhDi ? tinhDi.tenTinhThanh : "",
+          tinhDen: tinhDen ? tinhDen.tenTinhThanh : "",
+          khoangCach: Number(formData.khoangCach),
+          thoiGianDiChuyen: formData.thoiGianDiChuyen,
+          tinhDenUrl: "", // hoặc giá trị phù hợp nếu có
+        });
       } else {
         // Thêm mới tuyến xe: dùng API /api/tuyen-xe/taoTuyen
         url = "http://localhost:8081/api/tuyen-xe/taoTuyen";
