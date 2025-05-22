@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams, useLocation } from "react-router-dom";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem, { timelineItemClasses } from "@mui/lab/TimelineItem";
@@ -6,6 +7,8 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
+import { MoveLeft } from "lucide-react";
+import authService from "../../services/authService"; // Thêm dòng này ở đầu file
 
 const RouteSchedule = () => {
   const { routeId } = useParams();
@@ -15,8 +18,13 @@ const RouteSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rendered, setRendered] = useState(false);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // Lấy vai trò đúng cách như trong Login.jsx
+  const role = authService.getUserRole();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,29 +100,29 @@ const RouteSchedule = () => {
           }`}
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-800">
-              Tuyến xe {route?.tenTuyen || ""}
-            </h1>
+            {/* Nút quay lại bên trái */}
             <button
               onClick={() => window.history.back()}
               className="flex items-center text-orange-400 transition-colors duration-300"
             >
-              <svg
-                className="w-5 h-5 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              <span>Quay lại</span>
+              <MoveLeft />
+              <span className="ml-1">Quay lại</span>
             </button>
+            <h1 className="text-xl font-bold text-gray-800 flex-1 text-center">
+              Tuyến xe {route?.tenTuyen || ""}
+            </h1>
+            {/* Nút sửa chỉ hiển thị nếu là ADMIN */}
+            {role === "ADMIN" && (
+              <button
+                onClick={() => {
+                  navigate(`/admin/route-schedule/${route?.id}/edit`);
+                }}
+                className="px-4 py-2 bg-orange-100 text-orange-600 rounded hover:bg-orange-200 font-medium ml-2"
+                title="Sửa tuyến xe"
+              >
+                Sửa lịch trình
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-3 mt-2 text-gray-600 text-sm">
             <div className="flex items-center">

@@ -24,6 +24,7 @@ import ProvinceManagement from "./components/Admin/ProvinceManagement";
 import VehiclesManagement from "./components/Admin/VehiclesManagement";
 import RouteSchedule from "./components/Admin/RouteSchedule";
 import OrderManagement from "./components/Admin/OrderManagement";
+import RouteScheduleEdit from "./components/Admin/RouteScheduleEdit";
 
 // Route guard
 import PrivateRoute from "./components/Auth/PrivateRoute";
@@ -61,6 +62,11 @@ const App = () => {
             <Route path="/payment-success" element={<PaySuccess />} />
             <Route path="/payment-failed" element={<PayFail />} />
             <Route path="/tra-cuu-ve" element={<FindMyBooking />} />
+            <Route path="/tra-cuu-ve" element={<FindMyBooking />} />
+            <Route
+              path="/route-schedule/:routeId"
+              element={<RouteSchedule />}
+            />
             <Route path="/about-us" element={<AboutUsPage />}></Route>
           </Route>
 
@@ -76,12 +82,16 @@ const App = () => {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="rating" element={<RatingManagement />} />
+
             <Route path="routes" element={<RoutesManagement />} />
             <Route path="manage-trips" element={<TripManagement />} />
             <Route path="manage-orders" element={<OrderManagement />} />
             <Route path="reports" element={<DndKitList />} />
             <Route path="discount" element={<Discount />} />
-
+            <Route
+              path="/admin/route-schedule/:routeId/edit"
+              element={<RouteScheduleEdit />}
+            />
             <Route
               path="routes/:routeId/schedule"
               element={<RouteSchedule />}

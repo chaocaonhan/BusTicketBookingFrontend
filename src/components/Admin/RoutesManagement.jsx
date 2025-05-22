@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Thêm Link
 import TableActions from "./TableActions";
+import { toast } from "react-toastify";
 
 const RoutesManagement = () => {
   const [routes, setRoutes] = useState([]);
@@ -105,10 +106,33 @@ const RoutesManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const method = editingRoute ? "PUT" : "POST";
-      const url = editingRoute
-        ? `http://localhost:8081/api/tuyenxe/${editingRoute.id}`
-        : "http://localhost:8081/api/tuyenxe";
+      let url, method, body;
+      if (editingRoute) {
+        // Sửa tuyến xe (giữ nguyên như cũ)
+        url = `http://localhost:8081/api/tuyenxe/${editingRoute.id}`;
+        method = "PUT";
+        body = JSON.stringify(formData);
+      } else {
+        // Thêm mới tuyến xe: dùng API /api/tuyen-xe/taoTuyen
+        url = "http://localhost:8081/api/tuyen-xe/taoTuyen";
+        method = "POST";
+        // Tìm tên tỉnh đi và tỉnh đến từ provinces
+        const tinhDi = provinces.find(
+          (p) => p.id === Number(formData.tinhDiId)
+        );
+        const tinhDen = provinces.find(
+          (p) => p.id === Number(formData.tinhDenId)
+        );
+        body = JSON.stringify({
+          id: 0,
+          tenTuyen: formData.tenTuyen,
+          tinhDi: tinhDi ? tinhDi.tenTinhThanh : "",
+          tinhDen: tinhDen ? tinhDen.tenTinhThanh : "",
+          khoangCach: Number(formData.khoangCach),
+          thoiGianDiChuyen: formData.thoiGianDiChuyen,
+          tinhDenUrl: "",
+        });
+      }
 
       const res = await fetch(url, {
         method,
@@ -116,14 +140,20 @@ const RoutesManagement = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body,
       });
 
       if (!res.ok) throw new Error("Lưu thất bại");
       setShowModal(false);
+      toast.success(
+        editingRoute
+          ? "Cập nhật tuyến xe thành công!"
+          : "Thêm tuyến xe thành công!"
+      );
       fetchRoutes();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -207,7 +237,7 @@ const RoutesManagement = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-3xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-800">
                 {editingRoute ? "Chỉnh sửa tuyến xe" : "Thêm tuyến xe"}
@@ -232,94 +262,91 @@ const RoutesManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-600">Tên tuyến</label>
-                <input
-                  name="tenTuyen"
-                  value={formData.tenTuyen}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                />
+            {/* Form ngang */}
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="text-sm text-gray-600">Tên tuyến</label>
+                  <input
+                    name="tenTuyen"
+                    value={formData.tenTuyen}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Tỉnh đi</label>
+                  <select
+                    name="tinhDiId"
+                    value={formData.tinhDiId}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="">Chọn tỉnh đi</option>
+                    {provinces.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.tenTinhThanh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Tỉnh đến</label>
+                  <select
+                    name="tinhDenId"
+                    value={formData.tinhDenId}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="">Chọn tỉnh đến</option>
+                    {provinces.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.tenTinhThanh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    Khoảng cách (km)
+                  </label>
+                  <input
+                    name="khoangCach"
+                    type="number"
+                    value={formData.khoangCach}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">
+                    Thời gian di chuyển
+                  </label>
+                  <input
+                    name="thoiGianDiChuyen"
+                    value={formData.thoiGianDiChuyen}
+                    onChange={handleInputChange}
+                    required
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600">Trạng thái</label>
+                  <select
+                    name="trangThai"
+                    value={formData.trangThai}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                  >
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="INACTIVE">Không hoạt động</option>
+                  </select>
+                </div>
               </div>
-
-              <div>
-                <label className="text-sm text-gray-600">Tỉnh đi</label>
-                <select
-                  name="tinhDiId"
-                  value={formData.tinhDiId}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                >
-                  <option value="">Chọn tỉnh đi</option>
-                  {provinces.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.tenTinhThanh}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-600">Tỉnh đến</label>
-                <select
-                  name="tinhDenId"
-                  value={formData.tinhDenId}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                >
-                  <option value="">Chọn tỉnh đến</option>
-                  {provinces.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.tenTinhThanh}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-600">
-                  Khoảng cách (km)
-                </label>
-                <input
-                  name="khoangCach"
-                  type="number"
-                  value={formData.khoangCach}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-600">
-                  Thời gian di chuyển
-                </label>
-                <input
-                  name="thoiGianDiChuyen"
-                  value={formData.thoiGianDiChuyen}
-                  onChange={handleInputChange}
-                  required
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm text-gray-600">Trạng thái</label>
-                <select
-                  name="trangThai"
-                  value={formData.trangThai}
-                  onChange={handleInputChange}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                >
-                  <option value="ACTIVE">Hoạt động</option>
-                  <option value="INACTIVE">Không hoạt động</option>
-                </select>
-              </div>
-
               <div className="flex justify-end mt-6">
                 <button
                   type="button"

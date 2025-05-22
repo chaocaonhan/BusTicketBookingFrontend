@@ -61,12 +61,19 @@ const TuyenXe = () => {
     },
     {
       cell: (row) => (
-        <div className="text-center w-full">
+        <div className="text-center w-full ">
           <button
             className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
             onClick={() => handleSearchRouteClick(row)}
           >
             Tìm tuyến xe
+          </button>
+
+          <button
+            className="px-4 py-2 ml-4 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
+            onClick={() => handleViewScheduleClick(row)}
+          >
+            Xem lịch trình
           </button>
         </div>
       ),
@@ -122,6 +129,11 @@ const TuyenXe = () => {
     navigate(`/dat-ve?${queryParams.toString()}`);
   };
 
+  const handleViewScheduleClick = (route) => {
+    // Chuyển hướng sang trang RouteSchedule với id tuyến xe
+    navigate(`/route-schedule/${route.id}`, { state: { route } });
+  };
+
   return (
     <section className="container mx-auto my-9 w-[80%] ">
       <div className="bg-white shadow-lg rounded-lg p-6">
@@ -143,7 +155,7 @@ const TuyenXe = () => {
           />
         </div>
         <div className="border-b mb-4"></div>
-        <DataTable columns={columns} data={records} />
+        <DataTable className="text-3xl" columns={columns} data={records} />
       </div>
     </section>
   );

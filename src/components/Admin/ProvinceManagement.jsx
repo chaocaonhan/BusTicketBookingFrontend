@@ -194,17 +194,23 @@ const ProvinceManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8081/api/Station/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...newStation,
-          tinhThanh: selectedProvince.tenTinhThanh,
-        }),
-      });
+      // Lấy maTinh từ selectedProvince
+      const maTinh = selectedProvince?.id;
+      const response = await fetch(
+        "http://localhost:8081/api/Station/themDiemDon",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            tenDiemDonTra: newStation.tenDiemDon,
+            diaChi: newStation.diaChi,
+            maTinh: maTinh,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Không thể thêm điểm đón");
