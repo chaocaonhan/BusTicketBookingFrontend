@@ -159,16 +159,18 @@ const UsersManagement = () => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Không thể xóa người dùng");
+      const data = await response.json();
+
+      if (data.code === 200) {
+        toast.success("Xóa người dùng thành công!");
+        fetchUsers(currentPage);
+        setTimeout(() => setSuccessMessage(""), 3000);
+      } else {
+        toast.error(data.message || "Không thể xóa người dùng");
+        setError(data.message || "Không thể xóa người dùng");
       }
-
-      toast.success("Xóa người dùng thành công!");
-      fetchUsers(currentPage); // Refresh with current page
-
-      // Xóa thông báo sau 3 giây
-      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
+      toast.error(err.message);
       setError(err.message);
     }
   };
@@ -192,20 +194,22 @@ const UsersManagement = () => {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error(
-          `Không thể ${editingUser ? "cập nhật" : "thêm"} người dùng`
-        );
-      }
+      const data = await response.json();
 
-      setShowModal(false);
-      toast.success(
-        editingUser
-          ? "Cập nhật người dùng thành công!"
-          : "Thêm người dùng mới thành công!"
-      );
-      fetchUsers(currentPage); // Refresh with current page
+      if (data.code === 200) {
+        setShowModal(false);
+        toast.success(
+          editingUser
+            ? "Cập nhật người dùng thành công!"
+            : "Thêm người dùng mới thành công!"
+        );
+        fetchUsers(currentPage);
+      } else {
+        toast.error(data.message || "Có lỗi xảy ra");
+        setError(data.message || "Có lỗi xảy ra");
+      }
     } catch (err) {
+      toast.error(err.message);
       setError(err.message);
     }
   };
@@ -272,20 +276,6 @@ const UsersManagement = () => {
           </div>
         </div>
       </div>
-
-      {/* Hiển thị thông báo thành công */}
-      {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          {successMessage}
-        </div>
-      )}
-
-      {/* Hiển thị lỗi nếu có */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
