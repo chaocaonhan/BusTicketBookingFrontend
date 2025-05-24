@@ -2,11 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import success from "../../assets/success.png";
 import axios from "axios";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const BookingDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { bookingInfo } = location.state || {};
+  const { outboundTrip, returnTrip } = bookingInfo;
+  const isReturn = !!returnTrip;
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -19,6 +29,18 @@ const BookingDetail = () => {
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
+
+  // Enhanced pickup/dropoff state management
+  const [outboundPickupPoints, setOutboundPickupPoints] = useState([]);
+  const [outboundDropoffPoints, setOutboundDropoffPoints] = useState([]);
+  const [selectedOutboundPickup, setSelectedOutboundPickup] = useState("");
+  const [selectedOutboundDropoff, setSelectedOutboundDropoff] = useState("");
+
+  // Return trip pickup/dropoff points (if applicable)
+  const [returnPickupPoints, setReturnPickupPoints] = useState([]);
+  const [returnDropoffPoints, setReturnDropoffPoints] = useState([]);
+  const [selectedReturnPickup, setSelectedReturnPickup] = useState("");
+  const [selectedReturnDropoff, setSelectedReturnDropoff] = useState("");
 
   // Lấy thông tin người dùng khi component được khởi tạo
   useEffect(() => {
@@ -38,10 +60,8 @@ const BookingDetail = () => {
 
         if (response.data.code === 200) {
           const userData = response.data.result;
-          // Lưu userId từ response
           setUserId(userData.id);
 
-          // Kiểm tra nếu vai trò là CUSTOMER bằng cách tìm kiếm trong chuỗi vaiTro
           if (userData.vaiTro && userData.vaiTro.includes("CUSTOMER")) {
             setForm((prev) => ({
               ...prev,
@@ -57,7 +77,50 @@ const BookingDetail = () => {
     };
 
     fetchUserInfo();
-  }, []); // Chỉ chạy một lần khi component mount
+  }, []);
+
+  // Lấy điểm đón/trả cho lượt đi
+  useEffect(() => {
+    if (outboundTrip?.id) {
+      fetchTripPoints(outboundTrip.id, "outbound");
+    }
+  }, [outboundTrip?.id]);
+
+  // Lấy điểm đón/trả cho lượt về
+  useEffect(() => {
+    if (isReturn && returnTrip?.id) {
+      fetchTripPoints(returnTrip.id, "return");
+    }
+  }, [isReturn, returnTrip?.id]);
+
+  const fetchTripPoints = async (tripId, tripType) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/chuyenxe/lichTrinhChuyenXe?idChuyenXe=${tripId}`
+      );
+      const data = await response.json();
+
+      if (data.result && Array.isArray(data.result)) {
+        const points = data.result;
+
+        if (tripType === "outbound") {
+          setOutboundPickupPoints(points);
+          setOutboundDropoffPoints(points);
+          setSelectedOutboundPickup(points[0]?.tenDiemDon || "");
+          setSelectedOutboundDropoff(
+            points[points.length - 1]?.tenDiemDon || ""
+          );
+        } else {
+          setReturnPickupPoints(points);
+          setReturnDropoffPoints(points);
+          setSelectedReturnPickup(points[0]?.tenDiemDon || "");
+          setSelectedReturnDropoff(points[points.length - 1]?.tenDiemDon || "");
+        }
+      }
+    } catch (err) {
+      console.error(`Lỗi tải điểm đón/trả cho chuyến ${tripType}:`, err);
+    }
+  };
 
   if (!bookingInfo) {
     return (
@@ -66,9 +129,6 @@ const BookingDetail = () => {
       </div>
     );
   }
-
-  const { outboundTrip, returnTrip } = bookingInfo;
-  const isReturn = !!returnTrip;
 
   // Helper
   const formatDateTime = (date, time) =>
@@ -113,9 +173,20 @@ const BookingDetail = () => {
   };
 
   const handlePayment = async () => {
-    // Kiểm tra form đã được điền đầy đủ chưa
+    // Validate form
     if (!form.name || !form.phone || !form.email) {
       alert("Vui lòng điền đầy đủ thông tin khách hàng");
+      return;
+    }
+
+    // Validate pickup/dropoff selections
+    if (!selectedOutboundPickup || !selectedOutboundDropoff) {
+      alert("Vui lòng chọn điểm đón và điểm trả cho chuyến đi");
+      return;
+    }
+
+    if (isReturn && (!selectedReturnPickup || !selectedReturnDropoff)) {
+      alert("Vui lòng chọn điểm đón và điểm trả cho chuyến về");
       return;
     }
 
@@ -123,38 +194,47 @@ const BookingDetail = () => {
     await checkSeatsAvailability();
   };
 
+  const prepareBookingData = () => {
+    return {
+      // Thông tin người dùng
+      userId: userId,
+      hoTen: form.name,
+      sdt: form.phone,
+      email: form.email,
+
+      // Thông tin thanh toán
+      tongTien: total,
+      trangThaiThanhToan: 0,
+
+      // Thông tin chuyến đi
+      loaiChuyenDi: isReturn ? 1 : 0,
+
+      // Thông tin chuyến đi với điểm đón/trả
+      chuyenDi: {
+        idChuyenXe: outboundTrip.id,
+        danhSachGheMuonDat: outboundTrip.selectedSeats.map((seat) => seat.id),
+        diemDon: selectedOutboundPickup,
+        diemTra: selectedOutboundDropoff,
+      },
+
+      // Thông tin chuyến về (nếu có)
+      ...(isReturn && {
+        chuyenVe: {
+          idChuyenXe: returnTrip.id,
+          danhSachGheMuonDat: returnTrip.selectedSeats.map((seat) => seat.id),
+          diemDon: selectedReturnPickup,
+          diemTra: selectedReturnDropoff,
+        },
+      }),
+    };
+  };
+
   const handleChooseVNPAYPayment = async () => {
     try {
       setLoading(true);
-      // Chuẩn bị dữ liệu đặt vé
       const bookingData = {
-        // Thông tin người dùng
-        userId: userId,
-        hoTen: form.name,
-        sdt: form.phone,
-        email: form.email,
-
-        // Thông tin thanh toán
-        tongTien: total,
+        ...prepareBookingData(),
         kieuThanhToan: "VNPAY",
-        trangThaiThanhToan: 0,
-
-        // Thông tin chuyến đi
-        loaiChuyenDi: isReturn ? 1 : 0,
-
-        // Thông tin chuyến đi
-        chuyenDi: {
-          idChuyenXe: outboundTrip.id,
-          danhSachGheMuonDat: outboundTrip.selectedSeats.map((seat) => seat.id),
-        },
-
-        // Thông tin chuyến về (nếu có)
-        ...(isReturn && {
-          chuyenVe: {
-            idChuyenXe: returnTrip.id,
-            danhSachGheMuonDat: returnTrip.selectedSeats.map((seat) => seat.id),
-          },
-        }),
       };
 
       console.log("Booking data:", bookingData);
@@ -173,7 +253,6 @@ const BookingDetail = () => {
       console.log("Booking response:", bookingResponse.data);
 
       if (bookingResponse.data.code === 200 && bookingResponse.data.result) {
-        // Lấy bookingId từ response - result giờ là string ID trực tiếp
         const bookingId = bookingResponse.data.result;
 
         if (!bookingId) {
@@ -192,6 +271,12 @@ const BookingDetail = () => {
             paymentMethod: "VNPAY",
             paymentStatus: "Đã thanh toán",
             bookingDate: new Date().toLocaleString("vi-VN"),
+            outboundPickup: selectedOutboundPickup,
+            outboundDropoff: selectedOutboundDropoff,
+            ...(isReturn && {
+              returnPickup: selectedReturnPickup,
+              returnDropoff: selectedReturnDropoff,
+            }),
           },
           tripData: {
             outboundTrip: {
@@ -257,35 +342,9 @@ const BookingDetail = () => {
     try {
       setLoading(true);
 
-      // Chuẩn bị dữ liệu đặt vé
       const bookingData = {
-        // Thông tin người dùng
-        userId: userId,
-        hoTen: form.name,
-        sdt: form.phone,
-        email: form.email,
-
-        // Thông tin thanh toán
-        tongTien: total,
+        ...prepareBookingData(),
         kieuThanhToan: "CASH",
-        trangThaiThanhToan: 0,
-
-        // Thông tin chuyến đi
-        loaiChuyenDi: isReturn ? 1 : 0,
-
-        // Thông tin chuyến đi
-        chuyenDi: {
-          idChuyenXe: outboundTrip.id,
-          danhSachGheMuonDat: outboundTrip.selectedSeats.map((seat) => seat.id),
-        },
-
-        // Thông tin chuyến về (nếu có)
-        ...(isReturn && {
-          chuyenVe: {
-            idChuyenXe: returnTrip.id,
-            danhSachGheMuonDat: returnTrip.selectedSeats.map((seat) => seat.id),
-          },
-        }),
       };
 
       // Gọi API đặt vé thanh toán khi lên xe
@@ -308,6 +367,12 @@ const BookingDetail = () => {
             email: form.email,
             total: total,
             paymentMethod: "Thanh toán khi lên xe",
+            outboundPickup: selectedOutboundPickup,
+            outboundDropoff: selectedOutboundDropoff,
+            ...(isReturn && {
+              returnPickup: selectedReturnPickup,
+              returnDropoff: selectedReturnDropoff,
+            }),
           },
           tripData: {
             outboundTrip: outboundTrip,
@@ -420,6 +485,53 @@ const BookingDetail = () => {
                   {outboundTrip.selectedSeats.map((s) => s.chair).join(", ")}
                 </span>
               </div>
+
+              {/* Điểm đón cho chuyến đi */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2 text-[#3b4a54]">
+                  Điểm đón <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={selectedOutboundPickup}
+                  onValueChange={setSelectedOutboundPickup}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn điểm đón" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {outboundPickupPoints.map((point, idx) => (
+                      <SelectItem key={idx} value={point.tenDiemDon}>
+                        {point.tenDiemDon}
+                        {point.thoiGian && ` - ${point.thoiGian}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Điểm trả cho chuyến đi */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2 text-[#3b4a54]">
+                  Điểm trả <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={selectedOutboundDropoff}
+                  onValueChange={setSelectedOutboundDropoff}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn điểm trả" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {outboundDropoffPoints.map((point, idx) => (
+                      <SelectItem key={idx} value={point.tenDiemDon}>
+                        {point.tenDiemDon}
+                        {point.thoiGian && ` - ${point.thoiGian}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex justify-between items-center mt-6 pt-4 border-t">
                 <span className="text-[#3b4a54] font-semibold">
                   Tổng tiền lượt đi
@@ -429,6 +541,7 @@ const BookingDetail = () => {
                 </span>
               </div>
             </div>
+
             {/* Thông tin lượt về */}
             {isReturn && (
               <div className="bg-white rounded-xl shadow p-8">
@@ -468,6 +581,53 @@ const BookingDetail = () => {
                     {returnTrip.selectedSeats.map((s) => s.chair).join(", ")}
                   </span>
                 </div>
+
+                {/* Điểm đón cho chuyến về */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-[#3b4a54]">
+                    Điểm đón <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={selectedReturnPickup}
+                    onValueChange={setSelectedReturnPickup}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn điểm đón" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {returnPickupPoints.map((point, idx) => (
+                        <SelectItem key={idx} value={point.tenDiemDon}>
+                          {point.tenDiemDon}
+                          {point.thoiGian && ` - ${point.thoiGian}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Điểm trả cho chuyến về */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-[#3b4a54]">
+                    Điểm trả <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={selectedReturnDropoff}
+                    onValueChange={setSelectedReturnDropoff}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn điểm trả" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {returnDropoffPoints.map((point, idx) => (
+                        <SelectItem key={idx} value={point.tenDiemDon}>
+                          {point.tenDiemDon}
+                          {point.thoiGian && ` - ${point.thoiGian}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="flex justify-between items-center mt-6 pt-4 border-t">
                   <span className="text-[#3b4a54] font-semibold">
                     Tổng tiền lượt về
@@ -479,6 +639,7 @@ const BookingDetail = () => {
               </div>
             )}
           </div>
+
           {/* Điều khoản & lưu ý */}
           <div className="bg-white rounded-lg shadow p-6 mb-4">
             <div className="text-orange-600 font-bold mb-2">
@@ -500,6 +661,7 @@ const BookingDetail = () => {
             </div>
           </div>
         </div>
+
         {/* RIGHT - Thông tin khách hàng */}
         <div className="w-full md:w-[340px]">
           {/* Thông tin khách hàng */}

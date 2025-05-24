@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   DndContext,
@@ -303,6 +304,8 @@ const RouteScheduleEdit = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [showTrashBin, setShowTrashBin] = useState(false);
+  const location = useLocation();
+  const tenTuyen = location.state?.tenTuyen || "";
 
   const token = localStorage.getItem("token");
   const role = authService.getUserRole();
@@ -478,7 +481,7 @@ const RouteScheduleEdit = () => {
         </div>
 
         <h2 className="text-xl text-orange-400 font-bold text-center flex-1">
-          Chỉnh sửa lịch trình tuyến xe : {stops[0].tenTuyenXe}
+          Chỉnh sửa lịch trình tuyến xe : {tenTuyen}
         </h2>
 
         {/* Add Station Button */}

@@ -115,7 +115,9 @@ const RouteSchedule = () => {
             {role === "ADMIN" && (
               <button
                 onClick={() => {
-                  navigate(`/admin/route-schedule/${route?.id}/edit`);
+                  navigate(`/admin/route-schedule/${route?.id}/edit`, {
+                    state: { tenTuyen: route?.tenTuyen },
+                  });
                 }}
                 className="px-4 py-2 bg-orange-100 text-orange-600 rounded hover:bg-orange-200 font-medium ml-2"
                 title="Sửa tuyến xe"
