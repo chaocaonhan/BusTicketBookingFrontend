@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BusSearch from "../components/comon/BusSearch";
@@ -9,12 +8,9 @@ import { PhoneCall, BusFront, Bus, TramFront } from "lucide-react";
 
 const Home = () => {
   const navigate = useNavigate();
-
-  // Thêm state để lưu đánh giá
   const [ratings, setRatings] = useState([]);
   const [loadingRatings, setLoadingRatings] = useState(true);
 
-  // Lấy đánh giá từ API
   useEffect(() => {
     const fetchRatings = async () => {
       try {
@@ -32,7 +28,6 @@ const Home = () => {
     fetchRatings();
   }, []);
 
-  // Hàm render sao
   const renderStars = (rating) => (
     <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -53,9 +48,10 @@ const Home = () => {
     destination,
     departureDate,
     returnDate,
-    isReturn
+    isReturn,
+    from,
+    to
   ) => {
-    // Đảm bảo isReturn là false nếu không có returnDate
     if (!returnDate || returnDate === "null") {
       isReturn = false;
     }
@@ -66,24 +62,25 @@ const Home = () => {
       departureDate,
       returnDate,
       isReturn,
+      from,
+      to,
     });
 
-    // Tạo query string từ các tham số tìm kiếm
     const queryParams = new URLSearchParams({
       departure,
       destination,
       departureDate,
-      returnDate: returnDate, // Đặt null nếu không có returnDate
+      returnDate: returnDate || "",
       isReturn: isReturn ? "true" : "false",
+      from, // ID của điểm đi
+      to, // ID của điểm đến
     }).toString();
 
-    // Điều hướng đến BookingPage với query string
     navigate(`/dat-ve?${queryParams}`);
   };
 
   return (
     <div className="relative w-full min-h-screen">
-      {/* Phần BusSearch */}
       <div
         className="w-full grid place-items-center"
         style={{
@@ -97,11 +94,10 @@ const Home = () => {
       >
         <BusSearch
           className="p-6 rounded-lg shadow-lg"
-          onSearch={handleSearch} // Truyền handleSearch vào BusSearch
+          onSearch={handleSearch}
         />
       </div>
 
-      {/* Phần PopularRoutes và BusFeatures */}
       <PopularRoutes className="px-3 " />
 
       <section className="max-[80%] mx-auto bg-white rounded-xl my-10 px-6 py-8">
@@ -135,7 +131,6 @@ const Home = () => {
                   <span className="text-orange-500">1900 1212</span>
                 </span>
               </li>
-
               <li className="flex items-center gap-3">
                 <span className="inline-flex items-center justify-center w-10 h-10 text-white bg-orange-400 rounded-full">
                   <PhoneCall />
@@ -152,8 +147,8 @@ const Home = () => {
 
       <section className="max-[90%] mx-auto bg-amber-50 rounded-xl shadow-md my-10 px-6 py-8">
         <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1 w-1/2 text-2xl ">
-            <div className="pl-[200px] ">
+          <div className="flex-1 w-1/2 text-2xl">
+            <div className="pl-[200px]">
               <h2 className="text-2xl font-bold text-orange-500 mb-2">
                 Đa dạng loại xe
               </h2>
@@ -165,7 +160,7 @@ const Home = () => {
                   <span className="inline-flex items-center justify-center w-10 h-10 text-white bg-orange-400 rounded-full">
                     <BusFront />
                   </span>
-                  <span className=" text-orange-500 text-lg">
+                  <span className="text-orange-500 text-lg">
                     Economy 34 ghế
                   </span>
                 </li>
@@ -189,7 +184,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Hiển thị đánh giá ở đây */}
           <div className="flex-1 flex flex-col items-center justify-center">
             <h3 className="text-xl font-bold text-orange-500 mb-3">
               Trải nghiệm từ khách hàng?
@@ -236,7 +230,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* ...rest of Home... */}
       <BusFeatures />
     </div>
   );

@@ -13,6 +13,8 @@ const BookingPage = () => {
   const [searchParams, setSearchParams] = useState({
     departure: queryParams.get("departure") || "",
     destination: queryParams.get("destination") || "",
+    from: queryParams.get("from") || "", // ID điểm đi
+    to: queryParams.get("to") || "", // ID điểm đến
     departureDate: queryParams.get("departureDate") || "",
     returnDate: queryParams.get("returnDate") || "",
     isReturn: queryParams.get("isReturn") === "true",
@@ -26,13 +28,14 @@ const BookingPage = () => {
   });
   const [activeTab, setActiveTab] = useState("outbound");
 
-  // Hàm xử lý tìm kiếm
   const handleSearch = (
     departure,
     destination,
     departureDate,
     returnDate,
-    isReturn
+    isReturn,
+    from,
+    to
   ) => {
     const updatedParams = {
       departure,
@@ -40,6 +43,8 @@ const BookingPage = () => {
       departureDate,
       returnDate,
       isReturn: !!isReturn,
+      from,
+      to,
     };
 
     setSearchParams(updatedParams);
@@ -51,24 +56,19 @@ const BookingPage = () => {
     navigate(`?${newQueryParams.toString()}`);
   };
 
-  // Hàm xử lý khi chọn ghế và tiếp tục
   const handleContinueBooking = (tripInfo, currentTab) => {
     if (searchParams.isReturn) {
       if (currentTab === "outbound") {
-        // Lưu thông tin chuyến đi và chuyển sang tab chiều về
         setBookingInfo((prev) => ({
           ...prev,
           outboundTrip: tripInfo,
         }));
-        // Chuyển sang tab chiều về
         setActiveTab("return");
       } else {
-        // Lưu thông tin chuyến về và chuyển sang trang đặt vé
         setBookingInfo((prev) => ({
           ...prev,
           returnTrip: tripInfo,
         }));
-        // Chuyển sang trang đặt vé với thông tin đã lưu
         navigate("/BookingDetail", {
           state: {
             bookingInfo: {
@@ -79,7 +79,6 @@ const BookingPage = () => {
         });
       }
     } else {
-      // Chuyến một chiều, lưu thông tin và chuyển sang trang đặt vé
       setBookingInfo({
         outboundTrip: tripInfo,
       });
@@ -93,13 +92,14 @@ const BookingPage = () => {
     }
   };
 
-  // Fetch dữ liệu chuyến xe
   useEffect(() => {
     const fetchResults = async () => {
       if (
         !searchParams.departure ||
         !searchParams.destination ||
-        !searchParams.departureDate
+        !searchParams.departureDate ||
+        !searchParams.from ||
+        !searchParams.to
       ) {
         setSearchResults([]);
         return;
@@ -109,8 +109,8 @@ const BookingPage = () => {
 
       try {
         const apiUrl = new URL("http://localhost:8081/api/chuyenxe/search");
-        apiUrl.searchParams.append("tinhDi", searchParams.departure);
-        apiUrl.searchParams.append("tinhDen", searchParams.destination);
+        apiUrl.searchParams.append("idDiemDi", searchParams.from); // Sử dụng from thay vì departure
+        apiUrl.searchParams.append("idDiemDen", searchParams.to); // Sử dụng to thay vì destination
         apiUrl.searchParams.append("ngayDi", searchParams.departureDate);
         apiUrl.searchParams.append("ngayVe", searchParams.returnDate);
         apiUrl.searchParams.append("khuHoi", searchParams.isReturn);
@@ -138,7 +138,6 @@ const BookingPage = () => {
     fetchResults();
   }, [searchParams]);
 
-  // Simple loading spinner component
   const LoadingSpinner = () => (
     <div className="text-center py-8">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
@@ -148,7 +147,6 @@ const BookingPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-orange-100">
-      {/* Phần BusSearch */}
       <div
         className="w-full grid place-items-center"
         style={{
@@ -167,7 +165,7 @@ const BookingPage = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 ">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {loading ? (
           <LoadingSpinner />
         ) : searchResults ? (
@@ -184,7 +182,7 @@ const BookingPage = () => {
               setActiveTab={setActiveTab}
             />
           ) : (
-            <div className="w-full text-center flex flex-col items-center justify-center py-8 ">
+            <div className="w-full text-center flex flex-col items-center justify-center py-8">
               <hr className="w-full mb-4" />
               <p className="font-bold text-2xl mb-2">
                 Không tìm thấy chuyến xe

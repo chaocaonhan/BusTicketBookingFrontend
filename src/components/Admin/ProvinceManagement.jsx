@@ -350,11 +350,16 @@ const ProvinceManagement = () => {
                       key={point.id}
                       className="bg-white shadow rounded-lg p-4 border border-gray-200 flex justify-between items-center"
                     >
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-800">
-                          {point.tenDiemDon}
-                        </h3>
-                        <p className="text-gray-600">{point.diaChi}</p>
+                      <div className="flex flex-row">
+                        <div className="flex text-2xl text-orange-400 items-center">
+                          <h2>ID{point.id}</h2>
+                        </div>
+                        <div className="ml-4">
+                          <h3 className="text-lg font-bold text-gray-800">
+                            {point.tenDiemDon}
+                          </h3>
+                          <p className="text-gray-600">{point.diaChi}</p>
+                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteStation(point.id)}
