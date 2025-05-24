@@ -1,5 +1,6 @@
 // components/FilterPanel.jsx
 import React from "react";
+import { FunnelX } from "lucide-react";
 
 const FilterPanel = ({
   timeFilters,
@@ -12,24 +13,12 @@ const FilterPanel = ({
   return (
     <div className="w-1/4 p-6 bg-white rounded-lg shadow mr-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">BỘ LỌC TÌM KIẾM</h3>
+        <h3 className="text-lg font-bold">BỘ LỌC </h3>
         <button
           onClick={onReset}
           className="text-red-500 mr-2 flex items-center"
         >
-          Bỏ lọc
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 ml-1"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <FunnelX />
         </button>
       </div>
 
