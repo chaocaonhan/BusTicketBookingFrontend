@@ -1,6 +1,14 @@
 import React from "react";
 import OrderTickets from "../Admin/OrderTickets";
 import Paid from "../../assets/Paid.png";
+import { useState } from "react";
+import { MessageCircleMore } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+} from "@/components/ui/pagination";
 
 function isWithin10Minutes(dateString) {
   const now = new Date();
@@ -18,12 +26,28 @@ const MyBooking = ({
   handleRepayment,
   formatDate,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // số đơn hàng hiển thị mỗi trang
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+
+  // Lấy danh sách orders cho trang hiện tại
+  const currentOrders = orders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Hàm chuyển trang
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="bg-white w-full shadow-md rounded-lg p-6 border border-orange-100">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-gray-800">Lịch sử mua vé</h3>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
@@ -52,7 +76,7 @@ const MyBooking = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {orders.map((order) => (
+            {currentOrders.map((order) => (
               <React.Fragment key={order.id}>
                 <tr
                   className="hover:bg-gray-50 cursor-pointer"
@@ -106,18 +130,7 @@ const MyBooking = ({
                       }}
                       className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <MessageCircleMore />
                       {order.daDanhGia ? "Xem đánh giá" : "Đánh giá"}
                     </button>
                   </td>
@@ -145,6 +158,28 @@ const MyBooking = ({
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* //phân trang */}
+      <div className="flex justify-center mt-6">
+        <Pagination>
+          <PaginationContent>
+            {[...Array(totalPages)].map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  href="#"
+                  isActive={index + 1 === currentPage}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onPageChange(index + 1);
+                  }}
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import FilterPanel from "./FilterPanel";
 import ResultsHeader from "./ResultsHeader";
 import TripItem from "./TripItem";
-import { parseTime, calculateDuration } from "@/utils/timeUtils";
+import { parseTime, calculateDuration } from "@/lib/timeUtils";
 
 const SearchResults = ({
   fromProvince,
