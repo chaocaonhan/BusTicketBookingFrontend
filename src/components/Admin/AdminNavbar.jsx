@@ -63,7 +63,7 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
             <div className="relative">
               <button
                 onClick={toggleDropdown}
-                className="flex items-center text-gray-700 hover:text-blue-600"
+                className="flex items-center text-gray-700 hover:text-orange-500"
               >
                 <img
                   src={userInfo?.avatar ? userInfo.avatar : avatar}

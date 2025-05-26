@@ -28,6 +28,25 @@ const getUserRole = () => {
   return null;
 };
 
+const resetPassword = async (email) => {
+  const response = await fetch(
+    "http://localhost:8081/api/auth/reset-password",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to send reset password email");
+  }
+
+  return response.json();
+};
+
 // Đăng ký người dùng mới
 const register = async (userData) => {
   try {

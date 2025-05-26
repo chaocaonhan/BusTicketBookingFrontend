@@ -137,7 +137,7 @@ const TuyenXe = () => {
   return (
     <section className="container mx-auto my-9 w-[80%] ">
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="text-2xl font-bold text-gray-700 mb-4">
+        <div className="text-2xl font-bold text-[#00613d] mb-4">
           Các chuyến đi phổ biến
         </div>
         <div className="flex gap-4 mb-4">

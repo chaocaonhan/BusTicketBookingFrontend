@@ -94,12 +94,22 @@ const Login = () => {
             </div>
 
             <div className="mb-6">
-              <label
-                htmlFor="matKhau"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Mật khẩu
-              </label>
+              <div className="flex flex-row justify-between items-center mb-2">
+                <label
+                  htmlFor="matKhau"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Mật khẩu
+                </label>
+                <p className="text-sm text-gray-600 mt-2">
+                  <a
+                    href="/ "
+                    className="text-orange-500 font-medium hover:underline transition"
+                  >
+                    Quên mật khẩu?
+                  </a>
+                </p>
+              </div>
               <input
                 type="password"
                 className="w-full px-4 py-3 bg-orange-50 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"

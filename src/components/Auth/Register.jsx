@@ -7,6 +7,7 @@ const Register = () => {
     hoTen: "",
     email: "",
     matKhau: "",
+    matKhauXacNhan: "",
     sdt: "",
   });
   const [message, setMessage] = useState("");
@@ -23,6 +24,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.matKhau !== formData.matKhauXacNhan) {
+      setMessage("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await authService.register(formData);
@@ -117,6 +124,24 @@ const Register = () => {
 
           <div className="mb-4">
             <label
+              htmlFor="matKhauXacNhan"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Xác nhận mật khẩu
+            </label>
+            <input
+              type="password"
+              id="matKhauXacNhan"
+              name="matKhauXacNhan"
+              value={formData.matKhauXacNhan}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 mt-1 border border-orange-300 rounded-lg bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
               htmlFor="SDT"
               className="block text-sm font-medium text-gray-600"
             >
@@ -124,8 +149,8 @@ const Register = () => {
             </label>
             <input
               type="text"
-              id="sdt" // id bạn để sao cũng được
-              name="sdt" // ✅ Phải viết đúng key của formData
+              id="sdt"
+              name="sdt"
               value={formData.sdt}
               onChange={handleChange}
               required

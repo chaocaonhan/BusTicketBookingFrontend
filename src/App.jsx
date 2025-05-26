@@ -40,6 +40,7 @@ import AboutUsPage from "./pages/AboutUsPage";
 import FindMyBooking from "./components/comon/FindMyBooking";
 import DndKitList from "./components/comon/DndKitList";
 import Discount from "./components/Admin/Discount";
+import ForgotPassword from "./components/Auth/ForgotPassword";
 
 // React App
 const App = () => {
@@ -62,7 +63,7 @@ const App = () => {
             <Route path="/payment-success" element={<PaySuccess />} />
             <Route path="/payment-failed" element={<PayFail />} />
             <Route path="/tra-cuu-ve" element={<FindMyBooking />} />
-            <Route path="/tra-cuu-ve" element={<FindMyBooking />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route
               path="/route-schedule/:routeId"
               element={<RouteSchedule />}

@@ -70,8 +70,37 @@ const TripSchedule = ({ tripId }) => {
               {stop.thoiGianXeDen.slice(0, 5)}
             </TimelineOppositeContent>
             <TimelineSeparator>
-              <TimelineDot color={index === 0 ? "primary" : "grey"} />
-              {index < schedule.length - 1 && <TimelineConnector />}
+              <TimelineDot
+                sx={{
+                  backgroundColor: "#ff9100", // Cam đậm như RouteSchedule
+                  position: "relative",
+                  "&:before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: "50%",
+                    backgroundColor: "orange",
+                    opacity: 0.4,
+                    animation: "pulse 1s infinite ease-in-out",
+                    zIndex: -1,
+                  },
+                  "@keyframes pulse": {
+                    "0%": { transform: "scale(3.5)", opacity: 0.4 },
+                    "50%": { transform: "scale(1.5)", opacity: 0 },
+                    "100%": { transform: "scale(1)", opacity: 0.4 },
+                  },
+                }}
+              />
+              {index < schedule.length - 1 && (
+                <TimelineConnector
+                  sx={{
+                    backgroundColor: "#f97316", // Cam nhạt như RouteSchedule
+                  }}
+                />
+              )}
             </TimelineSeparator>
             <TimelineContent>
               <div className="font-medium">{stop.tenDiemDon}</div>

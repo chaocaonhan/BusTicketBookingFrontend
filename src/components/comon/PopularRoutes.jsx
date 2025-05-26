@@ -84,7 +84,7 @@ const PopularRoutes = () => {
   return (
     <section className="w-full mx-auto p-4 px-14 bg-amber-50">
       <div className="text-center mb-8 mt-10">
-        <h2 className="text-3xl font-bold text-gray-800">
+        <h2 className="text-3xl font-bold text-[#00613d]">
           Tuyến đường phổ biến
         </h2>
         <p className="text-gray-500 mt-2">
