@@ -24,7 +24,7 @@ const OrderManagement = () => {
     sdt: "",
     soLuongVe: 0,
   });
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("booked");
   const [search, setSearch] = useState("");
 
   // Pagination states
@@ -33,7 +33,7 @@ const OrderManagement = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
-  // Fetch orders with pagination and search
+  // Fetch orders with pagination, search, and tab-based filtering
   const fetchOrders = async (
     page = currentPage,
     size = pageSize,
@@ -42,11 +42,29 @@ const OrderManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      let url = searchValue.trim()
-        ? `http://localhost:8081/api/datve/search?keyword=${encodeURIComponent(
-            searchValue
-          )}&page=${page}&size=${size}`
-        : `http://localhost:8081/api/datve/getPage?page=${page}&size=${size}`;
+      let url;
+
+      // Determine trangThaiDonDat based on activeTab
+      let trangThaiDonDat;
+      switch (activeTab) {
+        case "history":
+          trangThaiDonDat = "COMPLETED";
+          break;
+        case "cancelled":
+          trangThaiDonDat = "CANCELED";
+          break;
+        case "booked":
+        default:
+          trangThaiDonDat = "BOOKED";
+      }
+
+      if (searchValue.trim()) {
+        url = `http://localhost:8081/api/datve/search?keyword=${encodeURIComponent(
+          searchValue
+        )}&page=${page}&size=${size}&trangThaiDonDat=${trangThaiDonDat}`;
+      } else {
+        url = `http://localhost:8081/api/datve/getPage?page=${page}&size=${size}&trangThaiDonDat=${trangThaiDonDat}`;
+      }
 
       const response = await fetch(url, {
         headers: {
@@ -59,14 +77,13 @@ const OrderManagement = () => {
       }
 
       const data = await response.json();
-      // Sửa đoạn này để tương thích với cả trường hợp không có code
-      if (data.code === 200 || data.content) {
+      if (data.content) {
         setOrders(data.content);
         setTotalPages(data.totalPages);
         setTotalElements(data.totalElements);
         setCurrentPage(data.number);
       } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách đơn đặt hàng");
+        throw new Error("Lỗi khi lấy danh sách đơn đặt hàng");
       }
     } catch (err) {
       setError(err.message);
@@ -75,10 +92,11 @@ const OrderManagement = () => {
     }
   };
 
+  // Fetch orders when activeTab, currentPage, or search changes
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line
-  }, []);
+  }, [activeTab, currentPage, pageSize]);
 
   // Debounce search
   const [searchTimeout, setSearchTimeout] = useState(null);
@@ -89,6 +107,7 @@ const OrderManagement = () => {
     if (searchTimeout) clearTimeout(searchTimeout);
 
     const timeout = setTimeout(() => {
+      setCurrentPage(0); // Reset to first page on search
       fetchOrders(0, pageSize, value);
     }, 500);
 
@@ -98,7 +117,7 @@ const OrderManagement = () => {
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage);
-      fetchOrders(newPage);
+      // fetchOrders(newPage); // Removed, handled by useEffect
     }
   };
 
@@ -190,43 +209,6 @@ const OrderManagement = () => {
     });
   };
 
-  // Lọc đơn theo tab và tìm kiếm (áp dụng cho dữ liệu đã phân trang)
-  const filteredOrders = orders.filter((order) => {
-    // Lọc theo tab
-    if (activeTab === "history" && order.trangThai !== "Đã thanh toán")
-      return false;
-
-    if (activeTab === "cancelled") {
-      const status = (order.trangThai || "").trim().toLowerCase();
-      if (status.startsWith("đã huỷ")) {
-        const match = status.match(/đã huỷ\s*(\d+)\s*\/\s*(\d+)/);
-        if (match) {
-          const a = parseInt(match[1], 10);
-          const b = parseInt(match[2], 10);
-          if (a === b) return true;
-          return false;
-        }
-        return true;
-      }
-      return false;
-    }
-
-    // Lọc theo tìm kiếm (tên khách, sdt, email)
-    const keyword = search.toLowerCase();
-    if (
-      keyword &&
-      !(
-        (order.tenHanhKhach || "").toLowerCase().includes(keyword) ||
-        (order.tenNguoiDat || "").toLowerCase().includes(keyword) ||
-        (order.sdt || "").toLowerCase().includes(keyword) ||
-        (order.email || "").toLowerCase().includes(keyword)
-      )
-    ) {
-      return false;
-    }
-    return true;
-  });
-
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -238,13 +220,13 @@ const OrderManagement = () => {
           <div className="flex rounded-md bg-gray-100 overflow-hidden">
             <button
               className={`px-4 py-2 text-sm font-medium ${
-                activeTab === "all"
+                activeTab === "booked"
                   ? "bg-orange-100 text-orange-600"
                   : "text-gray-700 hover:bg-gray-200"
               }`}
-              onClick={() => setActiveTab("all")}
+              onClick={() => setActiveTab("booked")}
             >
-              Tất cả
+              Đã đặt
             </button>
             <button
               className={`px-4 py-2 text-sm font-medium ${
@@ -286,7 +268,7 @@ const OrderManagement = () => {
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-400"></div>
         </div>
       ) : error ? (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -294,38 +276,32 @@ const OrderManagement = () => {
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto ">
             <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
+              <thead>
                 <tr>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Tên khách hàng
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Số điện thoại
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Trạng thái
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Ngày đặt
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Kiểu thanh toán
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Tổng tiền
-                  </th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Thao tác
-                  </th>
+                  {[
+                    "ID",
+                    "Tên khách hàng",
+                    "Số điện thoại",
+                    "Trạng thái",
+                    "Ngày đặt",
+                    "Thanh toán",
+                    "Tổng tiền",
+                    ...(activeTab === "booked" ? ["Thao tác"] : []),
+                  ].map((title) => (
+                    <th
+                      key={title}
+                      className="py-3 px-4 text-left font-medium text-gray-600 uppercase tracking-wider"
+                    >
+                      {title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-200">
-                {filteredOrders.map((order) => (
+                {orders.map((order) => (
                   <React.Fragment key={order.id}>
                     <tr
                       key={order.id + "-main"}
@@ -342,7 +318,7 @@ const OrderManagement = () => {
                         {order.sdt || "N/A"}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-900">
-                        {order.trangThai || 0}
+                        {order.trangThai || "N/A"}
                       </td>
                       <td className="py-3 px-4 text-sm text-gray-900">
                         {formatDate(order.ngayDat)}
@@ -365,9 +341,11 @@ const OrderManagement = () => {
                       >
                         {(order.tongTien || 0).toLocaleString("vi-VN")} VND
                       </td>
-                      <td className="py-3 px-4 text-sm text-gray-900">
-                        <TableActions onEdit={() => handleEditOrder(order)} />
-                      </td>
+                      {activeTab === "booked" && (
+                        <td className="py-3 px-4 text-sm text-gray-900">
+                          <TableActions onEdit={() => handleEditOrder(order)} />
+                        </td>
+                      )}
                     </tr>
                     <tr key={order.id + "-expand"}>
                       <td colSpan="6" className="p-0 w-full">
@@ -397,7 +375,7 @@ const OrderManagement = () => {
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
-                  &laquo;
+                  «
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -408,7 +386,7 @@ const OrderManagement = () => {
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
-                  &lsaquo;
+                  ‹
                 </button>
 
                 {generatePageNumbers().map((page) => (
@@ -434,7 +412,7 @@ const OrderManagement = () => {
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
-                  &rsaquo;
+                  ›
                 </button>
                 <button
                   onClick={() => handlePageChange(totalPages - 1)}
@@ -445,7 +423,7 @@ const OrderManagement = () => {
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >
-                  &raquo;
+                  »
                 </button>
               </div>
             </div>

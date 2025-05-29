@@ -3,7 +3,6 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8081/api/nguoidung/";
 
-// Lưu JWT token vào localStorage
 const setToken = (token) => {
   localStorage.setItem("token", token);
 };

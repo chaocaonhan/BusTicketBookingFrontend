@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import pickup from "../../assets/pickup.svg";
 import station from "../../assets/station.svg";
-import arrow from "../../assets/arrow.png";
+import { ArrowDownUp } from "lucide-react";
 
 import { AiOutlineDoubleRight } from "react-icons/ai";
 import { AiOutlineDoubleLeft } from "react-icons/ai";
@@ -149,12 +149,8 @@ const PopularRoutes = () => {
 
                         <div className="flex-1">
                           <div className="flex flex-row items-center">
-                            <div className="w-1/3">
-                              <img
-                                src={arrow}
-                                alt="arrow"
-                                className="w-5 h-5"
-                              />
+                            <div className="w-1/3 ">
+                              <ArrowDownUp className="w-4 h-8 mx-1 text-gray-400" />
                             </div>
                             <div className="w-2/3"></div>
                           </div>

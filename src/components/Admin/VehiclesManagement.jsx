@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { showSuccess, showError } from "../../utils/toastConfig";
+import { ListCollapse, Pencil, Trash2 } from "lucide-react";
 
 const VehiclesManagement = () => {
   const [vehicles, setVehicles] = useState([]);
@@ -121,10 +123,18 @@ const VehiclesManagement = () => {
     try {
       const token = localStorage.getItem("token");
       const url = editingVehicle
-        ? `http://localhost:8081/api/Xe/${editingVehicle.id}`
+        ? `http://localhost:8081/api/Xe/suaThongTinXe/${editingVehicle.id}`
         : "http://localhost:8081/api/Xe";
 
       const method = editingVehicle ? "PUT" : "POST";
+
+      // Create XeDTO object
+      const xeDTO = editingVehicle
+        ? {
+            id: editingVehicle.id,
+            ...formData,
+          }
+        : formData;
 
       const response = await fetch(url, {
         method,
@@ -132,19 +142,25 @@ const VehiclesManagement = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(xeDTO),
       });
 
-      if (!response.ok) {
+      const data = await response.json();
+
+      if (data.code === 200) {
+        showSuccess(
+          editingVehicle ? "Cập nhật xe thành công!" : "Thêm xe mới thành công!"
+        );
+        setShowModal(false);
+        fetchVehicles();
+      } else {
         throw new Error(
-          `Không thể ${editingVehicle ? "cập nhật" : "thêm"} phương tiện`
+          data.message ||
+            `Không thể ${editingVehicle ? "cập nhật" : "thêm"} phương tiện`
         );
       }
-
-      setShowModal(false);
-      fetchVehicles(); // Refresh danh sách sau khi thêm/sửa
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -156,7 +172,7 @@ const VehiclesManagement = () => {
         </h1>
         <button
           onClick={handleAddVehicle}
-          className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
         >
           Thêm phương tiện
         </button>
@@ -232,19 +248,13 @@ const VehiclesManagement = () => {
                       {vehicle.trangThai}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    <button
-                      onClick={() => handleEditVehicle(vehicle)}
-                      className="text-blue-600 hover:text-blue-900 bg-blue-100 px-3 py-1 rounded mr-2"
-                    >
-                      Sửa
-                    </button>
-                    <button
+                  <td className="py-3 px-4 text-sm flex flex-row items-center space-x-2 text-orange-400">
+                    <Pencil onClick={() => handleEditVehicle(vehicle)} />
+                    <Trash2
                       onClick={() => handleDeleteVehicle(vehicle.id)}
-                      className="text-red-600 hover:text-red-900 bg-red-100 px-3 py-1 rounded"
-                    >
-                      Xóa
-                    </button>
+                      className="text-red-500"
+                    />
+                    <ListCollapse />
                   </td>
                 </tr>
               ))}
@@ -253,7 +263,6 @@ const VehiclesManagement = () => {
         </div>
       )}
 
-      {/* Modal for Add/Edit Vehicle */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">

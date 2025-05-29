@@ -3,7 +3,20 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function BusSearch({ className, onSearch, searchParams }) {
   const [locations, setLocations] = useState([]);
@@ -15,8 +28,8 @@ export default function BusSearch({ className, onSearch, searchParams }) {
   const [destination, setDestination] = useState(
     searchParams?.destination || ""
   );
-  const [from, setFrom] = useState(searchParams?.from || ""); // Thêm state cho from (ID điểm đi)
-  const [to, setTo] = useState(searchParams?.to || ""); // Thêm state cho to (ID điểm đến)
+  const [from, setFrom] = useState(searchParams?.from || "");
+  const [to, setTo] = useState(searchParams?.to || "");
   const [departureProvince, setDepartureProvince] = useState("");
   const [destinationProvince, setDestinationProvince] = useState("");
 
@@ -311,35 +324,38 @@ export default function BusSearch({ className, onSearch, searchParams }) {
       <div className="bg-white bg-opacity-70 rounded-xl mt-3 shadow-lg w-full max-w-4xl mx-4 p-6 border border-gray-100">
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-6">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="tripType"
-                checked={isReturn === false}
-                onChange={() => setIsReturn(false)}
-                className="mr-2 accent-orange-500"
-              />
-              <span className="text-base font-medium text-gray-800">
-                Một chiều
-              </span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="tripType"
-                checked={isReturn === true}
-                onChange={() => setIsReturn(true)}
-                className="mr-2 accent-orange-500"
-              />
-              <span className="text-base font-medium text-gray-800">
-                Khứ hồi
-              </span>
-            </label>
+            <div className="flex items-center cursor-pointer">
+              <RadioGroup
+                defaultValue={isReturn ? "round-trip" : "one-way"}
+                onValueChange={(value) => setIsReturn(value === "round-trip")}
+              >
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="one-way" id="one-way" />
+                    <Label
+                      htmlFor="one-way"
+                      className="text-xl pl-1 text-orange-500"
+                    >
+                      Một chiều
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="round-trip" id="round-trip" />
+                    <Label
+                      htmlFor="round-trip"
+                      className="text-xl pl-1 text-orange-500"
+                    >
+                      Khứ hồi
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
+            <div className="flex flex-col gap-2 ">
+              <label className="text-xl font-medium text-gray-700">
                 Điểm đi
               </label>
               <CustomDropdown
@@ -353,7 +369,7 @@ export default function BusSearch({ className, onSearch, searchParams }) {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-xl font-medium text-gray-700">
                 Điểm đến
               </label>
               <CustomDropdown
@@ -367,7 +383,9 @@ export default function BusSearch({ className, onSearch, searchParams }) {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Ngày đi</label>
+              <label className="text-xl font-medium text-gray-700">
+                Ngày đi
+              </label>
               <input
                 type="date"
                 className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -379,7 +397,9 @@ export default function BusSearch({ className, onSearch, searchParams }) {
 
             {isReturn === true && (
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Ngày về</label>
+                <label className="text-xl font-medium text-gray-700">
+                  Ngày về
+                </label>
                 <input
                   type="date"
                   className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -393,10 +413,11 @@ export default function BusSearch({ className, onSearch, searchParams }) {
 
           <div className="flex justify-center mt-2">
             <button
-              className="bg-orange-500 text-white py-3 px-6 rounded-full hover:bg-orange-600 transition font-medium w-64"
+              className="bg-orange-500 text-white flex flex-row py-3 px-6 mx-auto rounded-full hover:bg-orange-600 transition font-medium w-64"
               onClick={handleSearch}
             >
-              Tìm chuyến xe
+              <Search />
+              <p className="text-xl px-2 ">Tìm chuyến xe</p>
             </button>
           </div>
         </div>

@@ -13,7 +13,7 @@ const Layout = () => {
       <Navbar className="fixed top-0 left-0 w-full z-20 bg-white shadow-md p-0" />
 
       {/* Tạo khoảng trống cho Navbar */}
-      <div className="pt-16 flex-1">
+      <div className="pt-16 flex-1 ">
         <Outlet />
       </div>
 

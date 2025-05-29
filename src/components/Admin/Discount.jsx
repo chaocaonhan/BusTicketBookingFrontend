@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { showSuccess, showError } from "../../utils/toastConfig";
 
 const Discount = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -75,10 +76,16 @@ const Discount = () => {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Xoá thất bại");
-      fetchDiscounts();
+
+      const data = await res.json();
+      if (data.code === 200) {
+        showSuccess("Xóa mã khuyến mãi thành công!");
+        fetchDiscounts();
+      } else {
+        throw new Error(data.message || "Xóa thất bại");
+      }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -87,12 +94,10 @@ const Discount = () => {
     try {
       let url, method, body;
       if (editingDiscount) {
-        // Sửa mã (giữ nguyên như cũ)
         url = `http://localhost:8081/api/khuyen-mai/${editingDiscount.id}`;
         method = "PUT";
         body = JSON.stringify(formData);
       } else {
-        // Thêm mới: dùng API /api/khuyen-mai/addMa và chỉ gửi các trường cần thiết
         url = "http://localhost:8081/api/khuyen-mai/addMa";
         method = "POST";
         body = JSON.stringify({
@@ -103,6 +108,7 @@ const Discount = () => {
           ngayKetThuc: formData.ngayKetThuc,
         });
       }
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -111,12 +117,21 @@ const Discount = () => {
         },
         body,
       });
+
       const data = await res.json();
-      if (data.code !== 200) throw new Error("Lưu thất bại");
-      setShowModal(false);
-      fetchDiscounts();
+      if (data.code === 200) {
+        showSuccess(
+          editingDiscount
+            ? "Cập nhật mã khuyến mãi thành công!"
+            : "Thêm mã khuyến mãi mới thành công!"
+        );
+        setShowModal(false);
+        fetchDiscounts();
+      } else {
+        throw new Error(data.message || "Có lỗi xảy ra");
+      }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 

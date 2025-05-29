@@ -130,7 +130,6 @@ const TuyenXe = () => {
   };
 
   const handleViewScheduleClick = (route) => {
-    // Chuyển hướng sang trang RouteSchedule với id tuyến xe
     navigate(`/route-schedule/${route.id}`, { state: { route } });
   };
 

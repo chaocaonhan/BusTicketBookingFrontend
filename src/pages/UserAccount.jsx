@@ -386,29 +386,27 @@ const UserAccount = () => {
   };
 
   const handleCancelOrder = async (orderId) => {
-    if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8081/api/datve/huyDon/${orderId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-        if (!response.ok || data.code !== 200) {
-          throw new Error(data.message || "Có lỗi xảy ra khi hủy đơn hàng!");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/datve/huyDon/${orderId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        toast.success("Hủy đơn hàng thành công!");
-        fetchOrders();
-      } catch (err) {
-        toast.error(err.message || "Có lỗi xảy ra khi hủy đơn hàng");
+      const data = await response.json();
+      if (!response.ok || data.code !== 200) {
+        throw new Error(data.message || "Có lỗi xảy ra khi hủy đơn hàng!");
       }
+
+      toast.success("Hủy đơn hàng thành công!");
+      fetchOrders();
+    } catch (err) {
+      toast.error(err.message || "Có lỗi xảy ra khi hủy đơn hàng");
     }
   };
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { toastConfig } from "./utils/toastConfig";
 
 // Layouts
 import Layout from "./Layout/Layout";
@@ -102,7 +103,7 @@ const App = () => {
           </Route>
         </Routes>
       </main>
-      <ToastContainer limit={1} />
+      <ToastContainer limit={1} {...toastConfig} />
     </Router>
   );
 };

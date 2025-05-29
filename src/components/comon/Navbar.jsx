@@ -4,7 +4,8 @@ import { FaBars, FaX } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
 import axios from "axios";
-import avatar from "../../assets/avatar.png"; // Import ảnh từ assets
+import avatar from "../../assets/avatar.png";
+import { Bus } from "lucide-react";
 
 export const Navbar = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -124,9 +125,12 @@ export const Navbar = () => {
     <nav className="bg-[url('./assets/nav-bg.png')] fixed w-full top-0 left-0 h-16 lg:px-24 md:px-16 sm:px-7 px-4 py-4 backdrop-blur-lg transition-transform duration-300 z-50 p-0 min-h-16">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between">
         {/* Logo section */}
-        <Link to="/" className="text-4xl text-white font-bold">
-          SaoVietBus
-        </Link>
+        <div className="flex flex-row items-center gap-2">
+          <Bus className="w-12 h-10 text-white" />
+          <Link to="/" className="text-4xl text-white font-bold">
+            Saoviet
+          </Link>
+        </div>
 
         {/* Hamburger menu for mobile */}
         <div className="md:hidden">

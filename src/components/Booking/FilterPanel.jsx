@@ -51,7 +51,7 @@ const FilterPanel = ({
 };
 
 const FilterSection = ({ title, filters, onChange, type, options }) => (
-  <div className="mb-6">
+  <div className="mb-6 max-h-36">
     <h4 className="font-medium mb-2">{title}</h4>
     <div
       className={

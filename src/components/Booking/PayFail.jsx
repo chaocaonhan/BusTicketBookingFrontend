@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const PayFail = () => {
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="container mx-auto px-4 py-8 mt-14">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
         {/* Failure Icon */}
         <div className="flex justify-center mb-6">

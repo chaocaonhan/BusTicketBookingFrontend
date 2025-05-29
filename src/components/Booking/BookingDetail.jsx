@@ -449,7 +449,7 @@ const BookingDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Thông tin lượt đi */}
             <div className="bg-white rounded-xl shadow p-8">
-              <div className="font-bold text-xl text-black mb-6">
+              <div className="font-bold text-xl text-[#00613d] mb-6">
                 Thông tin lượt đi
               </div>
               <div className="flex justify-between items-center mb-4">
@@ -545,7 +545,7 @@ const BookingDetail = () => {
             {/* Thông tin lượt về */}
             {isReturn && (
               <div className="bg-white rounded-xl shadow p-8">
-                <div className="font-bold text-xl text-black mb-6">
+                <div className="font-bold text-xl text-[#00613d]  mb-6">
                   Thông tin lượt về
                 </div>
                 <div className="flex justify-between items-center mb-4">
@@ -653,10 +653,8 @@ const BookingDetail = () => {
                 lòng liên hệ Trung tâm tổng đài 1900 1234 để được hỗ trợ.
               </div>
               <div>
-                (*) Nếu quý khách có nhu cầu trung chuyển, vui lòng liên hệ Tổng
-                đài trung chuyển 1900 6918 trước khi đặt vé. Chúng tôi không
-                đón/trung chuyển tại những điểm xe trung chuyển không thể tới
-                được.
+                (*) Nếu quý khách muốn huỷ vé, hãy huỷ trước 6 tiếng. Trường hợp
+                huỷ vé sau thời gian này, quý khách sẽ không được hoàn tiền.
               </div>
             </div>
           </div>

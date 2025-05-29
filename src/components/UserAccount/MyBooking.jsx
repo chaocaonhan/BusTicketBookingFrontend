@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import OrderTickets from "../Admin/OrderTickets";
 import Paid from "../../assets/Paid.png";
-import { useState } from "react";
 import { MessageCircleMore } from "lucide-react";
+import ConfirmDialog from "../comon/ConfirmDialog";
 import {
   Pagination,
   PaginationContent,
@@ -10,37 +10,54 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 
-function isWithin10Minutes(dateString) {
-  const now = new Date();
+// Inject current time for testability
+const isWithin10Minutes = (dateString, now = new Date()) => {
+  if (!dateString) return false;
   const orderDate = new Date(dateString);
+  if (isNaN(orderDate.getTime())) return false; // Handle invalid date
   const diffMs = now - orderDate;
   return diffMs >= 0 && diffMs <= 10 * 60 * 1000;
-}
+};
 
 const MyBooking = ({
-  orders,
+  orders = [], // Default to empty array
   expandedOrderId,
   handleRowClick,
   handleRatingClick,
   handleCancelOrder,
   handleRepayment,
-  formatDate,
+  formatDate = (date) => new Date(date).toLocaleString("vi-VN"), // Default formatDate
+  itemsPerPage = 10, // Configurable items per page
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // số đơn hàng hiển thị mỗi trang
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-  // Tính tổng số trang
+  // Calculate total pages
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
-  // Lấy danh sách orders cho trang hiện tại
+  // Get orders for the current page
   const currentOrders = orders.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Hàm chuyển trang
+  // Handle page change
   const onPageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const onCancelClick = (orderId, e) => {
+    e.stopPropagation();
+    setSelectedOrderId(orderId);
+    setShowCancelDialog(true);
+  };
+
+  const onConfirmCancel = () => {
+    if (selectedOrderId) {
+      handleCancelOrder(selectedOrderId);
+    }
+    setShowCancelDialog(false);
   };
 
   return (
@@ -49,7 +66,7 @@ const MyBooking = ({
         <h3 className="text-xl font-semibold text-gray-800">Lịch sử mua vé</h3>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white" aria-label="Lịch sử mua vé">
           <thead className="bg-gray-100">
             <tr>
               <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
@@ -78,18 +95,20 @@ const MyBooking = ({
           <tbody className="divide-y divide-gray-200">
             {currentOrders.map((order) => (
               <React.Fragment key={order.id}>
+                {" "}
+                {/* Key retained for list rendering */}
                 <tr
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={(e) => handleRowClick(order.id, e)}
                 >
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.id}
+                    {order.id || "N/A"}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    {order.trangThai || 0}
+                    {order.trangThai || "Không xác định"}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    {formatDate(order.ngayDat)}
+                    {order.ngayDat ? formatDate(order.ngayDat) : "N/A"}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {order.kieuThanhToan === "CASH" ? "Tiền mặt" : "VNPAY"}
@@ -108,15 +127,15 @@ const MyBooking = ({
                     }
                   >
                     {(order.tongTien || 0).toLocaleString("vi-VN")} VND
-                    {/* Hiển thị nút Thanh toán nếu đủ điều kiện */}
                     {order.kieuThanhToan === "VNPAY" &&
                       order.trangThaiThanhToan === "UNPAID" &&
                       isWithin10Minutes(order.ngayDat) && (
                         <button
                           className="ml-2 px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-xs"
-                          onClick={() =>
-                            handleRepayment(order.id, order.tongTien)
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRepayment(order.id, order.tongTien);
+                          }}
                         >
                           Thanh toán
                         </button>
@@ -129,6 +148,7 @@ const MyBooking = ({
                         handleRatingClick(order.id);
                       }}
                       className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors"
+                      aria-label={order.daDanhGia ? "Xem đánh giá" : "Đánh giá"}
                     >
                       <MessageCircleMore />
                       {order.daDanhGia ? "Xem đánh giá" : "Đánh giá"}
@@ -136,11 +156,9 @@ const MyBooking = ({
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCancelOrder(order.id);
-                      }}
+                      onClick={(e) => onCancelClick(order.id, e)}
                       className="text-red-600 hover:text-red-800 transition-colors"
+                      aria-label="Hủy đơn"
                     >
                       Hủy đơn
                     </button>
@@ -160,7 +178,7 @@ const MyBooking = ({
         </table>
       </div>
 
-      {/* //phân trang */}
+      {/* Pagination */}
       <div className="flex justify-center mt-6">
         <Pagination>
           <PaginationContent>
@@ -181,6 +199,16 @@ const MyBooking = ({
           </PaginationContent>
         </Pagination>
       </div>
+
+      <ConfirmDialog
+        open={showCancelDialog}
+        title="Xác nhận hủy đơn"
+        description="Bạn có chắc chắn muốn hủy đơn hàng này?"
+        cancelText="Không"
+        confirmText="Có, hủy đơn"
+        onCancel={() => setShowCancelDialog(false)}
+        onConfirm={onConfirmCancel}
+      />
     </div>
   );
 };

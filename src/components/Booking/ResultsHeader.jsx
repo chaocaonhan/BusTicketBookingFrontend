@@ -14,8 +14,10 @@ const ResultsHeader = ({
   onSortChange,
 }) => (
   <div className="mb-4">
-    <h2 className="text-xl font-bold">
-      {from} - {to} ({count})
+    <h2 className="text-xl font-bold text-[#00613d]">
+      {activeTab === "outbound"
+        ? `${from} - ${to} ( ${count} )`
+        : `${to} -  ${from} ( ${count}    )`}
     </h2>
 
     <div className="flex mt-2 gap-2">

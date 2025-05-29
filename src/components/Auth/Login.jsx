@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify"; // Import toast
+import { showError, showSuccess } from "@/utils/toastConfig";
 import authService from "../../services/authService";
 
 const Login = () => {
@@ -21,6 +21,15 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.email.trim()) {
+      showError("Vui lòng nhập email!");
+      return;
+    }
+
+    if (!formData.matKhau.trim()) {
+      showError("Vui lòng nhập mật khẩu!");
+      return;
+    }
     setLoading(true);
     try {
       const response = await authService.login(
@@ -28,16 +37,7 @@ const Login = () => {
         formData.matKhau
       );
 
-      // Hiển thị thông báo thành công
-      toast.success("Đăng nhập thành công!", {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored",
-      });
+      showSuccess("Đăng nhập thành công!");
 
       window.dispatchEvent(new Event("authChange"));
 
@@ -51,15 +51,7 @@ const Login = () => {
       }
     } catch (error) {
       // Hiển thị thông báo lỗi
-      toast.error("Email hoặc mật khẩu không chính xác.", {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "colored",
-      });
+      showError("Mật khẩu hoặc email không đúng!");
     } finally {
       setLoading(false);
     }
@@ -88,7 +80,6 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 placeholder="Nhập email của bạn"
               />
             </div>
@@ -103,7 +94,7 @@ const Login = () => {
                 </label>
                 <p className="text-sm text-gray-600 mt-2">
                   <a
-                    href="/ "
+                    href="/forgot-password"
                     className="text-orange-500 font-medium hover:underline transition"
                   >
                     Quên mật khẩu?
@@ -117,7 +108,6 @@ const Login = () => {
                 name="matKhau"
                 value={formData.matKhau}
                 onChange={handleChange}
-                required
                 placeholder="Nhập mật khẩu"
               />
             </div>
