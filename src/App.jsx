@@ -39,7 +39,6 @@ import RatingManagement from "./components/Admin/RatingManagement";
 import PayFail from "./components/Booking/PayFail";
 import AboutUsPage from "./pages/AboutUsPage";
 import FindMyBooking from "./components/comon/FindMyBooking";
-import DndKitList from "./components/comon/DndKitList";
 import Discount from "./components/Admin/Discount";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 
@@ -88,7 +87,6 @@ const App = () => {
             <Route path="routes" element={<RoutesManagement />} />
             <Route path="manage-trips" element={<TripManagement />} />
             <Route path="manage-orders" element={<OrderManagement />} />
-            <Route path="reports" element={<DndKitList />} />
             <Route path="discount" element={<Discount />} />
             <Route
               path="/admin/route-schedule/:routeId/edit"

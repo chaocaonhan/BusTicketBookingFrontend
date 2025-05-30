@@ -468,71 +468,75 @@ const RouteScheduleEdit = () => {
     return <div className="text-red-500 py-4 text-center">Lỗi: {error}</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-4 mt-14 bg-white">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <button
-            onClick={handleBack}
-            className="mr-3 text-orange-500 hover:text-orange-600 flex items-center font-medium"
-          >
-            <MoveLeft size={20} className="mr-1" />
-            <span>Quay lại</span>
-          </button>
+    <div className="flex flex-row max-w-[70%] mx-auto">
+      <div className="flex items-start mt-20">
+        <button
+          onClick={handleBack}
+          className="mr-3 text-orange-500 hover:text-orange-600 flex items-center font-medium"
+        >
+          <MoveLeft className="mr-1 w-5 h-5" />
+          <span>Quay lại</span>
+        </button>
+      </div>
+      <div className="max-w-3xl mx-auto p-4 mt-14 bg-white">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl text-orange-400 font-bold text-center flex-1">
+            Lịch trình tuyến : {tenTuyen}
+          </h2>
         </div>
 
-        <h2 className="text-xl text-orange-400 font-bold text-center flex-1">
-          Chỉnh sửa lịch trình tuyến xe : {tenTuyen}
-        </h2>
-
-        {/* Add Station Button */}
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="px-4 py-2 bg-orange-50 text-orange-500 rounded-md hover:bg-orange-100 text-sm font-medium"
-        >
-          Thêm điểm đón
-        </button>
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm font-medium ml-2"
-        >
-          Lưu
-        </button>
-      </div>
-
-      <div className="relative">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <SortableContext
-            items={stops.map((stop) => stop.id)}
-            strategy={verticalListSortingStrategy}
+        <div className="relative">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
           >
-            {stops.map((stop) => (
-              <SortableItem key={stop.id} id={stop.id} stop={stop} />
-            ))}
-          </SortableContext>
+            <SortableContext
+              items={stops.map((stop) => stop.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {stops.map((stop) => (
+                <SortableItem key={stop.id} id={stop.id} stop={stop} />
+              ))}
+            </SortableContext>
 
-          {/* Trash bin that appears when dragging */}
-          <TrashBin isActive={showTrashBin} />
+            {/* Trash bin that appears when dragging */}
+            <TrashBin isActive={showTrashBin} />
 
-          {/* Drag overlay for the item being dragged */}
-          <DragOverlay>
-            {activeId ? <DragItemPreview stop={activeStop} /> : null}
-          </DragOverlay>
-        </DndContext>
+            {/* Drag overlay for the item being dragged */}
+            <DragOverlay>
+              {activeId ? <DragItemPreview stop={activeStop} /> : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+
+        {/* Add Station Form Modal */}
+        <AddStationForm
+          className="mx-auto"
+          isOpen={showAddForm}
+          onClose={() => setShowAddForm(false)}
+          onAdd={handleAddStation}
+          token={token}
+        />
       </div>
-
-      {/* Add Station Form Modal */}
-      <AddStationForm
-        isOpen={showAddForm}
-        onClose={() => setShowAddForm(false)}
-        onAdd={handleAddStation}
-        token={token}
-      />
+      <div className="flex items-start mt-20">
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="px-4 py-2 bg-orange-50 text-orange-500 rounded-md hover:bg-orange-100 text-lg font-medium"
+          >
+            Thêm điểm đón
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-green-100 text-green-800 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+          >
+            Lưu
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

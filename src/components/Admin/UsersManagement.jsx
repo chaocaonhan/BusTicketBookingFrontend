@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import TableActions from "./TableActions";
 import { toast } from "react-toastify";
+import ConfirmDialog from "../comon/ConfirmDialog";
 
 const UsersManagement = () => {
   const [users, setUsers] = useState([]);
@@ -9,6 +10,7 @@ const UsersManagement = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [formData, setFormData] = useState({
     id: 0,
@@ -140,10 +142,7 @@ const UsersManagement = () => {
 
   const handleDeleteUser = (user) => {
     setUserToDelete(user);
-    // Implement delete confirmation modal logic here
-    if (window.confirm(`Bạn có chắc chắn muốn xóa người dùng ${user.hoTen}?`)) {
-      deleteUser(user.id);
-    }
+    setShowDeleteDialog(true);
   };
 
   const deleteUser = async (userId) => {
@@ -173,6 +172,19 @@ const UsersManagement = () => {
       toast.error(err.message);
       setError(err.message);
     }
+  };
+
+  const handleConfirmDelete = () => {
+    if (userToDelete) {
+      deleteUser(userToDelete.id);
+    }
+    setShowDeleteDialog(false);
+    setUserToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
+    setUserToDelete(null);
   };
 
   const handleSubmit = async (e) => {
@@ -582,6 +594,19 @@ const UsersManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Add ConfirmDialog */}
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Xác nhận xóa người dùng"
+        description={`Bạn có chắc chắn muốn xóa người dùng ${
+          userToDelete?.hoTen || ""
+        }?`}
+        cancelText="Hủy"
+        confirmText="Xóa"
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

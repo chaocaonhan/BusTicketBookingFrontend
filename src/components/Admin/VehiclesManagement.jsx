@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { showSuccess, showError } from "../../utils/toastConfig";
 import { ListCollapse, Pencil, Trash2 } from "lucide-react";
+import ConfirmDialog from "../comon/ConfirmDialog";
 
 const VehiclesManagement = () => {
   const [vehicles, setVehicles] = useState([]);
   const [filteredVehicles, setFilteredVehicles] = useState([]); // Danh sách phương tiện sau khi lọc
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // Từ khóa tìm kiếm
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingVehicle, setEditingVehicle] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -16,6 +17,8 @@ const VehiclesManagement = () => {
     loaiXe: "ECONOMY",
     trangThai: "Active",
   });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
 
   const fetchVehicles = async () => {
     try {
@@ -93,38 +96,13 @@ const VehiclesManagement = () => {
     setShowModal(true);
   };
 
-  const handleDeleteVehicle = async (vehicleId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa phương tiện này?")) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8081/api/Xe/${vehicleId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Không thể xóa phương tiện");
-        }
-
-        fetchVehicles(); // Refresh danh sách sau khi xóa
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
       const url = editingVehicle
         ? `http://localhost:8081/api/Xe/suaThongTinXe/${editingVehicle.id}`
-        : "http://localhost:8081/api/Xe";
+        : "http://localhost:8081/api/Xe/themXe";
 
       const method = editingVehicle ? "PUT" : "POST";
 
@@ -161,6 +139,40 @@ const VehiclesManagement = () => {
       }
     } catch (err) {
       showError(err.message);
+    }
+  };
+
+  const handleDeleteVehicle = (vehicleId) => {
+    setVehicleToDelete(vehicleId);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmDeleteVehicle = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/Xe/xoaXe/${vehicleToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.code === 200) {
+        showSuccess("Xóa phương tiện thành công!");
+        fetchVehicles();
+      } else {
+        throw new Error(data.message || "Không thể xóa phương tiện");
+      }
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setShowConfirmDialog(false);
+      setVehicleToDelete(null);
     }
   };
 
@@ -361,6 +373,16 @@ const VehiclesManagement = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {showConfirmDialog && (
+        <ConfirmDialog
+          open={showConfirmDialog}
+          title="Xác nhận xóa"
+          description="Bạn có chắc chắn muốn xóa phương tiện này không?"
+          onCancel={() => setShowConfirmDialog(false)}
+          onConfirm={confirmDeleteVehicle}
+        />
       )}
     </div>
   );

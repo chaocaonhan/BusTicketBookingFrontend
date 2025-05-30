@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import TableActions from "./TableActions";
 import Select from "react-select";
+import ConfirmDialog from "../comon/ConfirmDialog";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const TripManagement = () => {
   const [trips, setTrips] = useState([]);
@@ -21,34 +32,51 @@ const TripManagement = () => {
     taiXe: "",
     diemDi: "",
     diemDen: "",
-    ngayKhoiHanh: "", // LocalDate
-    gioKhoiHanh: { hour: 0, minute: 0, second: 0, nano: 0 }, // Sẽ chuyển thành LocalTime
-    gioKetThuc: { hour: 0, minute: 0, second: 0, nano: 0 }, // Sẽ chuyển thành LocalTime
+    ngayKhoiHanh: "",
+    gioKhoiHanh: { hour: 0, minute: 0, second: 0, nano: 0 },
+    gioKetThuc: { hour: 0, minute: 0, second: 0, nano: 0 },
     giaVe: 0,
   });
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [tripToDelete, setTripToDelete] = useState(null);
+  const [activeTab, setActiveTab] = useState("SCHEDULED");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  const fetchTrips = async () => {
+  const fetchTrips = async (
+    page = currentPage,
+    size = pageSize,
+    date = selectedDate,
+    status = activeTab
+  ) => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:8081/api/chuyenxe/getAllChuyenXe",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let url = `http://localhost:8081/api/chuyenxe/getPage?page=${page}&size=${size}&trangThaiChuyenXe=${status}`;
+
+      if (date) {
+        const formattedDate = format(date, "yyyy-MM-dd");
+        url = `http://localhost:8081/api/chuyenxe/searchWithPageAndDate?keyword=${formattedDate}&page=${page}&size=${size}&trangThaiChuyenXe=${status}`;
+      }
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Không thể lấy danh sách chuyến xe");
       }
 
       const data = await response.json();
-      if (data.code === 200) {
-        setTrips(data.result);
+      if (data.content) {
+        setTrips(data.content);
+        setTotalPages(data.totalPages);
       } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách chuyến xe");
+        throw new Error("Lỗi khi lấy danh sách chuyến xe");
       }
     } catch (err) {
       setError(err.message);
@@ -132,11 +160,11 @@ const TripManagement = () => {
     }
   };
 
-  const fetchDrivers = async () => {
+  const fetchDrivers = async (ngayKhoiHanh, gioKhoiHanh) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:8081/api/nguoidung/danhSachTaiXe",
+        `http://localhost:8081/api/taiXe/taiXeTrongLich/${ngayKhoiHanh}/${gioKhoiHanh}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -145,14 +173,16 @@ const TripManagement = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Không thể lấy danh sách tài xế");
+        throw new Error("Không thể lấy danh sách tài xế trống lịch");
       }
 
       const data = await response.json();
       if (data.code === 200) {
         setDrivers(data.result);
       } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách tài xế");
+        throw new Error(
+          data.message || "Lỗi khi lấy danh sách tài xế trống lịch"
+        );
       }
     } catch (err) {
       setError(err.message);
@@ -197,7 +227,6 @@ const TripManagement = () => {
     fetchVehicleTypes();
     fetchVehicles();
     fetchRoutes();
-    fetchDrivers();
   }, []);
 
   const handleInputChange = (e) => {
@@ -210,13 +239,28 @@ const TripManagement = () => {
     if (name === "tenTuyen") {
       const selectedRoute = routes.find((route) => route.tenTuyen === value);
       if (selectedRoute) {
-        fetchStations(selectedRoute.tinhDi.tenTinhThanh, true); // Lấy danh sách bến xe điểm đi
-        fetchStations(selectedRoute.tinhDen.tenTinhThanh, false); // Lấy danh sách bến xe điểm đến
+        fetchStations(selectedRoute.tinhDi.tenTinhThanh, true);
+        fetchStations(selectedRoute.tinhDen.tenTinhThanh, false);
         setFormData((prev) => ({
           ...prev,
+          tenTuyen: selectedRoute.tenTuyen,
           diemDi: "",
           diemDen: "",
         }));
+      }
+    }
+
+    if (name === "ngayKhoiHanh" || name === "gioKhoiHanh") {
+      const ngayKhoiHanh = formData.ngayKhoiHanh || "";
+      const gioKhoiHanh = `${padTime(formData.gioKhoiHanh.hour)}:${padTime(
+        formData.gioKhoiHanh.minute
+      )}`;
+      if (
+        ngayKhoiHanh &&
+        formData.gioKhoiHanh.hour !== undefined &&
+        formData.gioKhoiHanh.minute !== undefined
+      ) {
+        fetchDrivers(ngayKhoiHanh, gioKhoiHanh);
       }
     }
   };
@@ -296,13 +340,16 @@ const TripManagement = () => {
     };
   }
 
+  const selectedRoute = routes.find(
+    (route) => route.tenTuyen === formData.tenTuyen
+  );
   const padTime = (num) => num.toString().padStart(2, "0");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const payload = {
-        tenTuyen: formData.tenTuyen,
+        tenTuyen: selectedRoute.id,
         bienSoXe: formData.bienSoXe,
         taiXe: formData.taiXe,
         diemDi: formData.diemDi,
@@ -367,12 +414,17 @@ const TripManagement = () => {
     }
   };
 
-  const handleDeleteTrip = async (trip) => {
-    if (window.confirm(`Bạn có chắc chắn muốn hủy chuyến xe này?`)) {
+  const handleDeleteTrip = (trip) => {
+    setTripToDelete(trip);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteTrip = async () => {
+    if (tripToDelete) {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:8081/api/chuyenxe/huyChuyen/${trip.id}`,
+          `http://localhost:8081/api/chuyenxe/huyChuyen/${tripToDelete.id}`,
           {
             method: "DELETE",
             headers: {
@@ -391,6 +443,9 @@ const TripManagement = () => {
         setTimeout(() => setSuccessMessage(""), 3000);
       } catch (err) {
         setError(err.message);
+      } finally {
+        setConfirmDialogOpen(false);
+        setTripToDelete(null);
       }
     }
   };
@@ -409,16 +464,127 @@ const TripManagement = () => {
     label: i.toString().padStart(2, "0"),
   }));
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      0,
+      Math.min(
+        currentPage - Math.floor(maxVisiblePages / 2),
+        totalPages - maxVisiblePages
+      )
+    );
+    startPage = Math.max(0, startPage);
+
+    const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages - 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Quản lý chuyến xe</h1>
-        <button
-          onClick={handleAddTrip}
-          className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-        >
-          Thêm chuyến xe
-        </button>
+        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
+          <div className="flex rounded-md bg-gray-100 overflow-hidden">
+            <button
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "SCHEDULED"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => {
+                setActiveTab("SCHEDULED");
+                setSelectedDate(null);
+                fetchTrips(currentPage, pageSize, null, "SCHEDULED");
+              }}
+            >
+              Lịch trình
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "DEPARTED"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => {
+                setActiveTab("DEPARTED");
+                setSelectedDate(null);
+                fetchTrips(currentPage, pageSize, null, "DEPARTED");
+              }}
+            >
+              Đang chạy
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "COMPLETED"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => {
+                setActiveTab("COMPLETED");
+                setSelectedDate(null);
+                fetchTrips(currentPage, pageSize, null, "COMPLETED");
+              }}
+            >
+              Hoàn thành
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium ${
+                activeTab === "CANCELED"
+                  ? "bg-orange-100 text-orange-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => {
+                setActiveTab("CANCELED");
+                setSelectedDate(null);
+                fetchTrips(currentPage, pageSize, null, "CANCELED");
+              }}
+            >
+              Đã huỷ
+            </button>
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  !selectedDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {selectedDate ? (
+                  format(selectedDate, "PPP")
+                ) : (
+                  <span>Lọc theo ngày</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setCurrentPage(0);
+                  fetchTrips(0, pageSize, date, activeTab);
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       {successMessage && (
@@ -441,10 +607,7 @@ const TripManagement = () => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Điểm đi
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Điểm đến
+                  Tuyến
                 </th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
                   Ngày đi
@@ -470,13 +633,10 @@ const TripManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {trips.map((trip, index) => (
+              {(trips || []).map((trip, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="py-3 px-4 text-sm text-gray-900">
-                    {trip.diemDi}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    {trip.diemDen}
+                    {trip.tenTuyen}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {trip.ngayKhoiHanh}
@@ -557,6 +717,54 @@ const TripManagement = () => {
                 </div>
 
                 <div>
+                  <label className="text-sm text-gray-600">
+                    Ngày khởi hành
+                  </label>
+                  <input
+                    type="date"
+                    name="ngayKhoiHanh"
+                    value={formData.ngayKhoiHanh}
+                    onChange={handleInputChange}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-600">Giờ khởi hành</label>
+                  <div className="flex gap-2">
+                    <Select
+                      options={hourOptions}
+                      placeholder="Giờ"
+                      value={hourOptions.find(
+                        (opt) => opt.value === formData.gioKhoiHanh.hour
+                      )}
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKhoiHanh",
+                          "hour"
+                        )
+                      }
+                    />
+                    <Select
+                      options={minuteOptions}
+                      placeholder="Phút"
+                      value={minuteOptions.find(
+                        (opt) => opt.value === formData.gioKhoiHanh.minute
+                      )}
+                      onChange={(selectedOption) =>
+                        handleTimeChange(
+                          { target: { value: selectedOption.value } },
+                          "gioKhoiHanh",
+                          "minute"
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <label className="text-sm text-gray-600">Loại xe</label>
                   <select
                     name="loaiXe"
@@ -611,137 +819,95 @@ const TripManagement = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="text-sm text-gray-600">Điểm đi</label>
-                  <select
-                    name="diemDi"
-                    value={formData.diemDi}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                    disabled={!formData.tenTuyen}
-                  >
-                    <option value="">Chọn điểm đi</option>
-                    {startStations.map((station) => (
-                      <option key={station.id} value={station.tenDiemDon}>
-                        {station.tenDiemDon}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {editingTrip && (
+                  <>
+                    <div>
+                      <label className="text-sm text-gray-600">Điểm đi</label>
+                      <select
+                        name="diemDi"
+                        value={formData.diemDi}
+                        onChange={handleInputChange}
+                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                        required
+                        disabled={!formData.tenTuyen}
+                      >
+                        <option value="">Chọn điểm đi</option>
+                        {startStations.map((station) => (
+                          <option key={station.id} value={station.tenDiemDon}>
+                            {station.tenDiemDon}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label className="text-sm text-gray-600">Điểm đến</label>
-                  <select
-                    name="diemDen"
-                    value={formData.diemDen}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                    disabled={!formData.tenTuyen}
-                  >
-                    <option value="">Chọn điểm đến</option>
-                    {endStations.map((station) => (
-                      <option key={station.id} value={station.tenDiemDon}>
-                        {station.tenDiemDon}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    <div>
+                      <label className="text-sm text-gray-600">Điểm đến</label>
+                      <select
+                        name="diemDen"
+                        value={formData.diemDen}
+                        onChange={handleInputChange}
+                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                        required
+                        disabled={!formData.tenTuyen}
+                      >
+                        <option value="">Chọn điểm đến</option>
+                        {endStations.map((station) => (
+                          <option key={station.id} value={station.tenDiemDon}>
+                            {station.tenDiemDon}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label className="text-sm text-gray-600">
-                    Ngày khởi hành
-                  </label>
-                  <input
-                    type="date"
-                    name="ngayKhoiHanh"
-                    value={formData.ngayKhoiHanh}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                  />
-                </div>
+                    <div>
+                      <label className="text-sm text-gray-600">
+                        Giờ kết thúc
+                      </label>
+                      <div className="flex gap-2">
+                        <Select
+                          options={hourOptions}
+                          placeholder="Giờ"
+                          value={hourOptions.find(
+                            (opt) => opt.value === formData.gioKetThuc.hour
+                          )}
+                          onChange={(selectedOption) =>
+                            handleTimeChange(
+                              { target: { value: selectedOption.value } },
+                              "gioKetThuc",
+                              "hour"
+                            )
+                          }
+                        />
+                        <Select
+                          options={minuteOptions}
+                          placeholder="Phút"
+                          value={minuteOptions.find(
+                            (opt) => opt.value === formData.gioKetThuc.minute
+                          )}
+                          onChange={(selectedOption) =>
+                            handleTimeChange(
+                              { target: { value: selectedOption.value } },
+                              "gioKetThuc",
+                              "minute"
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="text-sm text-gray-600">Giờ khởi hành</label>
-                  <div className="flex gap-2">
-                    <Select
-                      options={hourOptions}
-                      placeholder="Giờ"
-                      value={hourOptions.find(
-                        (opt) => opt.value === formData.gioKhoiHanh.hour
-                      )}
-                      onChange={(selectedOption) =>
-                        handleTimeChange(
-                          { target: { value: selectedOption.value } },
-                          "gioKhoiHanh",
-                          "hour"
-                        )
-                      }
-                    />
-                    <Select
-                      options={minuteOptions}
-                      placeholder="Phút"
-                      value={minuteOptions.find(
-                        (opt) => opt.value === formData.gioKhoiHanh.minute
-                      )}
-                      onChange={(selectedOption) =>
-                        handleTimeChange(
-                          { target: { value: selectedOption.value } },
-                          "gioKhoiHanh",
-                          "minute"
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Giờ kết thúc</label>
-                  <div className="flex gap-2">
-                    <Select
-                      options={hourOptions}
-                      placeholder="Giờ"
-                      value={hourOptions.find(
-                        (opt) => opt.value === formData.gioKetThuc.hour
-                      )}
-                      onChange={(selectedOption) =>
-                        handleTimeChange(
-                          { target: { value: selectedOption.value } },
-                          "gioKetThuc",
-                          "hour"
-                        )
-                      }
-                    />
-                    <Select
-                      options={minuteOptions}
-                      placeholder="Phút"
-                      value={minuteOptions.find(
-                        (opt) => opt.value === formData.gioKetThuc.minute
-                      )}
-                      onChange={(selectedOption) =>
-                        handleTimeChange(
-                          { target: { value: selectedOption.value } },
-                          "gioKetThuc",
-                          "minute"
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-600">Giá vé</label>
-                  <input
-                    type="number"
-                    name="giaVe"
-                    value={formData.giaVe}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                  />
-                </div>
+                    <div>
+                      <label className="text-sm text-gray-600">Giá vé</label>
+                      <input
+                        type="number"
+                        name="giaVe"
+                        value={formData.giaVe}
+                        onChange={handleInputChange}
+                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex justify-end mt-6">
@@ -760,6 +926,82 @@ const TripManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Xác nhận hủy chuyến"
+        description="Bạn có chắc chắn muốn hủy chuyến xe này?"
+        cancelText="Hủy"
+        confirmText="Xác nhận"
+        onCancel={() => setConfirmDialogOpen(false)}
+        onConfirm={confirmDeleteTrip}
+      />
+
+      {totalPages > 0 && (
+        <div className="flex justify-center items-center mt-6">
+          <div className="flex space-x-1">
+            <button
+              onClick={() => handlePageChange(0)}
+              disabled={currentPage === 0}
+              className={`px-3 py-1 rounded ${
+                currentPage === 0
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              «
+            </button>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 0}
+              className={`px-3 py-1 rounded ${
+                currentPage === 0
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              ‹
+            </button>
+
+            {generatePageNumbers().map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === page
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {page + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages - 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages - 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              ›
+            </button>
+            <button
+              onClick={() => handlePageChange(totalPages - 1)}
+              disabled={currentPage === totalPages - 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages - 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              »
+            </button>
           </div>
         </div>
       )}

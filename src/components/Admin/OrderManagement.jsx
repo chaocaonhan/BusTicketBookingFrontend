@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import TableActions from "./TableActions";
 import OrderTickets from "./OrderTickets";
 import React from "react";
-import Paid2 from "../../assets/Paid2.png";
+import { View, Trash2 } from "lucide-react";
 import Paid from "../../assets/Paid.png";
+import ConfirmDialog from "../comon/ConfirmDialog";
+import { showSuccess, showError } from "../../utils/toastConfig";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -32,6 +33,10 @@ const OrderManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+
+  // Cancel order states
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
 
   // Fetch orders with pagination, search, and tab-based filtering
   const fetchOrders = async (
@@ -150,7 +155,7 @@ const OrderManagement = () => {
     });
   };
 
-  const handleEditOrder = (order) => {
+  const handleViewOrder = (order) => {
     setEditingOrder(order);
     setFormData({
       tenNguoiDat: order.tenNguoiDat || "",
@@ -166,36 +171,6 @@ const OrderManagement = () => {
     setShowModal(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/datve/updateDonDat/${editingOrder.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await response.json();
-      if (!response.ok || data.code !== 200) {
-        throw new Error(data.message || "Có lỗi xảy ra!");
-      }
-
-      setShowModal(false);
-      setSuccessMessage("Cập nhật đơn đặt hàng thành công!");
-      fetchOrders(currentPage);
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const handleRowClick = (orderId) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
@@ -207,6 +182,40 @@ const OrderManagement = () => {
       month: "2-digit",
       year: "numeric",
     });
+  };
+
+  const handleCancelOrder = (order) => {
+    setOrderToCancel(order);
+    setShowCancelDialog(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!orderToCancel) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/datve/huyDon/${orderToCancel.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (data.code === 200) {
+        showSuccess("Huỷ đơn thành công");
+        fetchOrders();
+        setShowCancelDialog(false);
+        setOrderToCancel(null);
+      } else {
+        throw new Error(data.message || "Không thể huỷ đơn");
+      }
+    } catch (err) {
+      showError(err.message);
+    }
   };
 
   return (
@@ -343,7 +352,22 @@ const OrderManagement = () => {
                       </td>
                       {activeTab === "booked" && (
                         <td className="py-3 px-4 text-sm text-gray-900">
-                          <TableActions onEdit={() => handleEditOrder(order)} />
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleViewOrder(order)}
+                              className="text-orange-400 "
+                              title="Chỉnh sửa"
+                            >
+                              <View className="h-7 w-7" />
+                            </button>
+                            <button
+                              onClick={() => handleCancelOrder(order)}
+                              className="text-red-600 focus:outline-none"
+                              title="Xóa"
+                            >
+                              <Trash2 />
+                            </button>
+                          </div>
                         </td>
                       )}
                     </tr>
@@ -437,7 +461,7 @@ const OrderManagement = () => {
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
-                Chỉnh sửa đơn đặt hàng
+                Chi tiết đơn đặt hàng
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -459,7 +483,7 @@ const OrderManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form>
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="text-sm text-gray-600">Tên người đặt</label>
@@ -558,25 +582,27 @@ const OrderManagement = () => {
                   />
                 </div>
               </div>
-
-              <div className="flex justify-end mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="mr-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-green-100 text-green-800 rounded ring ring-transparent hover:ring-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50"
-                >
-                  Cập nhật
-                </button>
-              </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* Confirm Dialog for Cancel Order */}
+      {showCancelDialog && (
+        <ConfirmDialog
+          open={showCancelDialog}
+          title="Xác nhận huỷ đơn đặt hàng"
+          description={`Bạn có chắc chắn muốn huỷ đơn đặt hàng #${
+            orderToCancel?.id || ""
+          }?`}
+          cancelText="Không"
+          confirmText="Có, huỷ đơn"
+          onCancel={() => {
+            setShowCancelDialog(false);
+            setOrderToCancel(null);
+          }}
+          onConfirm={confirmCancelOrder}
+        />
       )}
     </div>
   );

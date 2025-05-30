@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import defaultProvinceImage from "../../assets/defaultProvinImg.jpg";
 import { CirclePlus, Undo2, Trash } from "lucide-react";
+import ConfirmDialog from "../comon/ConfirmDialog";
 
 const ProvinceManagement = () => {
   const [provinces, setProvinces] = useState([]);
@@ -23,6 +24,8 @@ const ProvinceManagement = () => {
     tenDiemDon: "",
     diaChi: "",
   });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pickupPointToDelete, setPickupPointToDelete] = useState(null);
 
   const fetchProvinces = async () => {
     try {
@@ -160,29 +163,36 @@ const ProvinceManagement = () => {
     }
   };
 
-  const handleDeleteStation = async (stationId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa điểm đón này?")) {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:8081/api/Station/id?id=${stationId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  const handleDeleteStation = (stationId) => {
+    setPickupPointToDelete(stationId);
+    setShowConfirmDialog(true);
+  };
 
-        if (!response.ok) {
-          throw new Error("Không thể xóa điểm đón");
+  const confirmDeleteStation = async () => {
+    if (!pickupPointToDelete) return;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8081/api/Station/id?id=${pickupPointToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        toast.success("Xóa điểm đón thành công!");
-        fetchPickupPoints(selectedProvince.tenTinhThanh);
-      } catch (err) {
-        toast.error(err.message || "Có lỗi xảy ra khi xóa điểm đón");
+      if (!response.ok) {
+        throw new Error("Không thể xóa điểm đón");
       }
+
+      toast.success("Xóa điểm đón thành công!");
+      fetchPickupPoints(selectedProvince.tenTinhThanh);
+    } catch (err) {
+      toast.error(err.message || "Có lỗi xảy ra khi xóa điểm đón");
+    } finally {
+      setShowConfirmDialog(false);
+      setPickupPointToDelete(null);
     }
   };
 
@@ -593,6 +603,16 @@ const ProvinceManagement = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showConfirmDialog && (
+        <ConfirmDialog
+          open={showConfirmDialog}
+          title="Xác nhận xóa"
+          description="Bạn có chắc chắn muốn xóa điểm đón này không?"
+          onCancel={() => setShowConfirmDialog(false)}
+          onConfirm={confirmDeleteStation}
+        />
       )}
     </div>
   );
