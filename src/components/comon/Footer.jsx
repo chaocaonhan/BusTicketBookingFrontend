@@ -19,8 +19,8 @@ const Footer = () => {
               <h2 className="text-2xl font-bold ">Sao Việt</h2>
             </Link>
             <p className="mb-4">
-              Nhà xe uy tín hàng đầu Việt Nam, chuyên phục vụ các tuyến đường
-              dài liên tỉnh với chất lượng dịch vụ tốt nhất.
+              Nhà xe uy tín hàng đầu Việt Nam, chuyên phục vụ tuyến đường Lào
+              Cai - Hà Nội với chất lượng dịch vụ tốt nhất.
             </p>
             <div className=" text-white flex space-x-4">
               <a href="#" className="hover:text-white transition-colors">
@@ -132,10 +132,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t-2 border-neutral-200 mt-10 pt-6 text-center">
+        <div className="border-t-2 border-neutral-200 mt-3 py-4 text-center">
           <p>
-            © {new Date().getFullYear()} Sao Việt. Tất cả các quyền được bảo
-            lưu.
+            © {new Date().getFullYear()} | Bản quyền thuộc về công ty Sao Việt
           </p>
         </div>
       </div>

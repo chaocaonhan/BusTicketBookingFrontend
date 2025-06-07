@@ -13,7 +13,7 @@ const ResultsHeader = ({
   sortBy,
   onSortChange,
 }) => (
-  <div className="mb-4">
+  <div className="mb-4 sticky top-20 ">
     <h2 className="text-xl font-bold text-[#00613d]">
       {activeTab === "outbound"
         ? `${from} - ${to} ( ${count} )`

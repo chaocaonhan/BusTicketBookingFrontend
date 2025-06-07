@@ -57,9 +57,6 @@ const SortableItem = ({ id, stop }) => {
           <span className="font-semibold text-gray-800 ml-2">
             {stop.tenDiemDon}
           </span>
-          <span className="ml-auto text-orange-500 font-medium">
-            {stop.thoiGianTuDiemDau || 0} km
-          </span>
         </div>
         <span className="text-gray-500 text-sm mt-1 ml-2">{stop.diaChi}</span>
       </div>
@@ -76,23 +73,29 @@ const TrashBin = ({ isActive }) => {
   return (
     <div
       ref={setNodeRef}
-      className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 p-4 rounded-lg border-2 
-        ${isOver ? "border-red-500 bg-red-100" : "border-gray-300 bg-white"} 
+      className={`absolute bottom-0 left-1/2 transform mb-16 p-4 rounded-lg border-2 
+        ${
+          isOver
+            ? "border-orange-500 bg-orange-100"
+            : "border-gray-300 bg-white"
+        } 
         shadow-lg transition-all duration-200 flex items-center justify-center
         ${
           isActive
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none"
         }
-        z-50`}
+        z-50 mx-auto`}
       style={{ width: "200px", height: "80px" }}
     >
       <Trash2
         size={32}
-        className={`${isOver ? "text-red-500" : "text-gray-400"} mr-2`}
+        className={`${isOver ? "text-orange-400" : "text-gray-400"} mr-2`}
       />
       <span
-        className={`font-medium ${isOver ? "text-red-500" : "text-gray-500"}`}
+        className={`font-medium ${
+          isOver ? "text-orange-500" : "text-gray-500"
+        }`}
       >
         Thả để xóa
       </span>
@@ -108,9 +111,6 @@ const DragItemPreview = ({ stop }) => {
         <div className="flex items-center">
           <span className="font-semibold text-gray-800 ml-2">
             {stop.tenDiemDon}
-          </span>
-          <span className="ml-auto text-orange-500 font-medium">
-            {stop.thoiGianTuDiemDau || 0} km
           </span>
         </div>
         <span className="text-gray-500 text-sm mt-1 ml-2">{stop.diaChi}</span>
@@ -468,11 +468,11 @@ const RouteScheduleEdit = () => {
     return <div className="text-red-500 py-4 text-center">Lỗi: {error}</div>;
 
   return (
-    <div className="flex flex-row max-w-[70%] mx-auto">
+    <div className="flex flex-row max-w-[70%] mx-auto ">
       <div className="flex items-start mt-20">
         <button
           onClick={handleBack}
-          className="mr-3 text-orange-500 hover:text-orange-600 flex items-center font-medium"
+          className="mr-3 text-orange-500 hover:text-orange-600 flex items-center font-medium text-lg"
         >
           <MoveLeft className="mr-1 w-5 h-5" />
           <span>Quay lại</span>
@@ -480,12 +480,12 @@ const RouteScheduleEdit = () => {
       </div>
       <div className="max-w-3xl mx-auto p-4 mt-14 bg-white">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl text-orange-400 font-bold text-center flex-1">
+          <h2 className="text-xl text-orange-400 font-medium text-center flex-1">
             Lịch trình tuyến : {tenTuyen}
           </h2>
         </div>
 
-        <div className="relative">
+        <div>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

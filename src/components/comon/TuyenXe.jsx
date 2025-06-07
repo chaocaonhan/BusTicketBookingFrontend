@@ -61,20 +61,22 @@ const TuyenXe = () => {
     },
     {
       cell: (row) => (
-        <div className="text-center w-full ">
-          <button
-            className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
-            onClick={() => handleSearchRouteClick(row)}
-          >
-            Tìm tuyến xe
-          </button>
+        <div className=" w-full ">
+          <div className="flex flex-row gap-4">
+            <button
+              className="px-4 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
+              onClick={() => handleSearchRouteClick(row)}
+            >
+              Tìm tuyến xe
+            </button>
 
-          <button
-            className="px-4 py-2 ml-4 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
-            onClick={() => handleViewScheduleClick(row)}
-          >
-            Xem lịch trình
-          </button>
+            <button
+              className="px-4 py-2 ml-4 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500"
+              onClick={() => handleViewScheduleClick(row)}
+            >
+              Xem lịch trình
+            </button>
+          </div>
         </div>
       ),
     },

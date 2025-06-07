@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import BusSearch from "../components/comon/BusSearch";
 import PopularRoutes from "../components/comon/PopularRoutes";
 import BusFeatures from "../components/comon/BusFeatures";
-import vanChuyenHangHoa from "../assets/vanChuyenHangHoa.png";
+import hotLine from "../assets/hotLine.png";
 import { PhoneCall, BusFront, Bus, TramFront } from "lucide-react";
 
 const Home = () => {
@@ -56,7 +56,7 @@ const Home = () => {
       isReturn = false;
     }
 
-    console.log("Search triggered with:", {
+    console.log("Thông tin tìm kiếm:", {
       departure,
       destination,
       departureDate,
@@ -108,8 +108,8 @@ const Home = () => {
               decoding="async"
               width="400"
               height="335"
-              src="https://xesaoviet.com.vn/wp-content/uploads/2023/12/xe-sao-viet-1900-6746.png"
-              alt="Xe Sao Việt"
+              src={hotLine}
+              alt="tổng đài"
               className="rounded-lg max-w-full h-auto"
             />
           </div>

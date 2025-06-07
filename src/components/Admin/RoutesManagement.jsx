@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Thêm Link
 import TableActions from "./TableActions";
 import { toast } from "react-toastify";
+import ConfirmDialog from "../comon/ConfirmDialog";
 
 const RoutesManagement = () => {
   const [routes, setRoutes] = useState([]);
@@ -10,6 +11,8 @@ const RoutesManagement = () => {
   const [error, setError] = useState(null);
   const [editingRoute, setEditingRoute] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [routeToDelete, setRouteToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     tenTuyen: "",
@@ -89,18 +92,37 @@ const RoutesManagement = () => {
     setShowModal(true);
   };
 
-  const handleDeleteRoute = async (id) => {
-    if (!window.confirm("Xác nhận xoá tuyến xe?")) return;
+  const handleDeleteRoute = (route) => {
+    setRouteToDelete(route);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteRoute = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/api/tuyen-xe/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Xoá thất bại");
+      const res = await fetch(
+        `http://localhost:8081/api/tuyen-xe/${routeToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.ok) {
+        toast.success("Xoá tuyến xe thành công!");
+      } else {
+        throw new Error("Xoá thất bại");
+      }
       fetchRoutes();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setConfirmDialogOpen(false);
+      setRouteToDelete(null);
     }
+  };
+
+  const cancelDeleteRoute = () => {
+    setConfirmDialogOpen(false);
+    setRouteToDelete(null);
   };
 
   const handleSubmit = async (e) => {
@@ -123,10 +145,9 @@ const RoutesManagement = () => {
           tinhDen: tinhDen ? tinhDen.tenTinhThanh : "",
           khoangCach: Number(formData.khoangCach),
           thoiGianDiChuyen: formData.thoiGianDiChuyen,
-          tinhDenUrl: "", // hoặc giá trị phù hợp nếu có
+          tinhDenUrl: "",
         });
       } else {
-        // Thêm mới tuyến xe: dùng API /api/tuyen-xe/taoTuyen
         url = "http://localhost:8081/api/tuyen-xe/taoTuyen";
         method = "POST";
         // Tìm tên tỉnh đi và tỉnh đến từ provinces
@@ -238,7 +259,7 @@ const RoutesManagement = () => {
                   <td className="py-2 px-4">
                     <TableActions
                       onEdit={() => handleEditRoute(route)}
-                      onDelete={() => handleDeleteRoute(route.id)}
+                      onDelete={() => handleDeleteRoute(route)}
                     />
                   </td>
                 </tr>
@@ -379,6 +400,18 @@ const RoutesManagement = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Xác nhận xoá tuyến xe"
+        description={`Xác nhận xoá tuyến ${
+          routeToDelete ? routeToDelete.tenTuyen : ""
+        } không?`}
+        cancelText="Hủy"
+        confirmText="Xác nhận"
+        onCancel={cancelDeleteRoute}
+        onConfirm={confirmDeleteRoute}
+      />
     </div>
   );
 };

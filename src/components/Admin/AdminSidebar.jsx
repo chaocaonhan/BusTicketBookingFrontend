@@ -22,12 +22,12 @@ const AdminSidebar = ({ collapsed }) => {
   };
 
   const menuItems = [
-    {
-      title: "Tổng quan",
-      icon: <House />,
-      path: "/admin/dashboard",
-      submenu: null,
-    },
+    // {
+    //   title: "Tổng quan",
+    //   icon: <House />,
+    //   path: "/admin/dashboard",
+    //   submenu: null,
+    // },
     {
       title: "Quản lý người dùng",
       icon: <Users />,

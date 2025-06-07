@@ -34,7 +34,7 @@ const PopularRoutes = () => {
           setRoutes(data.result);
         }
       } catch (error) {
-        console.error("Error fetching popular routes:", error);
+        console.error("Không thể tải danh sách tuyến đường:", error);
       } finally {
         setLoading(false);
       }
@@ -88,7 +88,7 @@ const PopularRoutes = () => {
           Tuyến đường phổ biến
         </h2>
         <p className="text-gray-500 mt-2">
-          Nhiều tuyến đường được khách hàng tin tưởng và lựa chọn nhiều nhất
+          Những tuyến đường được khách hàng tin tưởng và lựa chọn nhiều nhất
         </p>
       </div>
 
@@ -116,7 +116,7 @@ const PopularRoutes = () => {
           {routes.map((route) => (
             <SwiperSlide key={route.id}>
               <Card>
-                {/* Image */}
+                {/* ảnh */}
                 <div className="relative h-48 w-full">
                   <img
                     src={route.tinhDen.anh1 || "/placeholder.svg"}
@@ -126,10 +126,10 @@ const PopularRoutes = () => {
                   />
                 </div>
 
-                {/* Route Information */}
+                {/* Thông tin tuyến */}
                 <div>
                   <div className="flex w-full border-b border-dashed border-orange-200 p-2">
-                    {/* Departure and Destination */}
+                    {/* điểm đi - điểm đến */}
                     <div className="w-1/2 p-2 border-r border-dashed border-orange-500">
                       <div className="flex flex-col">
                         <div className="flex-1">
@@ -173,7 +173,7 @@ const PopularRoutes = () => {
                       </div>
                     </div>
 
-                    {/* Price */}
+                    {/* giá tiền */}
                     <div className="w-1/2 pl-2 my-auto">
                       <p className="w-full font-bold text-orange-400">
                         Từ{" "}
@@ -185,9 +185,9 @@ const PopularRoutes = () => {
                     </div>
                   </div>
 
-                  {/* Time and Distance */}
+                  {/* thời gian và khoảng cách */}
                   <div className="pt-2 flex flex-row">
-                    <div className="flex w-2/3 justify-between pl-4 text-sm text-gray-600">
+                    <div className="flex w-2/3 justify-between pl-4 text-lg text-gray-600">
                       <div className="flex flex-col">
                         <div className="flex items-center">
                           <span>Thời gian: {route.thoiGianDiChuyen}</span>

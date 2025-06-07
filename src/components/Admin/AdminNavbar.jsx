@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu, ChevronDown } from "lucide-react";
+
 import avatar from "../../assets/avatar.png";
 
 const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
@@ -33,18 +34,7 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
             onClick={toggleSidebar}
             className="p-2 mr-3 text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200"
           >
-            <svg
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
+            <Menu />
           </button>
           <span className="self-center text-xl font-semibold whitespace-nowrap">
             Quản lý vé xe khách
@@ -71,18 +61,7 @@ const AdminNavbar = ({ toggleSidebar, userInfo, loading, error }) => {
                   className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                 />
                 <span className="ml-2 font-medium">{userInfo.hoTen}</span>
-                <svg
-                  className="w-4 h-4 ml-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
+                <ChevronDown />
               </button>
 
               {isDropdownOpen && (

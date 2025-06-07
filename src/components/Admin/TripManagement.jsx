@@ -3,7 +3,7 @@ import TableActions from "./TableActions";
 import Select from "react-select";
 import ConfirmDialog from "../comon/ConfirmDialog";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { showSuccess, showError } from "../../utils/toastConfig";
 
 const TripManagement = () => {
   const [trips, setTrips] = useState([]);
@@ -79,10 +80,14 @@ const TripManagement = () => {
         throw new Error("Lỗi khi lấy danh sách chuyến xe");
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewTrip = (trip) => {
+    console.log(trip);
   };
 
   const fetchVehicleTypes = async () => {
@@ -108,7 +113,7 @@ const TripManagement = () => {
         throw new Error(data.message || "Lỗi khi lấy danh sách loại xe");
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -132,7 +137,7 @@ const TripManagement = () => {
         throw new Error(data.message || "Lỗi khi lấy danh sách xe");
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -156,7 +161,7 @@ const TripManagement = () => {
         throw new Error(data.message || "Lỗi khi lấy danh sách tuyến xe");
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -218,7 +223,7 @@ const TripManagement = () => {
         throw new Error(data.message || "Lỗi khi lấy danh sách bến xe");
       }
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -315,6 +320,7 @@ const TripManagement = () => {
       ngayKhoiHanh: formatDateToInput(trip.ngayKhoiHanh),
       gioKhoiHanh: parseTime(trip.gioKhoiHanh),
       gioKetThuc: parseTime(trip.gioKetThuc),
+      taiXe: trip.taiXe || "",
       giaVe: trip.giaVe || 0,
       loaiXe: trip.tenLoaiXe || "",
     });
@@ -344,6 +350,20 @@ const TripManagement = () => {
     (route) => route.tenTuyen === formData.tenTuyen
   );
   const padTime = (num) => num.toString().padStart(2, "0");
+
+  // const handleDriverSelectClick = () => {
+  //   const ngayKhoiHanh = formData.ngayKhoiHanh || "";
+  //   const gioKhoiHanh = `${padTime(formData.gioKhoiHanh.hour)}:${padTime(
+  //     formData.gioKhoiHanh.minute
+  //   )}`;
+  //   if (
+  //     ngayKhoiHanh &&
+  //     formData.gioKhoiHanh.hour !== undefined &&
+  //     formData.gioKhoiHanh.minute !== undefined
+  //   ) {
+  //     fetchDrivers(ngayKhoiHanh, gioKhoiHanh);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -402,7 +422,7 @@ const TripManagement = () => {
       }
 
       setShowModal(false);
-      setSuccessMessage(
+      showSuccess(
         editingTrip
           ? "Cập nhật chuyến xe thành công!"
           : "Thêm chuyến xe mới thành công!"
@@ -410,7 +430,7 @@ const TripManagement = () => {
       fetchTrips();
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
-      setError(err.message);
+      showError(err.message);
     }
   };
 
@@ -438,11 +458,11 @@ const TripManagement = () => {
           throw new Error(data.message || "Có lỗi xảy ra khi hủy chuyến xe!");
         }
 
-        setSuccessMessage("Hủy chuyến xe thành công!");
+        showSuccess("Hủy chuyến xe thành công!");
         fetchTrips();
         setTimeout(() => setSuccessMessage(""), 3000);
       } catch (err) {
-        setError(err.message);
+        showError(err.message);
       } finally {
         setConfirmDialogOpen(false);
         setTripToDelete(null);
@@ -467,6 +487,7 @@ const TripManagement = () => {
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages) {
       setCurrentPage(newPage);
+      fetchTrips(newPage, pageSize, selectedDate, activeTab);
     }
   };
 
@@ -495,6 +516,7 @@ const TripManagement = () => {
     <div className="bg-white shadow-md rounded-lg p-6 mt-16">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Quản lý chuyến xe</h1>
+
         <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
           <div className="flex rounded-md bg-gray-100 overflow-hidden">
             <button
@@ -585,6 +607,12 @@ const TripManagement = () => {
             </PopoverContent>
           </Popover>
         </div>
+        <button
+          onClick={handleAddTrip}
+          className="px-4 py-2 bg-green-100 text-green-800 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+        >
+          Tạo chuyến xe
+        </button>
       </div>
 
       {successMessage && (
@@ -606,35 +634,31 @@ const TripManagement = () => {
           <table className="min-w-full bg-white">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Tuyến
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Ngày đi
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Giờ khởi hành
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Giờ kết thúc
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Giá vé
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Loại xe
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Số ghế trống
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">
-                  Thao tác
-                </th>
+                {[
+                  "ID",
+                  "Tuyến",
+                  "Ngày đi",
+                  "Giờ khởi hành",
+                  "Giờ kết thúc",
+                  "Giá vé",
+                  "Loại xe",
+                  "Số ghế trống",
+                  "Thao tác",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="py-3 px-4 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-gray-200">
               {(trips || []).map((trip, index) => (
                 <tr key={index} className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-sm text-gray-900">{trip.id}</td>
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {trip.tenTuyen}
                   </td>
@@ -656,10 +680,17 @@ const TripManagement = () => {
                   <td className="py-3 px-4 text-sm text-gray-900">
                     {trip.soGheTrong}
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-900">
-                    <TableActions
-                      onEdit={() => handleEditTrip(trip)}
-                      onDelete={() => handleDeleteTrip(trip)}
+
+                  <td className=" flex flex-row py-3 px-4 text-sm text-gray-900">
+                    {activeTab === "SCHEDULED" && (
+                      <TableActions
+                        onEdit={() => handleEditTrip(trip)}
+                        onDelete={() => handleDeleteTrip(trip)}
+                      />
+                    )}
+                    <Eye
+                      className="h-7 w-7 text-orange-400 ml-1"
+                      onClick={() => handleViewTrip(trip)}
                     />
                   </td>
                 </tr>
@@ -680,19 +711,7 @@ const TripManagement = () => {
                 onClick={() => setShowModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X className="h-6 w-6" />
               </button>
             </div>
 
@@ -806,6 +825,7 @@ const TripManagement = () => {
                   <select
                     name="taiXe"
                     value={formData.taiXe}
+                    // onClick={handleDriverSelectClick}
                     onChange={handleInputChange}
                     className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                     required

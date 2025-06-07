@@ -80,7 +80,7 @@ const App = () => {
               </PrivateRoute>
             }
           >
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard" element={<UsersManagement />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="rating" element={<RatingManagement />} />
 

@@ -33,11 +33,16 @@ const MyBooking = ({
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
+  // Sort orders by booking date from newest to oldest
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.ngayDat) - new Date(a.ngayDat)
+  );
+
   // Calculate total pages
-  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedOrders.length / itemsPerPage);
 
   // Get orders for the current page
-  const currentOrders = orders.slice(
+  const currentOrders = sortedOrders.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import SeatTable from "./SeatTable";
 import TripSchedule from "./TripSchedule";
+import { ClockFading } from "lucide-react";
+import pickup from "../../assets/pickup.svg";
+import station from "../../assets/station.svg";
 
 const TripItem = ({
   trip,
@@ -115,26 +118,16 @@ const TripItem = ({
         <span className="text-xl font-bold">{start.slice(0, 5)}</span>
       </div>
 
-      <div className="flex flex-col items-center justify-center">
-        <div className="flex items-center">
-          <div className="h-px w-4 bg-gray-300"></div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-gray-500 mx-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div className="h-px w-4 bg-gray-300"></div>
+      <div className="flex items-center justify-center">
+        <img src={pickup} alt="pickup" className="w-6 h-6" />
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex items-center">
+            <span class="flex-1 w-12 border-b-4 border-dotted"></span>
+            <ClockFading className="w-8 h-8 text-orange-500 mx-1" />
+            <span class="flex-1 w-12 border-b-4 border-dotted"></span>
+          </div>
         </div>
-        <span className="text-xs text-gray-500 mt-1">{duration}</span>
+        <img src={station} alt="station" className="w-6 h-6" />
       </div>
 
       <div className="justify-self-end">
@@ -143,10 +136,13 @@ const TripItem = ({
     </div>
   );
 
-  const TripLocations = ({ from, to }) => (
+  const TripLocations = ({ from, to, duration }) => (
     <div className="flex mb-4">
-      <div className="w-1/2 font-medium text-gray-700">{from}</div>
-      <div className="w-1/2 text-right font-medium text-gray-700">{to}</div>
+      <div className="w-2/5 font-medium text-gray-700">{from}</div>
+      <span className="text-lg w-1/5 text-center text-gray-500 ">
+        {duration}
+      </span>
+      <div className="w-2/5 text-right font-medium text-gray-700">{to}</div>
     </div>
   );
 
@@ -219,7 +215,11 @@ const TripItem = ({
             end={trip.gioKetThuc}
             duration={calculateDuration(trip.gioKhoiHanh, trip.gioKetThuc)}
           />
-          <TripLocations from={trip.diemDi} to={trip.diemDen} />
+          <TripLocations
+            from={trip.diemDi}
+            to={trip.diemDen}
+            duration={calculateDuration(trip.gioKhoiHanh, trip.gioKetThuc)}
+          />
         </div>
 
         <TripPrice

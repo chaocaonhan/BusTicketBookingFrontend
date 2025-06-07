@@ -168,7 +168,7 @@ const SearchResults = ({
 
   return (
     <div className="py-4 max-w-6xl mx-auto">
-      <div className="flex">
+      <div className="flex gap-4">
         <FilterPanel
           timeFilters={timeFilters}
           typeFilters={typeFilters}
@@ -178,7 +178,7 @@ const SearchResults = ({
           onReset={resetFilters}
         />
 
-        <div className="w-3/4">
+        <div className="w-3/4 ">
           <ResultsHeader
             from={fromProvince || "Điểm đi"}
             to={toProvince || "Điểm đến"}
@@ -191,7 +191,7 @@ const SearchResults = ({
             sortBy={sortBy}
             onSortChange={handleSortChange}
           />
-          <div className="space-y-4">
+          <div className="space-y-4 min-h-[500px]">
             {filteredResults.length > 0 ? (
               filteredResults.map((trip) => (
                 <TripItem

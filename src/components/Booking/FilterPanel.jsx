@@ -11,41 +11,40 @@ const FilterPanel = ({
   onReset,
 }) => {
   return (
-    <div className="w-1/4 p-6 bg-white rounded-lg shadow mr-4">
+    <div className="w-1/4 p-6 bg-white rounded-lg shadow sticky top-20 h-fit max-h-[calc(100vh-2rem)]">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">BỘ LỌC </h3>
-        <button
-          onClick={onReset}
-          className="text-red-500 mr-2 flex items-center"
-        >
-          <FunnelX />
+        <h3 className="text-lg font-bold text-[#00613d]">BỘ LỌC</h3>
+        <button onClick={onReset} className="text-red-500">
+          <FunnelX className="h-5 w-5" />
         </button>
       </div>
 
-      <FilterSection
-        title="Giờ đi"
-        filters={timeFilters}
-        onChange={(id) => onFilterChange("time", id)}
-        type="checkbox"
-        options={[
-          { id: "morningEarly", label: "Sáng sớm 00:00 - 06:00" },
-          { id: "morning", label: "Buổi sáng 06:00 - 12:00" },
-          { id: "afternoon", label: "Buổi chiều 12:00 - 18:00" },
-          { id: "evening", label: "Buổi tối 18:00 - 24:00" },
-        ]}
-      />
+      <div className="space-y-6 overflow-y-auto">
+        <FilterSection
+          title="Giờ đi"
+          filters={timeFilters}
+          onChange={(id) => onFilterChange("time", id)}
+          type="checkbox"
+          options={[
+            { id: "morningEarly", label: "Sáng sớm 00:00 - 06:00" },
+            { id: "morning", label: "Buổi sáng 06:00 - 12:00" },
+            { id: "afternoon", label: "Buổi chiều 12:00 - 18:00" },
+            { id: "evening", label: "Buổi tối 18:00 - 24:00" },
+          ]}
+        />
 
-      <FilterSection
-        title="Loại xe"
-        filters={typeFilters}
-        onChange={(id) => onFilterChange("type", id)}
-        type="button"
-        options={[
-          { id: "seat", label: "ECONOMY" },
-          { id: "bed", label: "VIP" },
-          { id: "limousine", label: "ROYAL" },
-        ]}
-      />
+        <FilterSection
+          title="Loại xe"
+          filters={typeFilters}
+          onChange={(id) => onFilterChange("type", id)}
+          type="button"
+          options={[
+            { id: "seat", label: "ECONOMY" },
+            { id: "bed", label: "VIP" },
+            { id: "limousine", label: "ROYAL" },
+          ]}
+        />
+      </div>
     </div>
   );
 };
