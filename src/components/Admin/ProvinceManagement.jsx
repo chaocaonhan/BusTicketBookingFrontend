@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import axios from "axios";
 import defaultProvinceImage from "../../assets/defaultProvinImg.jpg";
-import { CirclePlus, Undo2, Trash } from "lucide-react";
+import { CirclePlus, Undo2, Trash, X } from "lucide-react";
 import ConfirmDialog from "../comon/ConfirmDialog";
 
 const ProvinceManagement = () => {
@@ -276,7 +276,7 @@ const ProvinceManagement = () => {
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-400"></div>
         </div>
       ) : error ? (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -393,7 +393,7 @@ const ProvinceManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">
+              <h3 className="text-xl font-semibold text-[#00613d]">
                 Thay đổi ảnh tỉnh thành
               </h3>
               <button
@@ -404,20 +404,7 @@ const ProvinceManagement = () => {
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X className="h-6 w-6" />
               </button>
             </div>
             <div className="space-y-4">
@@ -426,13 +413,13 @@ const ProvinceManagement = () => {
                   type="file"
                   accept="image/*"
                   onChange={onFileChange}
-                  className="mb-4"
+                  className="mb-4 text-orange-400 "
                 />
                 {preview && (
                   <img
                     src={preview}
                     alt="preview"
-                    className="max-w-[300px] rounded-lg mb-4"
+                    className="max-w-[300px] rounded-lg mb-4 "
                   />
                 )}
               </div>
@@ -449,7 +436,7 @@ const ProvinceManagement = () => {
                 </button>
                 <button
                   onClick={onUpload}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-400 rounded-md hover:bg-orange-500"
                 >
                   Tải lên
                 </button>

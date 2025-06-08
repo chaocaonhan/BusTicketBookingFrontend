@@ -266,7 +266,6 @@ const VehiclesManagement = () => {
                       onClick={() => handleDeleteVehicle(vehicle.id)}
                       className="text-red-500"
                     />
-                    <ListCollapse />
                   </td>
                 </tr>
               ))}

@@ -4,6 +4,7 @@ import BusSearch from "../components/comon/BusSearch";
 import PopularRoutes from "../components/comon/PopularRoutes";
 import BusFeatures from "../components/comon/BusFeatures";
 import hotLine from "../assets/hotLine.png";
+import busSearchBG from "../assets/busSearchBG.jpg";
 import { PhoneCall, BusFront, Bus, TramFront } from "lucide-react";
 
 const Home = () => {
@@ -85,8 +86,7 @@ const Home = () => {
         className="w-full grid place-items-center"
         style={{
           minHeight: "500px",
-          backgroundImage:
-            "url('https://cuscoperu.b-cdn.net/wp-content/uploads/2024/08/Carretera.jpg')",
+          backgroundImage: `url(${busSearchBG})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { showSuccess, showError } from "../../utils/toastConfig";
+import ConfirmDialog from "../comon/ConfirmDialog";
 
 const Discount = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -8,6 +9,8 @@ const Discount = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingDiscount, setEditingDiscount] = useState(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [discountToDelete, setDiscountToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     maKhuyenMai: "",
@@ -69,13 +72,20 @@ const Discount = () => {
     setShowModal(true);
   };
 
-  const handleDeleteDiscount = async (id) => {
-    if (!window.confirm("Xác nhận xoá mã khuyến mãi?")) return;
+  const handleDeleteDiscount = (id) => {
+    setDiscountToDelete(id);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteDiscount = async () => {
     try {
-      const res = await fetch(`http://localhost:8081/api/khuyen-mai/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:8081/api/khuyen-mai/${discountToDelete}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const data = await res.json();
       if (data.code === 200) {
@@ -86,6 +96,8 @@ const Discount = () => {
       }
     } catch (err) {
       showError(err.message);
+    } finally {
+      setConfirmDialogOpen(false);
     }
   };
 
@@ -316,6 +328,16 @@ const Discount = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Xác nhận xoá"
+        description="Bạn có chắc chắn muốn xoá mã khuyến mãi này không?"
+        cancelText="Hủy"
+        confirmText="Xóa"
+        onCancel={() => setConfirmDialogOpen(false)}
+        onConfirm={confirmDeleteDiscount}
+      />
     </div>
   );
 };

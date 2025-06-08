@@ -133,7 +133,7 @@ const UserAccount = () => {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to update user data");
+      if (!response.ok) throw new Error("Cập nhật thông tin thất bại");
 
       const data = await response.json();
       if (data.code === 200) {
@@ -141,7 +141,7 @@ const UserAccount = () => {
         setIsEditing(false);
         toast.success(data.message || "Cập nhật thông tin thành công!");
       } else {
-        throw new Error(data.message || "Failed to update user data");
+        throw new Error(data.message || "Cập nhật thông tin thất bại");
       }
     } catch (err) {
       toast.error(err.message || "Có lỗi xảy ra khi cập nhật thông tin");

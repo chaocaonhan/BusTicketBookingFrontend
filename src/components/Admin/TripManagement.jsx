@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { showSuccess, showError } from "../../utils/toastConfig";
+import { useNavigate } from "react-router-dom";
 
 const TripManagement = () => {
   const [trips, setTrips] = useState([]);
@@ -36,7 +37,7 @@ const TripManagement = () => {
     ngayKhoiHanh: "",
     gioKhoiHanh: { hour: 0, minute: 0, second: 0, nano: 0 },
     gioKetThuc: { hour: 0, minute: 0, second: 0, nano: 0 },
-    giaVe: 0,
+    giaVe: "",
   });
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [tripToDelete, setTripToDelete] = useState(null);
@@ -45,6 +46,7 @@ const TripManagement = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
+  const navigate = useNavigate();
 
   const fetchTrips = async (
     page = currentPage,
@@ -87,7 +89,7 @@ const TripManagement = () => {
   };
 
   const handleViewTrip = (trip) => {
-    console.log(trip);
+    navigate(`/admin/trip-details`, { state: { trip } });
   };
 
   const fetchVehicleTypes = async () => {
@@ -194,39 +196,6 @@ const TripManagement = () => {
     }
   };
 
-  const fetchStations = async (provinceName, isStart) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:8081/api/Station/getByProvince?province=${encodeURIComponent(
-          provinceName
-        )}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Không thể lấy danh sách bến xe");
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        if (isStart) {
-          setStartStations(data.result);
-        } else {
-          setEndStations(data.result);
-        }
-      } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách bến xe");
-      }
-    } catch (err) {
-      showError(err.message);
-    }
-  };
-
   useEffect(() => {
     fetchTrips();
     fetchVehicleTypes();
@@ -244,8 +213,6 @@ const TripManagement = () => {
     if (name === "tenTuyen") {
       const selectedRoute = routes.find((route) => route.tenTuyen === value);
       if (selectedRoute) {
-        fetchStations(selectedRoute.tinhDi.tenTinhThanh, true);
-        fetchStations(selectedRoute.tinhDen.tenTinhThanh, false);
         setFormData((prev) => ({
           ...prev,
           tenTuyen: selectedRoute.tenTuyen,
@@ -301,15 +268,6 @@ const TripManagement = () => {
   const handleEditTrip = (trip) => {
     setEditingTrip(trip);
 
-    // Nếu muốn load lại bến xe theo tuyến, có thể tìm tuyến theo tên
-    const selectedRoute = routes.find(
-      (route) => route.tenTuyen === trip.tenTuyen
-    );
-    if (selectedRoute) {
-      fetchStations(selectedRoute.tinhDi.tenTinhThanh, true);
-      fetchStations(selectedRoute.tinhDen.tenTinhThanh, false);
-    }
-
     setFormData({
       tenTuyen: trip.tenTuyen || "",
       bienSoXe: trip.bienSo || "",
@@ -320,7 +278,6 @@ const TripManagement = () => {
       ngayKhoiHanh: formatDateToInput(trip.ngayKhoiHanh),
       gioKhoiHanh: parseTime(trip.gioKhoiHanh),
       gioKetThuc: parseTime(trip.gioKetThuc),
-      taiXe: trip.taiXe || "",
       giaVe: trip.giaVe || 0,
       loaiXe: trip.tenLoaiXe || "",
     });
@@ -351,19 +308,19 @@ const TripManagement = () => {
   );
   const padTime = (num) => num.toString().padStart(2, "0");
 
-  // const handleDriverSelectClick = () => {
-  //   const ngayKhoiHanh = formData.ngayKhoiHanh || "";
-  //   const gioKhoiHanh = `${padTime(formData.gioKhoiHanh.hour)}:${padTime(
-  //     formData.gioKhoiHanh.minute
-  //   )}`;
-  //   if (
-  //     ngayKhoiHanh &&
-  //     formData.gioKhoiHanh.hour !== undefined &&
-  //     formData.gioKhoiHanh.minute !== undefined
-  //   ) {
-  //     fetchDrivers(ngayKhoiHanh, gioKhoiHanh);
-  //   }
-  // };
+  const handleDriverSelectClick = () => {
+    const ngayKhoiHanh = formData.ngayKhoiHanh || "";
+    const gioKhoiHanh = `${padTime(formData.gioKhoiHanh.hour)}:${padTime(
+      formData.gioKhoiHanh.minute
+    )}`;
+    if (
+      ngayKhoiHanh &&
+      formData.gioKhoiHanh.hour !== undefined &&
+      formData.gioKhoiHanh.minute !== undefined
+    ) {
+      fetchDrivers(ngayKhoiHanh, gioKhoiHanh);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -623,7 +580,7 @@ const TripManagement = () => {
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-400"></div>
         </div>
       ) : error ? (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -719,34 +676,46 @@ const TripManagement = () => {
               <div className="grid grid-cols-3 gap-6">
                 <div>
                   <label className="text-sm text-gray-600">Tên tuyến</label>
-                  <select
-                    name="tenTuyen"
-                    value={formData.tenTuyen}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                  >
-                    <option value="">Chọn tuyến xe</option>
-                    {routes.map((route) => (
-                      <option key={route.id} value={route.tenTuyen}>
-                        {route.tenTuyen}
-                      </option>
-                    ))}
-                  </select>
+                  {editingTrip ? (
+                    <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                      {formData.tenTuyen}
+                    </div>
+                  ) : (
+                    <select
+                      name="tenTuyen"
+                      value={formData.tenTuyen}
+                      onChange={handleInputChange}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                      required
+                    >
+                      <option value="">Chọn tuyến xe</option>
+                      {routes.map((route) => (
+                        <option key={route.id} value={route.tenTuyen}>
+                          {route.tenTuyen}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-600">
                     Ngày khởi hành
                   </label>
-                  <input
-                    type="date"
-                    name="ngayKhoiHanh"
-                    value={formData.ngayKhoiHanh}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                  />
+                  {editingTrip ? (
+                    <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                      {formData.ngayKhoiHanh}
+                    </div>
+                  ) : (
+                    <input
+                      type="date"
+                      name="ngayKhoiHanh"
+                      value={formData.ngayKhoiHanh}
+                      onChange={handleInputChange}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                      required
+                    />
+                  )}
                 </div>
 
                 <div>
@@ -785,20 +754,26 @@ const TripManagement = () => {
 
                 <div>
                   <label className="text-sm text-gray-600">Loại xe</label>
-                  <select
-                    name="loaiXe"
-                    value={formData.loaiXe}
-                    onChange={handleInputChange}
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                    required
-                  >
-                    <option value="">Chọn loại xe</option>
-                    {vehicleTypes.map((type) => (
-                      <option key={type.id} value={type.tenLoaiXe}>
-                        {type.tenLoaiXe}
-                      </option>
-                    ))}
-                  </select>
+                  {editingTrip ? (
+                    <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                      {formData.loaiXe}
+                    </div>
+                  ) : (
+                    <select
+                      name="loaiXe"
+                      value={formData.loaiXe}
+                      onChange={handleInputChange}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
+                      required
+                    >
+                      <option value="">Chọn loại xe</option>
+                      {vehicleTypes.map((type) => (
+                        <option key={type.id} value={type.tenLoaiXe}>
+                          {type.tenLoaiXe}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div>
@@ -825,7 +800,7 @@ const TripManagement = () => {
                   <select
                     name="taiXe"
                     value={formData.taiXe}
-                    // onClick={handleDriverSelectClick}
+                    onClick={handleDriverSelectClick}
                     onChange={handleInputChange}
                     className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
                     required
@@ -843,75 +818,26 @@ const TripManagement = () => {
                   <>
                     <div>
                       <label className="text-sm text-gray-600">Điểm đi</label>
-                      <select
-                        name="diemDi"
-                        value={formData.diemDi}
-                        onChange={handleInputChange}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                        required
-                        disabled={!formData.tenTuyen}
-                      >
-                        <option value="">Chọn điểm đi</option>
-                        {startStations.map((station) => (
-                          <option key={station.id} value={station.tenDiemDon}>
-                            {station.tenDiemDon}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                        {formData.diemDi || "—"}
+                      </div>
                     </div>
 
                     <div>
                       <label className="text-sm text-gray-600">Điểm đến</label>
-                      <select
-                        name="diemDen"
-                        value={formData.diemDen}
-                        onChange={handleInputChange}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-orange-400 focus:border-orange-400"
-                        required
-                        disabled={!formData.tenTuyen}
-                      >
-                        <option value="">Chọn điểm đến</option>
-                        {endStations.map((station) => (
-                          <option key={station.id} value={station.tenDiemDon}>
-                            {station.tenDiemDon}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                        {formData.diemDen || "—"}
+                      </div>
                     </div>
 
                     <div>
                       <label className="text-sm text-gray-600">
                         Giờ kết thúc
                       </label>
-                      <div className="flex gap-2">
-                        <Select
-                          options={hourOptions}
-                          placeholder="Giờ"
-                          value={hourOptions.find(
-                            (opt) => opt.value === formData.gioKetThuc.hour
-                          )}
-                          onChange={(selectedOption) =>
-                            handleTimeChange(
-                              { target: { value: selectedOption.value } },
-                              "gioKetThuc",
-                              "hour"
-                            )
-                          }
-                        />
-                        <Select
-                          options={minuteOptions}
-                          placeholder="Phút"
-                          value={minuteOptions.find(
-                            (opt) => opt.value === formData.gioKetThuc.minute
-                          )}
-                          onChange={(selectedOption) =>
-                            handleTimeChange(
-                              { target: { value: selectedOption.value } },
-                              "gioKetThuc",
-                              "minute"
-                            )
-                          }
-                        />
+                      <div className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100 text-gray-800">
+                        {`${formData.gioKetThuc?.hour || "00"}:${
+                          formData.gioKetThuc?.minute || "00"
+                        }`}
                       </div>
                     </div>
 

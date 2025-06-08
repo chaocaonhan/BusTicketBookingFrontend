@@ -1,4 +1,3 @@
-// src/components/Admin/AdminSidebar.jsx
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
@@ -12,6 +11,7 @@ import {
   Bus,
   TextSearch,
   Percent,
+  Diameter,
 } from "lucide-react";
 
 const AdminSidebar = ({ collapsed }) => {
@@ -57,6 +57,12 @@ const AdminSidebar = ({ collapsed }) => {
       title: "Quản lý xe",
       icon: <Bus />,
       path: "/admin/vehicles",
+      submenu: null,
+    },
+    {
+      title: "Quản lý tài xế",
+      icon: <Diameter />,
+      path: "/admin/manage-drivers",
       submenu: null,
     },
     {

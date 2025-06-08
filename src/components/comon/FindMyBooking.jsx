@@ -38,7 +38,6 @@ function FindMyBooking() {
     }
   };
 
-  // Hàm định dạng ngày
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -49,7 +48,7 @@ function FindMyBooking() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-6 ">
+    <div className="container mx-auto px-4 py-8 mt-6 min-h-[calc(100vh-100px)]">
       <div className="max-w-3xl items-center mx-auto">
         <h1 className="text-3xl font-medium text-orange-500 mb-8">
           Kiểm tra thông tin vé
@@ -98,15 +97,13 @@ function FindMyBooking() {
         </form>
       </div>
 
-      {/* Hiển thị lỗi */}
       {error && (
         <div className="mb-6 text-center text-red-500 font-medium">{error}</div>
       )}
 
-      {/* Hiển thị thông tin vé nếu có */}
       {bookingInfo && (
         <div>
-          <section className="w-[80%] mx-auto rounded-lg shadow-lg p-8 mb-8 bg-orange-200">
+          <section className="w-[80%] mx-auto rounded-lg shadow-lg p-8 mb-8 bg-orange-100 text-orange-600">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                 <svg
@@ -125,7 +122,7 @@ function FindMyBooking() {
               </div>
             </div>
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-[#00613d] mb-2">
                 Thông tin vé của bạn
               </h2>
               <p className="text-gray-600">

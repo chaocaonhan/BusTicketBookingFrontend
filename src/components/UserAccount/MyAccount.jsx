@@ -43,7 +43,7 @@ const MyAccount = ({
             <div className="flex gap-2">
               <button
                 onClick={handleSave}
-                className="text-sm bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2"
+                className="text-sm bg-green-100 text-green-800 px-4 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +63,7 @@ const MyAccount = ({
               </button>
               <button
                 onClick={handleCancel}
-                className="text-sm bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition flex items-center gap-2"
+                className="text-sm bg-orange-400 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition flex items-center gap-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -170,8 +170,8 @@ const MyAccount = ({
             <span className="text-gray-500">Liên kết Email</span>
             <div className="flex items-center space-x-2">
               <span className="text-gray-700">{userData.email}</span>
-              <button className="text-sm bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 transition">
-                Thay đổi
+              <button className="text-sm bg-gray-300 text-gray-600 px-3 py-1 rounded cursor-not-allowed">
+                Đã xác nhận
               </button>
             </div>
           </div>
