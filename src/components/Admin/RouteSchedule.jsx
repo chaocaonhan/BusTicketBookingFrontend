@@ -268,7 +268,7 @@ const RouteSchedule = () => {
               <BadgeDollarSign className="w-5 h-5 mr-2" />
               <span className="font-medium">Giá vé</span>
             </div>
-            <p className="text-sm text-gray-600">350.000 VNĐ/người/chiều</p>
+            <p className="text-sm text-gray-600">Chỉ từ 1000đ / 1 km / Người</p>
           </div>
           <div className="bg-white border border-orange-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300 ">
             <div className="flex items-center text-orange-400 mb-2">

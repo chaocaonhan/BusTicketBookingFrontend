@@ -47,7 +47,6 @@ const UserAccount = () => {
   useEffect(() => {
     if (location.pathname === "/user/bookings") {
       setShowTicketHistory(true);
-      fetchOrders();
     }
   }, [location.pathname]);
 
@@ -223,33 +222,6 @@ const UserAccount = () => {
     navigate("/login");
   };
 
-  const fetchOrders = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:8081/api/datve/getMyDonDat",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Không thể lấy danh sách đơn đặt hàng");
-      }
-
-      const data = await response.json();
-      if (data.code === 200) {
-        setOrders(data.result);
-      } else {
-        throw new Error(data.message || "Lỗi khi lấy danh sách đơn đặt hàng");
-      }
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
-
   const handleRowClick = (orderId, event) => {
     if (event.target.closest("button")) {
       return;
@@ -369,12 +341,10 @@ const UserAccount = () => {
     }
   };
 
-  const handleRatingClick = (orderId) => {
+  const handleRatingClick = () => {
     setSelectedOrderId(orderId);
     setShowRatingModal(true);
-    if (orders.find((o) => o.id === orderId)?.daDanhGia) {
-      fetchExistingRating(orderId);
-    }
+    fetchExistingRating(orderId);
   };
 
   const handleCloseRatingModal = () => {
@@ -481,7 +451,6 @@ const UserAccount = () => {
       <div className="flex-1 p-6">
         {showTicketHistory ? (
           <MyBooking
-            orders={orders}
             expandedOrderId={expandedOrderId}
             handleRowClick={handleRowClick}
             handleRatingClick={handleRatingClick}

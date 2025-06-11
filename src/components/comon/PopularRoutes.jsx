@@ -51,21 +51,6 @@ const PopularRoutes = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // const handleBooking = (route) => {
-  //   const today = new Date();
-  //   const tomorrow = new Date(today);
-  //   tomorrow.setDate(tomorrow.getDate() + 1);
-
-  //   const queryParams = new URLSearchParams();
-  //   queryParams.append("departure", route.tinhDi.tenTinhThanh);
-  //   queryParams.append("destination", route.tinhDen.tenTinhThanh);
-  //   queryParams.append("departureDate", formatDate(today));
-  //   queryParams.append("returnDate", "");
-  //   queryParams.append("isReturn", "false");
-
-  //   navigate(`/dat-ve?${queryParams.toString()}`);
-  // };
-
   const handleBooking = async (route) => {
     const today = new Date();
     const formatDate = (date) => {
@@ -164,102 +149,101 @@ const PopularRoutes = () => {
           autoplay={false}
           loop={routes.length > 1}
         >
-          {routes.map((route) => (
-            <SwiperSlide key={route.id}>
-              <Card>
-                {/* ảnh */}
-                <div className="relative h-48 w-full">
-                  <img
-                    src={route.tinhDen.anh1 || "/placeholder.svg"}
-                    alt={`${route.tinhDi.tenTinhThanh} to ${route.tinhDen.tenTinhThanh}`}
-                    className="object-cover w-full h-full"
-                    loading="lazy"
-                  />
-                </div>
+          {routes.map((route) => {
+            const [diemDi, diemDen] = route.tenTuyen.split(" - ");
+            return (
+              <SwiperSlide key={route.id}>
+                <Card>
+                  {/* ảnh */}
+                  <div className="relative h-48 w-full">
+                    <img
+                      src={route.tinhDen.anh1 || "/placeholder.svg"}
+                      alt={`${route.tinhDi.tenTinhThanh} to ${route.tinhDen.tenTinhThanh}`}
+                      className="object-cover w-full h-full"
+                      loading="lazy"
+                    />
+                  </div>
 
-                {/* Thông tin tuyến */}
-                <div>
-                  <div className="flex w-full border-b border-dashed border-orange-200 p-2">
-                    {/* điểm đi - điểm đến */}
-                    <div className="w-1/2 p-2 border-r border-dashed border-orange-500">
-                      <div className="flex flex-col">
-                        <div className="flex-1">
-                          <div className="flex flex-row items-center">
-                            <div className="w-1/3">
-                              <img
-                                src={pickup}
-                                alt="pickup"
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="w-2/3">
-                              {route.tinhDi.tenTinhThanh}
+                  {/* Thông tin tuyến */}
+                  <div>
+                    <div className="flex w-full border-b border-dashed border-orange-200 p-2">
+                      {/* điểm đi - điểm đến */}
+                      <div className="w-1/2 p-2 border-r border-dashed border-orange-500">
+                        <div className="flex flex-col">
+                          <div className="flex-1">
+                            <div className="flex flex-row items-center">
+                              <div className="w-1/3">
+                                <img
+                                  src={pickup}
+                                  alt="pickup"
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="w-2/3">{diemDi}</div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex-1">
-                          <div className="flex flex-row items-center">
-                            <div className="w-1/3 ">
-                              <ArrowDownUp className="w-4 h-8 mx-1 text-gray-400" />
+                          <div className="flex-1">
+                            <div className="flex flex-row items-center">
+                              <div className="w-1/3 ">
+                                <ArrowDownUp className="w-4 h-8 mx-1 text-gray-400" />
+                              </div>
+                              <div className="w-2/3"></div>
                             </div>
-                            <div className="w-2/3"></div>
                           </div>
-                        </div>
 
-                        <div className="flex-1">
-                          <div className="flex flex-row items-center">
-                            <div className="w-1/3">
-                              <img
-                                src={station}
-                                alt="station"
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="w-2/3">
-                              {route.tinhDen.tenTinhThanh}
+                          <div className="flex-1">
+                            <div className="flex flex-row items-center">
+                              <div className="w-1/3">
+                                <img
+                                  src={station}
+                                  alt="station"
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="w-2/3">{diemDen}</div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* giá tiền */}
-                    <div className="w-1/2 pl-2 my-auto">
-                      <p className="w-full font-bold text-orange-400">
-                        Từ{" "}
-                        {(Number(route.khoangCach) * 1000).toLocaleString(
-                          "vi-VN"
-                        )}{" "}
-                        đ
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* thời gian và khoảng cách */}
-                  <div className="pt-2 flex flex-row">
-                    <div className="flex w-2/3 justify-between pl-4 text-lg text-gray-600">
-                      <div className="flex flex-col">
-                        <div className="flex items-center">
-                          <span>Thời gian: {route.thoiGianDiChuyen}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <span>Khoảng cách: {route.khoangCach}km</span>
-                        </div>
+                      {/* giá tiền */}
+                      <div className="w-1/2 pl-2 my-auto">
+                        <p className="w-full font-bold text-orange-400">
+                          Từ{" "}
+                          {(Number(route.khoangCach) * 1000).toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          đ
+                        </p>
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleBooking(route)}
-                      className="flex w-1/3 bg-orange-300 ml-auto self-end h-full hover:bg-orange-400 text-center py-2 px-4 transition-colors"
-                    >
-                      Đặt vé
-                    </button>
+                    {/* thời gian và khoảng cách */}
+                    <div className="pt-2 flex flex-row">
+                      <div className="flex w-2/3 justify-between pl-4 text-lg text-gray-600">
+                        <div className="flex flex-col">
+                          <div className="flex items-center">
+                            <span>Thời gian: {route.thoiGianDiChuyen}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span>Khoảng cách: {route.khoangCach}km</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleBooking(route)}
+                        className="flex w-1/3 bg-orange-300 ml-auto self-end h-full hover:bg-orange-400 text-center py-2 px-4 transition-colors"
+                      >
+                        Đặt vé
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </SwiperSlide>
-          ))}
+                </Card>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
 
         <div className="custom-swiper-button-next absolute -right-20 top-1/2 -translate-y-1/2 z-10 text-orange-500 text-4xl cursor-pointer p-3  transition">

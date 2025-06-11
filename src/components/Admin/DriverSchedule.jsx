@@ -202,7 +202,7 @@ export default function DriverSchedule() {
                       {daySchedule.map((schedule) => (
                         <div
                           key={schedule.id}
-                          className="p-2 border border-gray-100 rounded bg-gray-50 hover:bg-gray-100 transition-colors"
+                          className="p-2 border border-orange-300 rounded bg-gray-50 hover:bg-gray-100 transition-colors"
                         >
                           <div className="flex items-center gap-1 mb-1">
                             <Clock className="w-3 h-3 text-orange-400 flex-shrink-0" />

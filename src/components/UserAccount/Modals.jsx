@@ -170,8 +170,7 @@ export const ImageModal = ({
 export const RatingModal = ({
   showRatingModal,
   handleCloseRatingModal,
-  selectedOrderId,
-  orders,
+  order,
   rating,
   setRating,
   comment,
@@ -179,16 +178,18 @@ export const RatingModal = ({
   existingRating,
   handleRatingSubmit,
 }) => {
-  if (!showRatingModal) return null;
+  if (!showRatingModal || !order) return null;
+
+  const isReadonly = order.daDanhGia;
+  const displayRating = isReadonly ? existingRating?.soSao : rating;
+  const displayComment = isReadonly ? existingRating?.noiDung || "" : comment;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            {orders.find((o) => o.id === selectedOrderId)?.daDanhGia
-              ? "Đánh giá của bạn"
-              : "Đánh giá chuyến đi"}
+            {isReadonly ? "Đánh giá của bạn" : "Đánh giá chuyến đi"}
           </h3>
           <button
             onClick={handleCloseRatingModal}
@@ -215,19 +216,10 @@ export const RatingModal = ({
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
-                onClick={() =>
-                  !orders.find((o) => o.id === selectedOrderId)?.daDanhGia &&
-                  setRating(star)
-                }
+                onClick={() => !isReadonly && setRating(star)}
                 className={`text-3xl ${
-                  star <= (existingRating?.soSao || rating)
-                    ? "text-yellow-400"
-                    : "text-gray-300"
-                } ${
-                  !orders.find((o) => o.id === selectedOrderId)?.daDanhGia
-                    ? "hover:text-yellow-400"
-                    : ""
-                }`}
+                  star <= displayRating ? "text-yellow-400" : "text-gray-300"
+                } ${!isReadonly ? "hover:text-yellow-400" : ""}`}
               >
                 ★
               </button>
@@ -237,14 +229,11 @@ export const RatingModal = ({
             className="w-full p-3 border border-gray-200 rounded-md text-sm"
             placeholder="Nhập đánh giá của bạn..."
             rows={4}
-            value={existingRating?.noiDung || comment}
-            onChange={(e) =>
-              !orders.find((o) => o.id === selectedOrderId)?.daDanhGia &&
-              setComment(e.target.value)
-            }
-            disabled={orders.find((o) => o.id === selectedOrderId)?.daDanhGia}
+            value={displayComment}
+            onChange={(e) => !isReadonly && setComment(e.target.value)}
+            disabled={isReadonly}
           />
-          {!orders.find((o) => o.id === selectedOrderId)?.daDanhGia && (
+          {!isReadonly && (
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleCloseRatingModal}
@@ -253,7 +242,7 @@ export const RatingModal = ({
                 Hủy
               </button>
               <button
-                onClick={() => handleRatingSubmit(selectedOrderId)}
+                onClick={() => handleRatingSubmit(order.id)}
                 className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600"
               >
                 Gửi đánh giá

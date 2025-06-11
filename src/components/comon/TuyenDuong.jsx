@@ -39,34 +39,62 @@ const TuyenDuong = () => {
     }
   };
 
-  const handleStartFilter = (event) => {
+  const handleFilter = (event) => {
     const value = event.target.value.toLowerCase();
     setRecords(
-      data.filter((row) =>
-        row.tinhDi.tenTinhThanh.toLowerCase().includes(value)
-      )
+      data.filter((row) => row.tenTuyen.toLowerCase().includes(value))
     );
   };
 
-  const handleEndFilter = (event) => {
-    const value = event.target.value.toLowerCase();
-    setRecords(
-      data.filter((row) =>
-        row.tinhDen.tenTinhThanh.toLowerCase().includes(value)
-      )
-    );
-  };
-
-  const handleSearchRouteClick = (route) => {
+  const handleBooking = async (route) => {
     const today = new Date();
-    const queryParams = new URLSearchParams();
-    queryParams.append("departure", route.tinhDi.tenTinhThanh);
-    queryParams.append("destination", route.tinhDen.tenTinhThanh);
-    queryParams.append("departureDate", formatDate(today));
-    queryParams.append("returnDate", "");
-    queryParams.append("isReturn", "false");
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
 
-    navigate(`/dat-ve?${queryParams.toString()}`);
+    const token = localStorage.getItem("token");
+
+    try {
+      const resStops = await fetch(
+        `http://localhost:8081/api/diem-dung/tuyen/${route.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await resStops.json();
+
+      if (data.code === 200 && Array.isArray(data.result)) {
+        const stops = data.result;
+
+        if (stops.length < 2) {
+          console.error("Không đủ điểm dừng để tạo chuyến.");
+          return;
+        }
+
+        const firstStop = stops[0];
+        const lastStop = stops[stops.length - 1];
+
+        const queryParams = new URLSearchParams();
+        queryParams.append("departure", firstStop.tenDiemDon);
+        queryParams.append("destination", lastStop.tenDiemDon);
+        queryParams.append("departureDate", formatDate(today));
+        queryParams.append("returnDate", "");
+        queryParams.append("isReturn", "false");
+        queryParams.append("from", firstStop.idDiemDonTra);
+        queryParams.append("to", lastStop.idDiemDonTra);
+
+        navigate(`/dat-ve?${queryParams.toString()}`);
+      } else {
+        console.error("Không lấy được danh sách điểm dừng.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API điểm dừng:", error);
+    }
   };
 
   const handleViewScheduleClick = (route) => {
@@ -82,15 +110,9 @@ const TuyenDuong = () => {
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <input
             type="text"
-            onChange={handleStartFilter}
+            onChange={handleFilter}
             placeholder="Tìm kiếm điểm đi"
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-          />
-          <input
-            type="text"
-            onChange={handleEndFilter}
-            placeholder="Tìm kiếm điểm đến"
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="border border-gray-300 rounded-lg px-4 py-2 w-full  focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
         <div className="border-b mb-4"></div>
@@ -140,7 +162,7 @@ const TuyenDuong = () => {
                       <div className="flex flex-row justify-center gap-2">
                         <button
                           className="px-3 py-2 rounded-lg text-white bg-orange-400 font-semibold hover:bg-orange-500 transition-colors text-sm"
-                          onClick={() => handleSearchRouteClick(row)}
+                          onClick={() => handleBooking(row)}
                         >
                           Tìm tuyến xe
                         </button>
