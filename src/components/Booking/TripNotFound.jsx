@@ -1,4 +1,5 @@
 import React from "react";
+import busGoing from "../../assets/busGoing.png";
 
 const TripNotFound = () => {
   return (
@@ -13,11 +14,7 @@ const TripNotFound = () => {
         <div className="flex items-center gap-2"></div>
       </div>
       <div className="flex justify-center">
-        <img
-          src="https://static.vexere.com/webnx/prod/img/route-no-schedule-2.png"
-          alt=""
-          className="max-w-xs w-full"
-        />
+        <img src={busGoing} alt="" className="max-w-xs w-full" />
       </div>
     </div>
   );

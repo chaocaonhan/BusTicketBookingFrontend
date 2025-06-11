@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BusSearch from "@/components/comon/BusSearch";
 import SearchResults from "../components/Booking/SearchResults";
-import { toast } from "react-toastify";
 import TripNotFound from "@/components/Booking/TripNotFound";
+import { showSuccess, showError } from "../utils/toastConfig";
+import busSearchBG from "../assets/busSearchBG.jpg";
 
 const BookingPage = () => {
   const location = useLocation();
@@ -126,10 +127,7 @@ const BookingPage = () => {
         setSearchResults(data);
       } catch (error) {
         console.error("Lỗi API:", error);
-        toast.error("Không thể tải dữ liệu chuyến xe", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        showError("Không thể tải dữ liệu chuyến xe");
         setSearchResults([]);
       } finally {
         setLoading(false);
@@ -152,8 +150,7 @@ const BookingPage = () => {
         className="w-full grid place-items-center"
         style={{
           minHeight: "500px",
-          backgroundImage:
-            "url('https://cuscoperu.b-cdn.net/wp-content/uploads/2024/08/Carretera.jpg')",
+          backgroundImage: `url(${busSearchBG})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

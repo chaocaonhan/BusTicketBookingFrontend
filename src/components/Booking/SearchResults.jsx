@@ -1,4 +1,3 @@
-// SearchResults.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import FilterPanel from "./FilterPanel";
 import ResultsHeader from "./ResultsHeader";
@@ -208,9 +207,6 @@ const SearchResults = ({
             ) : (
               <>
                 <TripNotFound />
-                <p className="text-orange-500 font-bold text-right ">
-                  Tiếp tục đặt vé một chiều
-                </p>
               </>
             )}
           </div>

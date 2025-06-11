@@ -10,8 +10,19 @@ export const toastConfig = {
   theme: "colored",
 };
 
-// Truyền toastConfig vào các hàm toast
-export const showSuccess = (message) => toast.success(message, toastConfig);
-export const showError = (message) => toast.error(message, toastConfig);
-export const showInfo = (message) => toast.info(message, toastConfig);
-export const showWarning = (message) => toast.warning(message, toastConfig);
+let canShowToast = true;
+
+const showToast = (type, message) => {
+  if (canShowToast) {
+    canShowToast = false;
+    toast[type](message, toastConfig);
+    setTimeout(() => {
+      canShowToast = true;
+    }, 5000);
+  }
+};
+
+export const showSuccess = (message) => showToast("success", message);
+export const showError = (message) => showToast("error", message);
+export const showInfo = (message) => showToast("info", message);
+export const showWarning = (message) => showToast("warning", message);

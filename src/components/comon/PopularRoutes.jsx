@@ -51,19 +51,70 @@ const PopularRoutes = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const handleBooking = (route) => {
+  // const handleBooking = (route) => {
+  //   const today = new Date();
+  //   const tomorrow = new Date(today);
+  //   tomorrow.setDate(tomorrow.getDate() + 1);
+
+  //   const queryParams = new URLSearchParams();
+  //   queryParams.append("departure", route.tinhDi.tenTinhThanh);
+  //   queryParams.append("destination", route.tinhDen.tenTinhThanh);
+  //   queryParams.append("departureDate", formatDate(today));
+  //   queryParams.append("returnDate", "");
+  //   queryParams.append("isReturn", "false");
+
+  //   navigate(`/dat-ve?${queryParams.toString()}`);
+  // };
+
+  const handleBooking = async (route) => {
     const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
 
-    const queryParams = new URLSearchParams();
-    queryParams.append("departure", route.tinhDi.tenTinhThanh);
-    queryParams.append("destination", route.tinhDen.tenTinhThanh);
-    queryParams.append("departureDate", formatDate(today));
-    queryParams.append("returnDate", "");
-    queryParams.append("isReturn", "false");
+    const token = localStorage.getItem("token");
 
-    navigate(`/dat-ve?${queryParams.toString()}`);
+    try {
+      const resStops = await fetch(
+        `http://localhost:8081/api/diem-dung/tuyen/${route.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await resStops.json();
+
+      if (data.code === 200 && Array.isArray(data.result)) {
+        const stops = data.result;
+
+        if (stops.length < 2) {
+          console.error("Không đủ điểm dừng để tạo chuyến.");
+          return;
+        }
+
+        const firstStop = stops[0];
+        const lastStop = stops[stops.length - 1];
+
+        const queryParams = new URLSearchParams();
+        queryParams.append("departure", firstStop.tenDiemDon);
+        queryParams.append("destination", lastStop.tenDiemDon);
+        queryParams.append("departureDate", formatDate(today));
+        queryParams.append("returnDate", "");
+        queryParams.append("isReturn", "false");
+        queryParams.append("from", firstStop.idDiemDonTra);
+        queryParams.append("to", lastStop.idDiemDonTra);
+
+        navigate(`/dat-ve?${queryParams.toString()}`);
+      } else {
+        console.error("Không lấy được danh sách điểm dừng.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API điểm dừng:", error);
+    }
   };
 
   if (loading) {

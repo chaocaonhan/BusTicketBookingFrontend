@@ -1,6 +1,8 @@
 // components/FilterPanel.jsx
 import React from "react";
 import { FunnelX } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const FilterPanel = ({
   timeFilters,
@@ -59,15 +61,15 @@ const FilterSection = ({ title, filters, onChange, type, options }) => (
     >
       {options.map(({ id, label }) =>
         type === "checkbox" ? (
-          <label key={id} className="flex items-center">
-            <input
-              type="checkbox"
+          <div key={id} className="flex items-center">
+            <Checkbox
+              id={id}
               checked={filters[id]}
-              onChange={() => onChange(id)}
+              onCheckedChange={() => onChange(id)}
               className="mr-2"
             />
-            {label}
-          </label>
+            <Label htmlFor={id}>{label}</Label>
+          </div>
         ) : (
           <button
             key={id}

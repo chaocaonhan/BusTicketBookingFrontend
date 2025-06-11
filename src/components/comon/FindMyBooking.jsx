@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import axios from "axios";
-import OrderTickets from "../Admin/OrderTickets"; // Thêm dòng này ở đầu file
+import OrderTickets from "../Admin/OrderTickets";
+import search1 from "../../assets/search1.jpg";
+import search2 from "../../assets/search2.png";
 
 function FindMyBooking() {
   const [ticketCode, setTicketCode] = useState("");
@@ -32,7 +34,7 @@ function FindMyBooking() {
         );
       }
     } catch (err) {
-      setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
+      setError("Mã vé hoặc số điện thoại không hợp lệ.");
     } finally {
       setLoading(false);
     }
@@ -191,14 +193,14 @@ function FindMyBooking() {
 
       {/* Hướng dẫn sử dụng */}
       {!bookingInfo && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 w-[60%] mx-auto">
           <div className="text-center">
             <h2 className="text-xl font-medium text-gray-700 mb-4">
               Bước 1. Nhập thông tin vé
             </h2>
             <div className="bg-gray-50 p-4 rounded-lg flex justify-center">
               <img
-                src="https://static.vecteezy.com/system/resources/previews/013/220/410/non_2x/men-and-woman-of-multiracial-team-search-vacancy-with-binoculars-magnifying-glass-diverse-people-looking-finding-new-work-opportunities-vacancies-employment-career-strategy-concept-job-search-vector.jpg"
+                src={search1}
                 alt="Step 1: Enter ticket information"
                 className="object-contain h-64"
               />
@@ -211,7 +213,7 @@ function FindMyBooking() {
             </h2>
             <div className="bg-gray-50 p-4 rounded-lg flex justify-center">
               <img
-                src="https://dataspace.com/wp-content/uploads/2023/11/find-data-jobs-1.png"
+                src={search2}
                 alt="Step 2: Check ticket"
                 className="object-contain h-64"
               />

@@ -7,6 +7,8 @@ import {
   CheckCircle,
   ChevronRight,
 } from "lucide-react";
+import busSearchBG from "../assets/busSearchBG.jpg";
+import noiThat1 from "../assets/noiThat1.jpg";
 
 const AboutUsPage = () => {
   const steps = [
@@ -41,7 +43,7 @@ const AboutUsPage = () => {
       <section className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 py-6">
         <div className="flex-1 flex justify-start">
           <img
-            src="https://cuscoperu.b-cdn.net/wp-content/uploads/2024/08/Carretera.jpg"
+            src={busSearchBG}
             alt="Travel"
             className="max-w-full h-auto rounded-xl"
           />
@@ -100,7 +102,7 @@ const AboutUsPage = () => {
         </div>
         <div className="flex-1 pl-0 md:pl-8">
           <img
-            src="https://xesaoviet.com.vn/wp-content/uploads/2023/12/309982979_2492975140852544_2305745788631018570_n-scaled-1.jpg"
+            src={noiThat1}
             alt="Travel"
             className="max-w-full h-auto rounded-xl"
           />
@@ -135,14 +137,12 @@ const AboutUsPage = () => {
                   </div>
                 </div>
 
-                {/* Arrow (hidden on last item) */}
                 {index < steps.length - 1 && (
                   <div className="hidden lg:flex items-center justify-center mx-4">
                     <ChevronRight className="w-6 h-6 text-gray-400" />
                   </div>
                 )}
 
-                {/* Mobile Arrow (hidden on last item) */}
                 {index < steps.length - 1 && (
                   <div className="lg:hidden flex items-center justify-center my-4 rotate-90">
                     <ChevronRight className="w-6 h-6 text-gray-400" />
@@ -154,7 +154,6 @@ const AboutUsPage = () => {
         </div>
       </div>
 
-      {/* css below */}
       <div className="pt-8 pl-10 w-[80%] text-xl">
         <h2 className="text-3xl font-bold text-[#2d7768] mb-4 text-left">
           Những tiện ích khi chọn dịch vụ vận chuyển hành khách xe Sao Việt
