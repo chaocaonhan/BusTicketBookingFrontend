@@ -4,12 +4,6 @@ import OrderTickets from "../Admin/OrderTickets";
 import Paid from "../../assets/Paid.png";
 import { MessageCircleMore } from "lucide-react";
 import ConfirmDialog from "../comon/ConfirmDialog";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from "@/components/ui/pagination";
 
 // Inject current time for testability
 const isWithin10Minutes = (dateString, now = new Date()) => {
@@ -226,7 +220,8 @@ const MyBooking = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRatingClick(order.id);
+                            console.log("Order clicked:", order); // Debugging log
+                            handleRatingClick(order);
                           }}
                           className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors"
                           aria-label={

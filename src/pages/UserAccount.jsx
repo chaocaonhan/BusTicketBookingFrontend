@@ -20,7 +20,7 @@ const UserAccount = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showTicketHistory, setShowTicketHistory] = useState(false);
-  const [orders, setOrders] = useState([]);
+  const [order, setOrder] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [formData, setFormData] = useState({
     hoTen: "",
@@ -307,7 +307,6 @@ const UserAccount = () => {
         setShowRatingModal(false);
         setRating(0);
         setComment("");
-        fetchOrders();
       } else {
         throw new Error(data.message || "Lỗi khi gửi đánh giá");
       }
@@ -316,11 +315,11 @@ const UserAccount = () => {
     }
   };
 
-  const fetchExistingRating = async (orderId) => {
+  const fetchExistingRating = async (order) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:8081/api/danhGia/getByIdDonDat/${orderId}`,
+        `http://localhost:8081/api/danhGia/getByIdDonDat/${order.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -341,10 +340,12 @@ const UserAccount = () => {
     }
   };
 
-  const handleRatingClick = () => {
-    setSelectedOrderId(orderId);
+  const handleRatingClick = (order) => {
+    console.log("Order clicked for rating:", order);
+    setOrder(order);
     setShowRatingModal(true);
-    fetchExistingRating(orderId);
+    console.log("showRatingModal set to true");
+    fetchExistingRating(order);
   };
 
   const handleCloseRatingModal = () => {
@@ -374,7 +375,6 @@ const UserAccount = () => {
       }
 
       toast.success("Hủy đơn hàng thành công!");
-      fetchOrders();
     } catch (err) {
       toast.error(err.message || "Có lỗi xảy ra khi hủy đơn hàng");
     }
@@ -390,7 +390,6 @@ const UserAccount = () => {
       handleLogout();
     } else if (item === "Lịch sử mua vé") {
       setShowTicketHistory(true);
-      fetchOrders();
     }
   };
 
@@ -491,8 +490,7 @@ const UserAccount = () => {
       <RatingModal
         showRatingModal={showRatingModal}
         handleCloseRatingModal={handleCloseRatingModal}
-        selectedOrderId={selectedOrderId}
-        orders={orders}
+        order={order}
         rating={rating}
         setRating={setRating}
         comment={comment}
