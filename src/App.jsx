@@ -18,7 +18,6 @@ import Login from "./components/Auth/Login";
 import Unauthorized from "./components/comon/Unauthorized";
 
 // Pages - Admin
-import Dashboard from "./components/Admin/Dashboard";
 import RoutesManagement from "./components/Admin/RoutesManagement";
 import UsersManagement from "./components/Admin/UsersManagement";
 import ProvinceManagement from "./components/Admin/ProvinceManagement";

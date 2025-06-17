@@ -49,6 +49,7 @@ const SearchResults = ({
     [results, returnDate]
   );
 
+  //hiển thị chuyến đi hoặc chuyến về tuỳ vào active tab
   const tripsToShow = useMemo(
     () =>
       isReturn
@@ -59,7 +60,6 @@ const SearchResults = ({
     [isReturn, activeTab, outboundTrips, returnTrips]
   );
 
-  // Reset openSeatMapId when switching tabs
   useEffect(() => {
     setOpenSeatMapId(null);
   }, [activeTab]);

@@ -194,11 +194,8 @@ const TripItem = ({
       </div>
       <div className="ml-auto flex space-x-4">
         <button
-          className={`font-medium px-6 py-2 rounded-lg ${
-            selectedSeats.length > 0
-              ? "bg-orange-100 text-orange-500"
-              : "bg-orange-500 text-white"
-          }`}
+          className="font-medium px-6 py-2 rounded-lg bg-orange-100 text-orange-500"
+          onClick={handleShowSeatMap}
         >
           Chọn chuyến
         </button>
@@ -286,17 +283,16 @@ const TripItem = ({
               <div>
                 <h4 className="font-medium mb-2">Chính sách hủy vé:</h4>
                 <ul className="list-disc list-inside text-gray-600">
-                  <li>Hủy trước 24h: Hoàn tiền 100%</li>
-                  <li>Hủy trước 12h: Hoàn tiền 50%</li>
-                  <li>Hủy sau 12h: Không hoàn tiền</li>
+                  <li>Hủy trước 6h: Hoàn tiền 100%</li>
+                  <li>Hủy sau 6h: Không hoàn tiền</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-medium mb-2">Chính sách đổi vé:</h4>
+                <h4 className="font-medium mb-2">Chính sách khác</h4>
                 <ul className="list-disc list-inside text-gray-600">
-                  <li>Đổi vé trước 24h: Miễn phí</li>
-                  <li>Đổi vé trước 12h: Phí 10% giá vé</li>
-                  <li>Đổi vé sau 12h: Phí 20% giá vé</li>
+                  <li>Không được mang đồ ăn có mùi lên xe</li>
+                  <li>Không tự ý đổi chỗ</li>
+                  <li>Hành lý không quá 30kg</li>
                 </ul>
               </div>
             </div>

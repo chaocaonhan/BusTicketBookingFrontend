@@ -30,19 +30,16 @@ const BookingDetail = () => {
   const [userId, setUserId] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
 
-  // Enhanced pickup/dropoff state management
   const [outboundPickupPoints, setOutboundPickupPoints] = useState([]);
   const [outboundDropoffPoints, setOutboundDropoffPoints] = useState([]);
   const [selectedOutboundPickup, setSelectedOutboundPickup] = useState("");
   const [selectedOutboundDropoff, setSelectedOutboundDropoff] = useState("");
 
-  // Return trip pickup/dropoff points (if applicable)
   const [returnPickupPoints, setReturnPickupPoints] = useState([]);
   const [returnDropoffPoints, setReturnDropoffPoints] = useState([]);
   const [selectedReturnPickup, setSelectedReturnPickup] = useState("");
   const [selectedReturnDropoff, setSelectedReturnDropoff] = useState("");
 
-  // Lấy thông tin người dùng khi component được khởi tạo
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("token");
@@ -79,14 +76,12 @@ const BookingDetail = () => {
     fetchUserInfo();
   }, []);
 
-  // Lấy điểm đón/trả cho lượt đi
   useEffect(() => {
     if (outboundTrip?.id) {
       fetchTripPoints(outboundTrip.id, "outbound");
     }
   }, [outboundTrip?.id]);
 
-  // Lấy điểm đón/trả cho lượt về
   useEffect(() => {
     if (isReturn && returnTrip?.id) {
       fetchTripPoints(returnTrip.id, "return");

@@ -111,8 +111,8 @@ const BookingPage = () => {
 
       try {
         const apiUrl = new URL("http://localhost:8081/api/chuyenxe/search");
-        apiUrl.searchParams.append("idDiemDi", searchParams.from); // Sử dụng from thay vì departure
-        apiUrl.searchParams.append("idDiemDen", searchParams.to); // Sử dụng to thay vì destination
+        apiUrl.searchParams.append("idDiemDi", searchParams.from);
+        apiUrl.searchParams.append("idDiemDen", searchParams.to);
         apiUrl.searchParams.append("ngayDi", searchParams.departureDate);
         apiUrl.searchParams.append("ngayVe", searchParams.returnDate);
         apiUrl.searchParams.append("khuHoi", searchParams.isReturn);

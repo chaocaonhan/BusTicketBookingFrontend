@@ -373,13 +373,13 @@ const RouteScheduleEdit = () => {
     setActiveId(null);
     setShowTrashBin(false);
 
-    // If dropped on trash bin, delete the item
+    // thả vào thùng rác - xoá
     if (over && over.id === "trash-bin") {
       setStops((stops) => stops.filter((stop) => stop.id !== active.id));
       return;
     }
 
-    // Otherwise handle normal reordering
+    // thả vào vị trí khác thì sắp xếp lại
     if (active.id !== over?.id) {
       setStops((stops) => {
         const oldIndex = stops.findIndex((stop) => stop.id === active.id);
@@ -390,7 +390,7 @@ const RouteScheduleEdit = () => {
           console.log(`Thứ tự: ${idx + 1}, idDiemDonTra: ${stop.idDiemDonTra}`);
         });
 
-        return newStops; // chỉ gọi arrayMove 1 lần
+        return newStops;
       });
     }
   };
